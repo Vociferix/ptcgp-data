@@ -1,0 +1,36 @@
+{
+  "id": 801,
+  "name": "Ferrothorn",
+  "card_type": "pokemon",
+  "natdex_number": 598,
+  "element": "Metal",
+  "stage": "Stage 1",
+  "hp": 110,
+  "retreat_cost": 3,
+  "weakness": "Fire",
+  "flavor": "This Pokémon scrapes its spikes across rocks, and then uses the tips of its feelers to absorb the nutrients it finds within the stone.",
+  "is_ex": false,
+  "is_mega": false,
+  "ability": {
+    "name": "Steel Spikes",
+    "effect": "If this Pokémon is in the Active Spot and is damaged by an attack from your opponent's Pokémon, do 20 damage to the Attacking Pokémon."
+  },
+  "attacks": [
+    {
+      "name": "Spinning Attack",
+      "cost": [
+        "Metal",
+        "Metal",
+        "Colorless"
+      ],
+      "damage": 70
+    }
+  ],
+  "evolves_from": "Ferroseed",
+  "versions": [
+    {
+      "set": "A3a",
+      "number": 52
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "id": 1824,
+  "name": "Sandaconda",
+  "card_type": "pokemon",
+  "natdex_number": 844,
+  "element": "Fighting",
+  "stage": "Stage 1",
+  "hp": 130,
+  "retreat_cost": 3,
+  "weakness": "Grass",
+  "flavor": "The sand it spews contains sharp, pointy gravel, which is actually just sand that Sandaconda’s saliva has hardened into irregular shapes.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Super Sand Attack",
+      "cost": [
+        "Fighting",
+        "Fighting",
+        "Colorless"
+      ],
+      "damage": 70,
+      "effect": "During your opponent's next turn, if the Defending Pokémon tries to use an attack, your opponent flips a coin. If tails, that attack doesn't happen."
+    }
+  ],
+  "evolves_from": "Silicobra",
+  "versions": [
+    {
+      "set": "B3",
+      "number": 96
+    }
+  ]
+}

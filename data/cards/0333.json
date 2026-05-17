@@ -1,0 +1,30 @@
+{
+  "id": 333,
+  "name": "Finneon",
+  "card_type": "pokemon",
+  "natdex_number": 456,
+  "element": "Water",
+  "stage": "Basic",
+  "hp": 50,
+  "retreat_cost": 1,
+  "weakness": "Lightning",
+  "flavor": "The line running down its side can store sunlight. It shines vividly at night.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Elegant Swim",
+      "cost": [
+        "Water"
+      ],
+      "damage": 10,
+      "effect": "Flip a coin. If heads, during your opponent's next turn, prevent all damage from—and effects of—attacks done to this Pokémon."
+    }
+  ],
+  "versions": [
+    {
+      "set": "A2",
+      "number": 42
+    }
+  ]
+}

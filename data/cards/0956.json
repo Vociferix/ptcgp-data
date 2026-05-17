@@ -1,0 +1,37 @@
+{
+  "id": 956,
+  "name": "Ampharos",
+  "card_type": "pokemon",
+  "natdex_number": 181,
+  "element": "Lightning",
+  "stage": "Stage 2",
+  "hp": 150,
+  "retreat_cost": 2,
+  "weakness": "Fighting",
+  "flavor": "The bright light on its tail can be seen far away. It has been treasured since ancient times as a beacon.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Thunder Punch",
+      "cost": [
+        "Lightning",
+        "Lightning"
+      ],
+      "damage": 80,
+      "damage_suffix": "+",
+      "effect": "Flip a coin. If heads, this attack does 40 more damage. If tails, this Pokémon also does 20 damage to itself."
+    }
+  ],
+  "evolves_from": "Flaaffy",
+  "versions": [
+    {
+      "set": "A4",
+      "number": 69
+    },
+    {
+      "set": "A4",
+      "number": 172
+    }
+  ]
+}

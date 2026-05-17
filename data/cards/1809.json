@@ -1,0 +1,40 @@
+{
+  "id": 1809,
+  "name": "Mega Lucario ex",
+  "card_type": "pokemon",
+  "natdex_number": 448,
+  "element": "Fighting",
+  "stage": "Stage 1",
+  "hp": 190,
+  "retreat_cost": 1,
+  "weakness": "Psychic",
+  "is_ex": true,
+  "is_mega": true,
+  "attacks": [
+    {
+      "name": "Fighting Pulse",
+      "cost": [
+        "Fighting",
+        "Fighting"
+      ],
+      "damage": 90,
+      "damage_suffix": "+",
+      "effect": "If this Pokémon has at least 1 extra [F] Energy attached, this attack does 50 more damage."
+    }
+  ],
+  "evolves_from": "Riolu",
+  "versions": [
+    {
+      "set": "B3",
+      "number": 81
+    },
+    {
+      "set": "B3",
+      "number": 184
+    },
+    {
+      "set": "B3",
+      "number": 204
+    }
+  ]
+}

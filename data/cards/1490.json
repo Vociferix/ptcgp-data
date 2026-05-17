@@ -1,0 +1,35 @@
+{
+  "id": 1490,
+  "name": "Sandshrew",
+  "card_type": "pokemon",
+  "natdex_number": 27,
+  "element": "Fighting",
+  "stage": "Basic",
+  "hp": 60,
+  "retreat_cost": 1,
+  "weakness": "Grass",
+  "flavor": "No matter how high a place it falls from, this Pokémon can save itself by rolling into a ball and bouncing.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Double Scratch",
+      "cost": [
+        "Fighting"
+      ],
+      "damage": 20,
+      "damage_suffix": "x",
+      "effect": "Flip 2 coins. This attack does 20 damage for each heads."
+    }
+  ],
+  "versions": [
+    {
+      "set": "B2",
+      "number": 77
+    },
+    {
+      "set": "B2",
+      "number": 170
+    }
+  ]
+}

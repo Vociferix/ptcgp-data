@@ -1,0 +1,33 @@
+{
+  "id": 1256,
+  "name": "Golurk",
+  "card_type": "pokemon",
+  "natdex_number": 623,
+  "element": "Fighting",
+  "stage": "Stage 1",
+  "hp": 130,
+  "retreat_cost": 3,
+  "weakness": "Grass",
+  "flavor": "There’s a theory that inside Golurk is a perpetual motion machine that produces limitless energy, but this belief hasn’t been proven.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Heavy Rocket",
+      "cost": [
+        "Fighting",
+        "Fighting"
+      ],
+      "damage": 60,
+      "damage_suffix": "x",
+      "effect": "Reveal the top 3 cards of your deck. This attack does 60 damage for each Pokémon with a Retreat Cost of 3 or more you find there. Shuffle the revealed cards back into your deck."
+    }
+  ],
+  "evolves_from": "Golett",
+  "versions": [
+    {
+      "set": "B1",
+      "number": 136
+    }
+  ]
+}

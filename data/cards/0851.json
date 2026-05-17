@@ -1,0 +1,37 @@
+{
+  "id": 851,
+  "name": "Sylveon",
+  "card_type": "pokemon",
+  "natdex_number": 700,
+  "element": "Psychic",
+  "stage": "Stage 1",
+  "hp": 90,
+  "retreat_cost": 1,
+  "weakness": "Metal",
+  "flavor": "This Pokémon uses its ribbonlike feelers to send a soothing aura into its opponents, erasing their hostility.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Evoharmony",
+      "cost": [
+        "Psychic",
+        "Colorless"
+      ],
+      "damage": 40,
+      "damage_suffix": "+",
+      "effect": "This attack does 30 more damage for each Evolution Pokémon on your Bench."
+    }
+  ],
+  "evolves_from": "Eevee",
+  "versions": [
+    {
+      "set": "A3b",
+      "number": 33
+    },
+    {
+      "set": "A3b",
+      "number": 76
+    }
+  ]
+}

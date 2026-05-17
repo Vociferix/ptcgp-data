@@ -1,0 +1,33 @@
+{
+  "id": 1320,
+  "name": "Watchog",
+  "card_type": "pokemon",
+  "natdex_number": 505,
+  "element": "Colorless",
+  "stage": "Stage 1",
+  "hp": 100,
+  "retreat_cost": 1,
+  "weakness": "Fighting",
+  "flavor": "When they see an enemy, their tails stand high, and they spit the seeds of berries stored in their cheek pouches.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Biting Fang",
+      "cost": [
+        "Colorless",
+        "Colorless"
+      ],
+      "damage": 40,
+      "damage_suffix": "+",
+      "effect": "Flip a coin. If heads, this attack does 40 more damage."
+    }
+  ],
+  "evolves_from": "Patrat",
+  "versions": [
+    {
+      "set": "B1",
+      "number": 200
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "id": 973,
+  "name": "Wobbuffet",
+  "card_type": "pokemon",
+  "natdex_number": 202,
+  "element": "Psychic",
+  "stage": "Basic",
+  "hp": 90,
+  "retreat_cost": 2,
+  "weakness": "Darkness",
+  "flavor": "It hates light and shock. If attacked, it inflates its body to pump up its counterstrike.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Reply Strongly",
+      "cost": [
+        "Psychic",
+        "Colorless"
+      ],
+      "damage": 30,
+      "damage_suffix": "+",
+      "effect": "If this Pokémon was damaged by an attack during your opponent's last turn while it was in the Active Spot, this attack does 50 more damage."
+    }
+  ],
+  "versions": [
+    {
+      "set": "A4",
+      "number": 86
+    },
+    {
+      "set": "A4",
+      "number": 175
+    }
+  ]
+}

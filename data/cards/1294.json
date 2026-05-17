@@ -1,0 +1,51 @@
+{
+  "id": 1294,
+  "name": "Melmetal ex",
+  "card_type": "pokemon",
+  "natdex_number": 809,
+  "element": "Metal",
+  "stage": "Stage 1",
+  "hp": 170,
+  "retreat_cost": 3,
+  "weakness": "Fire",
+  "is_ex": true,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Headbutt",
+      "cost": [
+        "Metal",
+        "Metal",
+        "Colorless"
+      ],
+      "damage": 80
+    },
+    {
+      "name": "Metal Arms",
+      "cost": [
+        "Metal",
+        "Metal",
+        "Metal",
+        "Colorless"
+      ],
+      "damage": 100,
+      "damage_suffix": "+",
+      "effect": "If this Pokémon has a Pokémon Tool attached, this attack does 50 more damage."
+    }
+  ],
+  "evolves_from": "Meltan",
+  "versions": [
+    {
+      "set": "B1",
+      "number": 174
+    },
+    {
+      "set": "B1",
+      "number": 264
+    },
+    {
+      "set": "B1",
+      "number": 282
+    }
+  ]
+}

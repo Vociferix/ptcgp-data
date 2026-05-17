@@ -1,0 +1,39 @@
+{
+  "id": 20,
+  "name": "Victreebel",
+  "card_type": "pokemon",
+  "natdex_number": 71,
+  "element": "Grass",
+  "stage": "Stage 2",
+  "hp": 140,
+  "retreat_cost": 2,
+  "weakness": "Fire",
+  "flavor": "Said to live in huge colonies deep in jungles, although no one has ever returned from there.",
+  "is_ex": false,
+  "is_mega": false,
+  "ability": {
+    "name": "Fragrance Trap",
+    "effect": "If this Pokémon is in the Active Spot, once during your turn, you may switch in 1 of your opponent's Benched Basic Pokémon to the Active Spot."
+  },
+  "attacks": [
+    {
+      "name": "Vine Whip",
+      "cost": [
+        "Grass",
+        "Colorless"
+      ],
+      "damage": 60
+    }
+  ],
+  "evolves_from": "Weepinbell",
+  "versions": [
+    {
+      "set": "A1",
+      "number": 20
+    },
+    {
+      "set": "B1",
+      "number": 289
+    }
+  ]
+}

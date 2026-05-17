@@ -1,0 +1,34 @@
+{
+  "id": 315,
+  "name": "Magmortar",
+  "card_type": "pokemon",
+  "natdex_number": 467,
+  "element": "Fire",
+  "stage": "Stage 1",
+  "hp": 130,
+  "retreat_cost": 3,
+  "weakness": "Water",
+  "flavor": "When Magmortar inhales deeply, the fire burning in its belly intensifies, rising in temperature to over 3,600 degrees Fahrenheit.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Bursting Inferno",
+      "cost": [
+        "Fire",
+        "Fire",
+        "Fire",
+        "Fire"
+      ],
+      "damage": 100,
+      "effect": "Your opponent's Active Pokémon is now Burned."
+    }
+  ],
+  "evolves_from": "Magmar",
+  "versions": [
+    {
+      "set": "A2",
+      "number": 24
+    }
+  ]
+}

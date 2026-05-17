@@ -1,0 +1,33 @@
+{
+  "id": 945,
+  "name": "Mantine",
+  "card_type": "pokemon",
+  "natdex_number": 226,
+  "element": "Water",
+  "stage": "Basic",
+  "hp": 100,
+  "retreat_cost": 2,
+  "weakness": "Lightning",
+  "flavor": "While elegantly swimming in the sea, it ignores Remoraid that cling to its fins seeking food scraps.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Dive",
+      "cost": [
+        "Water",
+        "Water",
+        "Water",
+        "Colorless"
+      ],
+      "damage": 80,
+      "effect": "Flip a coin. If heads, during your opponent's next turn, prevent all damage from—and effects of—attacks done to this Pokémon."
+    }
+  ],
+  "versions": [
+    {
+      "set": "A4",
+      "number": 58
+    }
+  ]
+}

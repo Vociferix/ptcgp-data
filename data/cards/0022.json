@@ -1,0 +1,32 @@
+{
+  "id": 22,
+  "name": "Exeggutor",
+  "card_type": "pokemon",
+  "natdex_number": 103,
+  "element": "Grass",
+  "stage": "Stage 1",
+  "hp": 130,
+  "retreat_cost": 3,
+  "weakness": "Fire",
+  "flavor": "Each of Exeggutor’s three heads is thinking different thoughts. The three don’t seem to be very interested in one another.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Stomp",
+      "cost": [
+        "Grass"
+      ],
+      "damage": 30,
+      "damage_suffix": "+",
+      "effect": "Flip a coin. If heads, this attack does 30 more damage."
+    }
+  ],
+  "evolves_from": "Exeggcute",
+  "versions": [
+    {
+      "set": "A1",
+      "number": 22
+    }
+  ]
+}

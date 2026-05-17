@@ -1,0 +1,36 @@
+{
+  "id": 1682,
+  "name": "Raichu",
+  "card_type": "pokemon",
+  "natdex_number": 26,
+  "element": "Lightning",
+  "stage": "Stage 1",
+  "hp": 100,
+  "retreat_cost": 1,
+  "weakness": "Fighting",
+  "flavor": "If the electric pouches in its cheeks become fully charged, both ears will stand straight up.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Thunder",
+      "cost": [
+        "Lightning",
+        "Lightning"
+      ],
+      "damage": 90,
+      "effect": "This Pokémon also does 30 damage to itself."
+    }
+  ],
+  "evolves_from": "Pikachu",
+  "versions": [
+    {
+      "set": "B2b",
+      "number": 23
+    },
+    {
+      "set": "B2b",
+      "number": 97
+    }
+  ]
+}

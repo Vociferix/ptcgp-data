@@ -1,0 +1,33 @@
+{
+  "id": 45,
+  "name": "Flareon",
+  "card_type": "pokemon",
+  "natdex_number": 136,
+  "element": "Fire",
+  "stage": "Stage 1",
+  "hp": 120,
+  "retreat_cost": 2,
+  "weakness": "Water",
+  "flavor": "Inhaled air is carried to its flame sac, heated, and exhaled as fire that reaches over 3,000 degrees Fahrenheit.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Flamethrower",
+      "cost": [
+        "Fire",
+        "Colorless",
+        "Colorless"
+      ],
+      "damage": 110,
+      "effect": "Discard 1 [R] Energy from this Pokémon."
+    }
+  ],
+  "evolves_from": "Eevee",
+  "versions": [
+    {
+      "set": "A1",
+      "number": 45
+    }
+  ]
+}

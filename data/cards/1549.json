@@ -1,0 +1,37 @@
+{
+  "id": 1549,
+  "name": "Slaking",
+  "card_type": "pokemon",
+  "natdex_number": 289,
+  "element": "Colorless",
+  "stage": "Stage 2",
+  "hp": 160,
+  "retreat_cost": 4,
+  "weakness": "Fighting",
+  "flavor": "This Pokémon lives lying on its side. It only rolls over and moves when there is no more grass to eat.",
+  "is_ex": false,
+  "is_mega": false,
+  "ability": {
+    "name": "Snoozing Habit",
+    "effect": "As long as this Pokémon is in the Active Spot, whenever you attach an Energy from your Energy Zone to it, it is now Asleep."
+  },
+  "attacks": [
+    {
+      "name": "Knuckle Sandwich",
+      "cost": [
+        "Colorless",
+        "Colorless",
+        "Colorless"
+      ],
+      "damage": 150,
+      "effect": "Discard a random Energy from this Pokémon."
+    }
+  ],
+  "evolves_from": "Vigoroth",
+  "versions": [
+    {
+      "set": "B2",
+      "number": 136
+    }
+  ]
+}

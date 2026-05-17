@@ -1,0 +1,32 @@
+{
+  "id": 1808,
+  "name": "Lucario",
+  "card_type": "pokemon",
+  "natdex_number": 448,
+  "element": "Fighting",
+  "stage": "Stage 1",
+  "hp": 100,
+  "retreat_cost": 1,
+  "weakness": "Psychic",
+  "flavor": "It controls waves known as auras, which are powerful enough to pulverize huge rocks. It uses these waves to take down its prey.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Close Combat",
+      "cost": [
+        "Fighting",
+        "Fighting"
+      ],
+      "damage": 90,
+      "effect": "During your opponent's next turn, this Pokémon takes +20 damage from attacks."
+    }
+  ],
+  "evolves_from": "Riolu",
+  "versions": [
+    {
+      "set": "B3",
+      "number": 80
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "id": 1073,
+  "name": "Raikou ex",
+  "card_type": "pokemon",
+  "natdex_number": 243,
+  "element": "Lightning",
+  "stage": "Basic",
+  "hp": 130,
+  "retreat_cost": 2,
+  "weakness": "Fighting",
+  "is_ex": true,
+  "is_mega": false,
+  "ability": {
+    "name": "Legendary Pulse",
+    "effect": "At the end of your turn, if this Pokémon is in the Active Spot, draw a card."
+  },
+  "attacks": [
+    {
+      "name": "Voltaic Bullet",
+      "cost": [
+        "Lightning",
+        "Lightning"
+      ],
+      "damage": 60,
+      "effect": "This attack also does 10 damage to 1 of your opponent's Benched Pokémon."
+    }
+  ],
+  "versions": [
+    {
+      "set": "A4a",
+      "number": 25
+    },
+    {
+      "set": "A4a",
+      "number": 81
+    },
+    {
+      "set": "A4a",
+      "number": 88
+    },
+    {
+      "set": "B2a",
+      "number": 128
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "id": 1579,
+  "name": "Brambleghast",
+  "card_type": "pokemon",
+  "natdex_number": 947,
+  "element": "Grass",
+  "stage": "Stage 1",
+  "hp": 100,
+  "retreat_cost": 2,
+  "weakness": "Fire",
+  "flavor": "Brambleghast wanders around arid regions. On rare occasions, mass outbreaks of these Pokémon will bury an entire town.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Continuous Tumble",
+      "cost": [
+        "Grass",
+        "Colorless"
+      ],
+      "damage": 60,
+      "damage_suffix": "x",
+      "effect": "Flip a coin until you get tails. This attack does 60 damage for each heads."
+    }
+  ],
+  "evolves_from": "Bramblin",
+  "versions": [
+    {
+      "set": "B2a",
+      "number": 11
+    }
+  ]
+}

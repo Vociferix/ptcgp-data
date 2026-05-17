@@ -1,0 +1,33 @@
+{
+  "id": 1735,
+  "name": "Sceptile",
+  "card_type": "pokemon",
+  "natdex_number": 254,
+  "element": "Grass",
+  "stage": "Stage 2",
+  "hp": 140,
+  "retreat_cost": 1,
+  "weakness": "Fire",
+  "flavor": "It agilely flits through the jungle and uses the sharp-edged leaves on its arms to cut down its prey.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Leaf Blade",
+      "cost": [
+        "Grass",
+        "Grass"
+      ],
+      "damage": 70,
+      "damage_suffix": "+",
+      "effect": "Flip a coin. If heads, this attack does 50 more damage."
+    }
+  ],
+  "evolves_from": "Grovyle",
+  "versions": [
+    {
+      "set": "B3",
+      "number": 7
+    }
+  ]
+}

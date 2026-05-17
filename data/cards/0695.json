@@ -1,0 +1,33 @@
+{
+  "id": 695,
+  "name": "Lycanroc",
+  "card_type": "pokemon",
+  "natdex_number": 745,
+  "element": "Fighting",
+  "stage": "Stage 1",
+  "hp": 100,
+  "retreat_cost": 1,
+  "weakness": "Grass",
+  "flavor": "This Pokémon uses its rocky mane to slash any who approach. It will even disobey its Trainer if it dislikes the orders it was given.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Blood Fang",
+      "cost": [
+        "Fighting",
+        "Fighting"
+      ],
+      "damage": 50,
+      "damage_suffix": "+",
+      "effect": "If your opponent's Active Pokémon has more remaining HP than this Pokémon, this attack does 50 more damage."
+    }
+  ],
+  "evolves_from": "Rockruff",
+  "versions": [
+    {
+      "set": "A3",
+      "number": 101
+    }
+  ]
+}

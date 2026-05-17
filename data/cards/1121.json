@@ -1,0 +1,33 @@
+{
+  "id": 1121,
+  "name": "Pinsir",
+  "card_type": "pokemon",
+  "natdex_number": 127,
+  "element": "Grass",
+  "stage": "Basic",
+  "hp": 90,
+  "retreat_cost": 2,
+  "weakness": "Fire",
+  "flavor": "This Pokémon clamps its pincers down on its prey and then either splits the prey in half or flings it away.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "X-Scissor",
+      "cost": [
+        "Grass",
+        "Grass",
+        "Colorless"
+      ],
+      "damage": 50,
+      "damage_suffix": "+",
+      "effect": "Flip a coin. If heads, this attack does 50 more damage."
+    }
+  ],
+  "versions": [
+    {
+      "set": "B1",
+      "number": 1
+    }
+  ]
+}

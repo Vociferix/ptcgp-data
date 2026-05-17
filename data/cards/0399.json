@@ -1,0 +1,33 @@
+{
+  "id": 399,
+  "name": "Toxicroak",
+  "card_type": "pokemon",
+  "natdex_number": 454,
+  "element": "Darkness",
+  "stage": "Stage 1",
+  "hp": 90,
+  "retreat_cost": 2,
+  "weakness": "Fighting",
+  "flavor": "Swaying and dodging the attacks of its foes, it weaves its flexible body in close, then lunges out with its poisonous claws.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Group Beatdown",
+      "cost": [
+        "Darkness",
+        "Darkness"
+      ],
+      "damage": 40,
+      "damage_suffix": "x",
+      "effect": "Flip a coin for each Pokémon you have in play. This attack does 40 damage for each heads."
+    }
+  ],
+  "evolves_from": "Croagunk",
+  "versions": [
+    {
+      "set": "A2",
+      "number": 108
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "id": 916,
+  "name": "Typhlosion",
+  "card_type": "pokemon",
+  "natdex_number": 157,
+  "element": "Fire",
+  "stage": "Stage 2",
+  "hp": 140,
+  "retreat_cost": 2,
+  "weakness": "Water",
+  "flavor": "If its rage peaks, it becomes so hot that anything that touches it will instantly go up in flames.",
+  "is_ex": false,
+  "is_mega": false,
+  "ability": {
+    "name": "Fire Breath",
+    "effect": "Once during your turn, you may make your opponent's Active Pokémon Burned."
+  },
+  "attacks": [
+    {
+      "name": "Magma Punch",
+      "cost": [
+        "Fire",
+        "Fire"
+      ],
+      "damage": 60
+    }
+  ],
+  "evolves_from": "Quilava",
+  "versions": [
+    {
+      "set": "A4",
+      "number": 29
+    }
+  ]
+}

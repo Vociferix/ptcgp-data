@@ -1,0 +1,37 @@
+{
+  "id": 1175,
+  "name": "Ludicolo",
+  "card_type": "pokemon",
+  "natdex_number": 272,
+  "element": "Water",
+  "stage": "Stage 2",
+  "hp": 140,
+  "retreat_cost": 2,
+  "weakness": "Lightning",
+  "flavor": "If it hears festive music, it begins moving in rhythm in order to amplify its power.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Rhythmic Steps",
+      "cost": [
+        "Water",
+        "Water"
+      ],
+      "damage": 60,
+      "damage_suffix": "+",
+      "effect": "If you have exactly 1, 3, or 5 cards in your hand, this attack does 60 more damage."
+    }
+  ],
+  "evolves_from": "Lombre",
+  "versions": [
+    {
+      "set": "B1",
+      "number": 55
+    },
+    {
+      "set": "B1",
+      "number": 233
+    }
+  ]
+}

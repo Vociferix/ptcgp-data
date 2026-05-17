@@ -1,0 +1,35 @@
+{
+  "id": 1177,
+  "name": "Wailord",
+  "card_type": "pokemon",
+  "natdex_number": 321,
+  "element": "Water",
+  "stage": "Stage 1",
+  "hp": 200,
+  "retreat_cost": 4,
+  "weakness": "Lightning",
+  "flavor": "The biggest of all Pokémon. It can dive to a depth of almost 10,000 feet on only one breath.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Whale Pump",
+      "cost": [
+        "Colorless",
+        "Colorless",
+        "Colorless",
+        "Colorless"
+      ],
+      "damage": 60,
+      "damage_suffix": "+",
+      "effect": "This attack does 10 more damage for each [W] Energy attached to this Pokémon."
+    }
+  ],
+  "evolves_from": "Wailmer",
+  "versions": [
+    {
+      "set": "B1",
+      "number": 57
+    }
+  ]
+}

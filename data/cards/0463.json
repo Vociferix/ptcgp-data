@@ -1,0 +1,35 @@
+{
+  "id": 463,
+  "name": "Whiscash",
+  "card_type": "pokemon",
+  "natdex_number": 340,
+  "element": "Water",
+  "stage": "Stage 1",
+  "hp": 120,
+  "retreat_cost": 3,
+  "weakness": "Lightning",
+  "flavor": "It is extremely protective of its territory. If any foe approaches, it attacks using vicious tremors.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Thrash",
+      "cost": [
+        "Water",
+        "Water",
+        "Colorless",
+        "Colorless"
+      ],
+      "damage": 80,
+      "damage_suffix": "+",
+      "effect": "Flip a coin. If heads, this attack does 60 more damage. If tails, this Pokémon also does 20 damage to itself."
+    }
+  ],
+  "evolves_from": "Barboach",
+  "versions": [
+    {
+      "set": "A2a",
+      "number": 17
+    }
+  ]
+}

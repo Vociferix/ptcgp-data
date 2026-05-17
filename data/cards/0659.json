@@ -1,0 +1,32 @@
+{
+  "id": 659,
+  "name": "Vikavolt",
+  "card_type": "pokemon",
+  "natdex_number": 738,
+  "element": "Lightning",
+  "stage": "Stage 2",
+  "hp": 140,
+  "retreat_cost": 1,
+  "weakness": "Fighting",
+  "flavor": "It builds up electricity in its abdomen, focuses it through its jaws, and then fires the electricity off in concentrated beams.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Disconnect",
+      "cost": [
+        "Lightning",
+        "Lightning"
+      ],
+      "damage": 70,
+      "effect": "During your opponent's next turn, they can't play any Item cards from their hand."
+    }
+  ],
+  "evolves_from": "Charjabug",
+  "versions": [
+    {
+      "set": "A3",
+      "number": 65
+    }
+  ]
+}

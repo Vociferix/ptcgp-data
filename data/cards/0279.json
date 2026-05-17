@@ -1,0 +1,33 @@
+{
+  "id": 279,
+  "name": "Scolipede",
+  "card_type": "pokemon",
+  "natdex_number": 545,
+  "element": "Darkness",
+  "stage": "Stage 2",
+  "hp": 140,
+  "retreat_cost": 2,
+  "weakness": "Fighting",
+  "flavor": "Scolipede latches on to its prey with the claws on its neck before slamming them into the ground and jabbing them with its claws’ toxic spikes.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Venoshock",
+      "cost": [
+        "Darkness",
+        "Colorless"
+      ],
+      "damage": 70,
+      "damage_suffix": "+",
+      "effect": "If your opponent's Active Pokémon is Poisoned, this attack does 50 more damage."
+    }
+  ],
+  "evolves_from": "Whirlipede",
+  "versions": [
+    {
+      "set": "A1a",
+      "number": 55
+    }
+  ]
+}

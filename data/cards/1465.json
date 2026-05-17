@@ -1,0 +1,34 @@
+{
+  "id": 1465,
+  "name": "Plusle",
+  "card_type": "pokemon",
+  "natdex_number": 311,
+  "element": "Lightning",
+  "stage": "Basic",
+  "hp": 70,
+  "retreat_cost": 1,
+  "weakness": "Fighting",
+  "flavor": "This Pokémon absorbs electricity from telephone poles. It shorts out the electricity stored inside its body to create noises.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Electric Tail",
+      "cost": [
+        "Lightning"
+      ],
+      "damage": 10,
+      "effect": "Flip a coin. If heads, your opponent's Active Pokémon is now Paralyzed."
+    }
+  ],
+  "versions": [
+    {
+      "set": "B2",
+      "number": 52
+    },
+    {
+      "set": "P-B",
+      "number": 27
+    }
+  ]
+}

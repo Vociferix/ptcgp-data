@@ -1,0 +1,43 @@
+{
+  "id": 23,
+  "name": "Exeggutor ex",
+  "card_type": "pokemon",
+  "natdex_number": 103,
+  "element": "Grass",
+  "stage": "Stage 1",
+  "hp": 160,
+  "retreat_cost": 3,
+  "weakness": "Fire",
+  "is_ex": true,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Tropical Swing",
+      "cost": [
+        "Grass"
+      ],
+      "damage": 40,
+      "damage_suffix": "+",
+      "effect": "Flip a coin. If heads, this attack does 40 more damage."
+    }
+  ],
+  "evolves_from": "Exeggcute",
+  "versions": [
+    {
+      "set": "A1",
+      "number": 23
+    },
+    {
+      "set": "A1",
+      "number": 252
+    },
+    {
+      "set": "A3",
+      "number": 231
+    },
+    {
+      "set": "A4b",
+      "number": 13
+    }
+  ]
+}

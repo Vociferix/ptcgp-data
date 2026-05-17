@@ -1,0 +1,51 @@
+{
+  "id": 1058,
+  "name": "Entei ex",
+  "card_type": "pokemon",
+  "natdex_number": 244,
+  "element": "Fire",
+  "stage": "Basic",
+  "hp": 140,
+  "retreat_cost": 2,
+  "weakness": "Water",
+  "is_ex": true,
+  "is_mega": false,
+  "ability": {
+    "name": "Legendary Pulse",
+    "effect": "At the end of your turn, if this Pokémon is in the Active Spot, draw a card."
+  },
+  "attacks": [
+    {
+      "name": "Blazing Beatdown",
+      "cost": [
+        "Fire",
+        "Fire"
+      ],
+      "damage": 60,
+      "damage_suffix": "+",
+      "effect": "If this Pokémon has at least 2 extra [R] Energy attached, this attack does 60 more damage."
+    }
+  ],
+  "versions": [
+    {
+      "set": "A4a",
+      "number": 10
+    },
+    {
+      "set": "A4a",
+      "number": 79
+    },
+    {
+      "set": "A4a",
+      "number": 87
+    },
+    {
+      "set": "B2a",
+      "number": 126
+    },
+    {
+      "set": "P-A",
+      "number": 110
+    }
+  ]
+}

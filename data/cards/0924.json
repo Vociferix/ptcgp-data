@@ -1,0 +1,32 @@
+{
+  "id": 924,
+  "name": "Heatmor",
+  "card_type": "pokemon",
+  "natdex_number": 631,
+  "element": "Fire",
+  "stage": "Basic",
+  "hp": 90,
+  "retreat_cost": 2,
+  "weakness": "Water",
+  "flavor": "There’s a hole in its tail that allows it to draw in the air it needs to keep its fire burning. If the hole gets blocked, this Pokémon will fall ill.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Roasting Heat",
+      "cost": [
+        "Fire",
+        "Fire"
+      ],
+      "damage": 30,
+      "damage_suffix": "+",
+      "effect": "If your opponent's Active Pokémon is Burned, this attack does 60 more damage."
+    }
+  ],
+  "versions": [
+    {
+      "set": "A4",
+      "number": 37
+    }
+  ]
+}

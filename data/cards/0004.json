@@ -1,0 +1,54 @@
+{
+  "id": 4,
+  "name": "Venusaur ex",
+  "card_type": "pokemon",
+  "natdex_number": 3,
+  "element": "Grass",
+  "stage": "Stage 2",
+  "hp": 190,
+  "retreat_cost": 3,
+  "weakness": "Fire",
+  "is_ex": true,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Razor Leaf",
+      "cost": [
+        "Grass",
+        "Colorless",
+        "Colorless"
+      ],
+      "damage": 60
+    },
+    {
+      "name": "Giant Bloom",
+      "cost": [
+        "Grass",
+        "Grass",
+        "Colorless",
+        "Colorless"
+      ],
+      "damage": 100,
+      "effect": "Heal 30 damage from this Pokémon."
+    }
+  ],
+  "evolves_from": "Ivysaur",
+  "versions": [
+    {
+      "set": "A1",
+      "number": 4
+    },
+    {
+      "set": "A1",
+      "number": 251
+    },
+    {
+      "set": "A3",
+      "number": 230
+    },
+    {
+      "set": "A4b",
+      "number": 5
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "id": 1608,
+  "name": "Pawmot",
+  "card_type": "pokemon",
+  "natdex_number": 923,
+  "element": "Lightning",
+  "stage": "Stage 2",
+  "hp": 140,
+  "retreat_cost": 1,
+  "weakness": "Fighting",
+  "flavor": "Pawmot’s fluffy fur acts as a battery. It can store the same amount of electricity as an electric car.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Thunder Blast",
+      "cost": [
+        "Lightning",
+        "Lightning"
+      ],
+      "damage": 100,
+      "effect": "Discard a [L] Energy from this Pokémon."
+    }
+  ],
+  "evolves_from": "Pawmo",
+  "versions": [
+    {
+      "set": "B2a",
+      "number": 40
+    },
+    {
+      "set": "B2a",
+      "number": 121
+    }
+  ]
+}

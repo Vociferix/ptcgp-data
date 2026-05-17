@@ -1,0 +1,38 @@
+{
+  "id": 177,
+  "name": "Weezing",
+  "card_type": "pokemon",
+  "natdex_number": 110,
+  "element": "Darkness",
+  "stage": "Stage 1",
+  "hp": 110,
+  "retreat_cost": 3,
+  "weakness": "Fighting",
+  "flavor": "If one of the twin Koffing inflates, the other one deflates. It constantly mixes its poisonous gases.",
+  "is_ex": false,
+  "is_mega": false,
+  "ability": {
+    "name": "Gas Leak",
+    "effect": "Once during your turn, if this Pokémon is in the Active Spot, you may make your opponent's Active Pokémon Poisoned."
+  },
+  "attacks": [
+    {
+      "name": "Tackle",
+      "cost": [
+        "Darkness"
+      ],
+      "damage": 30
+    }
+  ],
+  "evolves_from": "Koffing",
+  "versions": [
+    {
+      "set": "A1",
+      "number": 177
+    },
+    {
+      "set": "A1",
+      "number": 243
+    }
+  ]
+}

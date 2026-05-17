@@ -1,0 +1,39 @@
+{
+  "id": 572,
+  "name": "Grafaiai",
+  "card_type": "pokemon",
+  "natdex_number": 945,
+  "element": "Darkness",
+  "stage": "Stage 1",
+  "hp": 90,
+  "retreat_cost": 1,
+  "weakness": "Fighting",
+  "flavor": "The color of the poisonous saliva depends on what the Pokémon eats. Grafaiai covers its fingers in its saliva and draws patterns on trees in forests.",
+  "is_ex": false,
+  "is_mega": false,
+  "ability": {
+    "name": "Poison Coating",
+    "effect": "Once during your turn, you may flip a coin. If heads, your opponent's Active Pokémon is now Poisoned."
+  },
+  "attacks": [
+    {
+      "name": "Bite",
+      "cost": [
+        "Darkness",
+        "Darkness"
+      ],
+      "damage": 40
+    }
+  ],
+  "evolves_from": "Shroodle",
+  "versions": [
+    {
+      "set": "A2b",
+      "number": 51
+    },
+    {
+      "set": "A2b",
+      "number": 76
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "id": 890,
+  "name": "Bellossom",
+  "card_type": "pokemon",
+  "natdex_number": 182,
+  "element": "Grass",
+  "stage": "Stage 2",
+  "hp": 130,
+  "retreat_cost": 1,
+  "weakness": "Fire",
+  "flavor": "Plentiful in the tropics. When it dances, its petals rub together and make a pleasant ringing sound.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Petal Dance",
+      "cost": [
+        "Grass",
+        "Grass"
+      ],
+      "damage": 60,
+      "damage_suffix": "x",
+      "effect": "Flip 3 coins. This attack does 60 damage for each heads. This Pokémon is now Confused."
+    }
+  ],
+  "evolves_from": "Gloom",
+  "versions": [
+    {
+      "set": "A4",
+      "number": 3
+    },
+    {
+      "set": "A4",
+      "number": 163
+    }
+  ]
+}

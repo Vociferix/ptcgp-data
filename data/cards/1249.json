@@ -1,0 +1,37 @@
+{
+  "id": 1249,
+  "name": "Hippowdon",
+  "card_type": "pokemon",
+  "natdex_number": 450,
+  "element": "Fighting",
+  "stage": "Stage 1",
+  "hp": 130,
+  "retreat_cost": 4,
+  "weakness": "Grass",
+  "flavor": "It brandishes its gaping mouth in a display of fearsome strength. It raises vast quantities of sand while attacking.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Crashing Fangs",
+      "cost": [
+        "Fighting",
+        "Fighting",
+        "Colorless"
+      ],
+      "damage": 100,
+      "effect": "Flip a coin. If tails, during your next turn, this Pokémon can't attack."
+    }
+  ],
+  "evolves_from": "Hippopotas",
+  "versions": [
+    {
+      "set": "B1",
+      "number": 129
+    },
+    {
+      "set": "B1",
+      "number": 241
+    }
+  ]
+}

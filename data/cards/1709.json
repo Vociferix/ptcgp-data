@@ -1,0 +1,39 @@
+{
+  "id": 1709,
+  "name": "Revavroom",
+  "card_type": "pokemon",
+  "natdex_number": 966,
+  "element": "Metal",
+  "stage": "Stage 1",
+  "hp": 110,
+  "retreat_cost": 3,
+  "weakness": "Fire",
+  "flavor": "Revavroom viciously threatens others with the sound of its exhaust. It sticks its tongue out from its cylindrical mouth and sprays toxic fluids.",
+  "is_ex": false,
+  "is_mega": false,
+  "ability": {
+    "name": "Metal Transport",
+    "effect": "Once during your turn, you may switch your Active [Metal] Pokémon with 1 of your Benched Pokémon."
+  },
+  "attacks": [
+    {
+      "name": "Outta-Control Dash",
+      "cost": [
+        "Metal",
+        "Colorless"
+      ],
+      "damage": 60
+    }
+  ],
+  "evolves_from": "Varoom",
+  "versions": [
+    {
+      "set": "B2b",
+      "number": 50
+    },
+    {
+      "set": "B2b",
+      "number": 74
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "id": 1551,
+  "name": "Tornadus",
+  "card_type": "pokemon",
+  "natdex_number": 641,
+  "element": "Colorless",
+  "stage": "Basic",
+  "hp": 90,
+  "retreat_cost": 1,
+  "weakness": "Lightning",
+  "flavor": "Tornadus expels massive energy from its tail, causing severe storms. Its power is great enough to blow houses away.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Blow Through",
+      "cost": [
+        "Colorless",
+        "Colorless"
+      ],
+      "damage": 40,
+      "damage_suffix": "+",
+      "effect": "If a Stadium is in play, this attack does 40 more damage."
+    }
+  ],
+  "versions": [
+    {
+      "set": "B2",
+      "number": 138
+    },
+    {
+      "set": "P-B",
+      "number": 30
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "id": 1536,
+  "name": "Salamence",
+  "card_type": "pokemon",
+  "natdex_number": 373,
+  "element": "Dragon",
+  "stage": "Stage 2",
+  "hp": 150,
+  "retreat_cost": 2,
+  "flavor": "It becomes uncontrollable if it is enraged. It destroys everything with shredding claws and fire.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Dragon Dive",
+      "cost": [
+        "Fire",
+        "Water",
+        "Colorless"
+      ],
+      "damage": 150,
+      "effect": "Flip a coin. If tails, this Pokémon also does 50 damage to itself."
+    }
+  ],
+  "evolves_from": "Shelgon",
+  "versions": [
+    {
+      "set": "B2",
+      "number": 123
+    },
+    {
+      "set": "B2",
+      "number": 178
+    }
+  ]
+}

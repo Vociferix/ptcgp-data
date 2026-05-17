@@ -1,0 +1,55 @@
+{
+  "id": 84,
+  "name": "Articuno ex",
+  "card_type": "pokemon",
+  "natdex_number": 144,
+  "element": "Water",
+  "stage": "Basic",
+  "hp": 140,
+  "retreat_cost": 2,
+  "weakness": "Lightning",
+  "is_ex": true,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Ice Wing",
+      "cost": [
+        "Water",
+        "Colorless"
+      ],
+      "damage": 40
+    },
+    {
+      "name": "Blizzard",
+      "cost": [
+        "Water",
+        "Water",
+        "Water"
+      ],
+      "damage": 80,
+      "effect": "This attack also does 10 damage to each of your opponent's Benched Pokémon."
+    }
+  ],
+  "versions": [
+    {
+      "set": "A1",
+      "number": 84
+    },
+    {
+      "set": "A1",
+      "number": 258
+    },
+    {
+      "set": "A1",
+      "number": 275
+    },
+    {
+      "set": "A3b",
+      "number": 104
+    },
+    {
+      "set": "A4b",
+      "number": 101
+    }
+  ]
+}

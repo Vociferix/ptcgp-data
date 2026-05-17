@@ -1,0 +1,33 @@
+{
+  "id": 1539,
+  "name": "Kangaskhan",
+  "card_type": "pokemon",
+  "natdex_number": 115,
+  "element": "Colorless",
+  "stage": "Basic",
+  "hp": 110,
+  "retreat_cost": 3,
+  "weakness": "Fighting",
+  "flavor": "There are records of a lost human child being raised by a childless Kangaskhan.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Steady Punch",
+      "cost": [
+        "Colorless",
+        "Colorless",
+        "Colorless"
+      ],
+      "damage": 60,
+      "damage_suffix": "+",
+      "effect": "Flip a coin. If heads, this attack does 30 more damage."
+    }
+  ],
+  "versions": [
+    {
+      "set": "B2",
+      "number": 126
+    }
+  ]
+}

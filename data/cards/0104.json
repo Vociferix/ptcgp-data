@@ -1,0 +1,55 @@
+{
+  "id": 104,
+  "name": "Zapdos ex",
+  "card_type": "pokemon",
+  "natdex_number": 145,
+  "element": "Lightning",
+  "stage": "Basic",
+  "hp": 130,
+  "retreat_cost": 1,
+  "weakness": "Lightning",
+  "is_ex": true,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Peck",
+      "cost": [
+        "Lightning"
+      ],
+      "damage": 20
+    },
+    {
+      "name": "Thundering Hurricane",
+      "cost": [
+        "Lightning",
+        "Lightning",
+        "Lightning"
+      ],
+      "damage": 50,
+      "damage_suffix": "x",
+      "effect": "Flip 4 coins. This attack does 50 damage for each heads."
+    }
+  ],
+  "versions": [
+    {
+      "set": "A1",
+      "number": 104
+    },
+    {
+      "set": "A1",
+      "number": 260
+    },
+    {
+      "set": "A1",
+      "number": 276
+    },
+    {
+      "set": "A3b",
+      "number": 105
+    },
+    {
+      "set": "A4b",
+      "number": 139
+    }
+  ]
+}

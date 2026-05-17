@@ -1,0 +1,37 @@
+{
+  "id": 185,
+  "name": "Dragonite",
+  "card_type": "pokemon",
+  "natdex_number": 149,
+  "element": "Dragon",
+  "stage": "Stage 2",
+  "hp": 160,
+  "retreat_cost": 3,
+  "flavor": "It is said that somewhere in the ocean lies an island where these gather. Only they live there.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Draco Meteor",
+      "cost": [
+        "Water",
+        "Lightning",
+        "Colorless",
+        "Colorless"
+      ],
+      "damage": 0,
+      "effect": "1 of your opponent's Pokémon is chosen at random 4 times. For each time a Pokémon was chosen, do 50 damage to it."
+    }
+  ],
+  "evolves_from": "Dragonair",
+  "versions": [
+    {
+      "set": "A1",
+      "number": 185
+    },
+    {
+      "set": "A1",
+      "number": 244
+    }
+  ]
+}

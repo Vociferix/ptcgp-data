@@ -1,0 +1,50 @@
+{
+  "id": 1605,
+  "name": "Chien-Pao ex",
+  "card_type": "pokemon",
+  "natdex_number": 1002,
+  "element": "Water",
+  "stage": "Basic",
+  "hp": 130,
+  "retreat_cost": 1,
+  "weakness": "Metal",
+  "is_ex": true,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Icicle",
+      "cost": [
+        "Water"
+      ],
+      "damage": 20
+    },
+    {
+      "name": "Diving Icicles",
+      "cost": [
+        "Water",
+        "Water",
+        "Water"
+      ],
+      "damage": 0,
+      "effect": "Discard all [W] Energy from this Pokémon. This attack does 130 damage to 1 of your opponent's Pokémon."
+    }
+  ],
+  "versions": [
+    {
+      "set": "B2a",
+      "number": 37
+    },
+    {
+      "set": "B2a",
+      "number": 102
+    },
+    {
+      "set": "B2a",
+      "number": 112
+    },
+    {
+      "set": "P-B",
+      "number": 41
+    }
+  ]
+}

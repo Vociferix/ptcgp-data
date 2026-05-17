@@ -1,0 +1,33 @@
+{
+  "id": 469,
+  "name": "Origin Forme Palkia",
+  "card_type": "pokemon",
+  "natdex_number": 484,
+  "element": "Water",
+  "stage": "Basic",
+  "hp": 120,
+  "retreat_cost": 2,
+  "weakness": "Lightning",
+  "flavor": "It soars across the sky in a form that greatly resembles the creator of all things. Perhaps this imitation of appearance is Palkia’s strategy for gaining Arceus’s powers.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Zone Smash",
+      "cost": [
+        "Water",
+        "Water",
+        "Water"
+      ],
+      "damage": 60,
+      "damage_suffix": "+",
+      "effect": "Flip a coin. If heads, this attack does 60 more damage."
+    }
+  ],
+  "versions": [
+    {
+      "set": "A2a",
+      "number": 23
+    }
+  ]
+}

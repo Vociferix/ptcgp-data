@@ -1,0 +1,43 @@
+{
+  "id": 1241,
+  "name": "Indeedee ex",
+  "card_type": "pokemon",
+  "natdex_number": 876,
+  "element": "Psychic",
+  "stage": "Basic",
+  "hp": 130,
+  "retreat_cost": 1,
+  "weakness": "Darkness",
+  "is_ex": true,
+  "is_mega": false,
+  "ability": {
+    "name": "Watch Over",
+    "effect": "Once during your turn, you may heal 20 damage from your Active Pokémon."
+  },
+  "attacks": [
+    {
+      "name": "Psychic",
+      "cost": [
+        "Psychic",
+        "Psychic"
+      ],
+      "damage": 30,
+      "damage_suffix": "+",
+      "effect": "This attack does 30 more damage for each Energy attached to your opponent's Active Pokémon."
+    }
+  ],
+  "versions": [
+    {
+      "set": "B1",
+      "number": 121
+    },
+    {
+      "set": "B1",
+      "number": 260
+    },
+    {
+      "set": "B1",
+      "number": 278
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "id": 78,
+  "name": "Gyarados",
+  "card_type": "pokemon",
+  "natdex_number": 130,
+  "element": "Water",
+  "stage": "Stage 1",
+  "hp": 150,
+  "retreat_cost": 4,
+  "weakness": "Lightning",
+  "flavor": "Once it appears, it goes on a rampage. It remains enraged until it demolishes everything around it.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Hyper Beam",
+      "cost": [
+        "Water",
+        "Water",
+        "Water",
+        "Water"
+      ],
+      "damage": 100,
+      "effect": "Discard a random Energy from your opponent's Active Pokémon."
+    }
+  ],
+  "evolves_from": "Magikarp",
+  "versions": [
+    {
+      "set": "A1",
+      "number": 78
+    },
+    {
+      "set": "A1",
+      "number": 233
+    }
+  ]
+}

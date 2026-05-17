@@ -1,0 +1,32 @@
+{
+  "id": 1260,
+  "name": "Crabominable",
+  "card_type": "pokemon",
+  "natdex_number": 740,
+  "element": "Fighting",
+  "stage": "Stage 1",
+  "hp": 120,
+  "retreat_cost": 3,
+  "weakness": "Psychic",
+  "flavor": "Though its punches are powerful, this Pokémon’s movements are sluggish. It blows icy bubbles from its mouth to immobilize its opponents.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Last-Chance Punch",
+      "cost": [
+        "Fighting"
+      ],
+      "damage": 30,
+      "damage_suffix": "+",
+      "effect": "If this Pokémon's remaining HP is 30 or less, this attack does 60 more damage."
+    }
+  ],
+  "evolves_from": "Crabrawler",
+  "versions": [
+    {
+      "set": "B1",
+      "number": 140
+    }
+  ]
+}

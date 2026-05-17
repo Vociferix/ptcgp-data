@@ -1,0 +1,31 @@
+{
+  "id": 285,
+  "name": "Eevee",
+  "card_type": "pokemon",
+  "natdex_number": 133,
+  "element": "Colorless",
+  "stage": "Basic",
+  "hp": 60,
+  "retreat_cost": 1,
+  "weakness": "Fighting",
+  "flavor": "Its ability to evolve into many forms allows it to adapt smoothly and perfectly to any environment.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Continuous Steps",
+      "cost": [
+        "Colorless"
+      ],
+      "damage": 20,
+      "damage_suffix": "x",
+      "effect": "Flip a coin until you get tails. This attack does 20 damage for each heads."
+    }
+  ],
+  "versions": [
+    {
+      "set": "A1a",
+      "number": 61
+    }
+  ]
+}

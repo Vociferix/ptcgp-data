@@ -1,0 +1,42 @@
+{
+  "id": 168,
+  "name": "Nidoqueen",
+  "card_type": "pokemon",
+  "natdex_number": 31,
+  "element": "Darkness",
+  "stage": "Stage 2",
+  "hp": 140,
+  "retreat_cost": 2,
+  "weakness": "Fighting",
+  "flavor": "Nidoqueen is better at defense than offense. With scales like armor, this Pokémon will shield its children from any kind of attack.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Lovestrike",
+      "cost": [
+        "Darkness",
+        "Darkness",
+        "Colorless"
+      ],
+      "damage": 80,
+      "damage_suffix": "+",
+      "effect": "This attack does 50 more damage for each of your Benched Nidoking."
+    }
+  ],
+  "evolves_from": "Nidorina",
+  "versions": [
+    {
+      "set": "A1",
+      "number": 168
+    },
+    {
+      "set": "A1",
+      "number": 240
+    },
+    {
+      "set": "A4",
+      "number": 225
+    }
+  ]
+}

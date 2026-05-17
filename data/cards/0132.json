@@ -1,0 +1,52 @@
+{
+  "id": 132,
+  "name": "Gardevoir",
+  "card_type": "pokemon",
+  "natdex_number": 282,
+  "element": "Psychic",
+  "stage": "Stage 2",
+  "hp": 110,
+  "retreat_cost": 2,
+  "weakness": "Darkness",
+  "flavor": "To protect its Trainer, it will expend all its psychic power to create a small black hole.",
+  "is_ex": false,
+  "is_mega": false,
+  "ability": {
+    "name": "Psy Shadow",
+    "effect": "Once during your turn, you may take 1 [Psychic] Energy from your Energy Zone and attach it to the [Psychic] Pokémon in the Active Spot."
+  },
+  "attacks": [
+    {
+      "name": "Psyshot",
+      "cost": [
+        "Psychic",
+        "Psychic",
+        "Colorless"
+      ],
+      "damage": 60
+    }
+  ],
+  "evolves_from": "Kirlia",
+  "versions": [
+    {
+      "set": "A1",
+      "number": 132
+    },
+    {
+      "set": "A3b",
+      "number": 99
+    },
+    {
+      "set": "A4b",
+      "number": 168
+    },
+    {
+      "set": "A4b",
+      "number": 169
+    },
+    {
+      "set": "A4b",
+      "number": 357
+    }
+  ]
+}

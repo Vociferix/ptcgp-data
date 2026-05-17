@@ -1,0 +1,32 @@
+{
+  "id": 30,
+  "name": "Lilligant",
+  "card_type": "pokemon",
+  "natdex_number": 549,
+  "element": "Grass",
+  "stage": "Stage 1",
+  "hp": 100,
+  "retreat_cost": 1,
+  "weakness": "Fire",
+  "flavor": "The fragrance of the garland on its head has a relaxing effect, but taking care of it is very difficult.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Leaf Supply",
+      "cost": [
+        "Grass",
+        "Grass"
+      ],
+      "damage": 50,
+      "effect": "Take a [G] Energy from your Energy Zone and attach it to 1 of your Benched [G] Pokémon."
+    }
+  ],
+  "evolves_from": "Petilil",
+  "versions": [
+    {
+      "set": "A1",
+      "number": 30
+    }
+  ]
+}

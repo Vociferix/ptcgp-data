@@ -1,0 +1,45 @@
+{
+  "id": 243,
+  "name": "Gyarados ex",
+  "card_type": "pokemon",
+  "natdex_number": 130,
+  "element": "Water",
+  "stage": "Stage 1",
+  "hp": 180,
+  "retreat_cost": 3,
+  "weakness": "Lightning",
+  "is_ex": true,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Rampaging Whirlpool",
+      "cost": [
+        "Water",
+        "Water",
+        "Water",
+        "Colorless"
+      ],
+      "damage": 140,
+      "effect": "Discard a random Energy from among the Energy attached to all Pokémon (both yours and your opponent's)."
+    }
+  ],
+  "evolves_from": "Magikarp",
+  "versions": [
+    {
+      "set": "A1a",
+      "number": 18
+    },
+    {
+      "set": "A1a",
+      "number": 76
+    },
+    {
+      "set": "A4",
+      "number": 234
+    },
+    {
+      "set": "A4b",
+      "number": 98
+    }
+  ]
+}

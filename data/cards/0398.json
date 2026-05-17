@@ -1,0 +1,36 @@
+{
+  "id": 398,
+  "name": "Croagunk",
+  "card_type": "pokemon",
+  "natdex_number": 453,
+  "element": "Darkness",
+  "stage": "Basic",
+  "hp": 60,
+  "retreat_cost": 1,
+  "weakness": "Fighting",
+  "flavor": "Inflating its poison sacs, it fills the area with an odd sound and hits flinching opponents with a poison jab.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Group Beatdown",
+      "cost": [
+        "Darkness",
+        "Darkness"
+      ],
+      "damage": 20,
+      "damage_suffix": "x",
+      "effect": "Flip a coin for each Pokémon you have in play. This attack does 20 damage for each heads."
+    }
+  ],
+  "versions": [
+    {
+      "set": "A2",
+      "number": 107
+    },
+    {
+      "set": "A2",
+      "number": 173
+    }
+  ]
+}

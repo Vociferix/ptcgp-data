@@ -1,0 +1,32 @@
+{
+  "id": 1936,
+  "name": "Pikachu",
+  "card_type": "pokemon",
+  "natdex_number": 25,
+  "element": "Lightning",
+  "stage": "Basic",
+  "hp": 60,
+  "retreat_cost": 1,
+  "weakness": "Fighting",
+  "flavor": "When it is angered, it immediately discharges the energy stored in the pouches in its cheeks.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Quick Attack",
+      "cost": [
+        "Lightning",
+        "Colorless"
+      ],
+      "damage": 20,
+      "damage_suffix": "+",
+      "effect": "Flip a coin. If heads, this attack does 30 more damage."
+    }
+  ],
+  "versions": [
+    {
+      "set": "P-A",
+      "number": 111
+    }
+  ]
+}

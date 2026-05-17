@@ -1,0 +1,64 @@
+{
+  "id": 129,
+  "name": "Mewtwo ex",
+  "card_type": "pokemon",
+  "natdex_number": 150,
+  "element": "Psychic",
+  "stage": "Basic",
+  "hp": 150,
+  "retreat_cost": 2,
+  "weakness": "Darkness",
+  "is_ex": true,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Psychic Sphere",
+      "cost": [
+        "Psychic",
+        "Colorless"
+      ],
+      "damage": 50
+    },
+    {
+      "name": "Psydrive",
+      "cost": [
+        "Psychic",
+        "Psychic",
+        "Colorless",
+        "Colorless"
+      ],
+      "damage": 150,
+      "effect": "Discard 2 [P] Energy from this Pokémon."
+    }
+  ],
+  "versions": [
+    {
+      "set": "A1",
+      "number": 129
+    },
+    {
+      "set": "A1",
+      "number": 262
+    },
+    {
+      "set": "A1",
+      "number": 282
+    },
+    {
+      "set": "A1",
+      "number": 286
+    },
+    {
+      "set": "A4b",
+      "number": 158
+    },
+    {
+      "set": "A4b",
+      "number": 365
+    },
+    {
+      "set": "P-A",
+      "number": 50
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "id": 1464,
+  "name": "Zapdos",
+  "card_type": "pokemon",
+  "natdex_number": 145,
+  "element": "Lightning",
+  "stage": "Basic",
+  "hp": 100,
+  "retreat_cost": 1,
+  "weakness": "Lightning",
+  "flavor": "Zapdos is a legendary bird Pokémon. It’s said that when Zapdos rubs its feathers together, lightning will fall immediately after.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Heavy Thunder",
+      "cost": [
+        "Lightning",
+        "Lightning",
+        "Lightning"
+      ],
+      "damage": 0,
+      "effect": "1 other Pokémon (either yours or your opponent's) is chosen at random 1 time. Do 100 damage to the chosen Pokémon."
+    }
+  ],
+  "versions": [
+    {
+      "set": "B2",
+      "number": 51
+    }
+  ]
+}

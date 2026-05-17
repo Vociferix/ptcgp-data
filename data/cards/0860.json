@@ -1,0 +1,31 @@
+{
+  "id": 860,
+  "name": "Carbink",
+  "card_type": "pokemon",
+  "natdex_number": 703,
+  "element": "Fighting",
+  "stage": "Basic",
+  "hp": 80,
+  "retreat_cost": 1,
+  "weakness": "Grass",
+  "flavor": "When beset by attackers, Carbink wipes them all out by firing high-energy beams from the gems embedded in its body.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Hard Roll",
+      "cost": [
+        "Fighting",
+        "Colorless"
+      ],
+      "damage": 30,
+      "effect": "Flip a coin. If heads, during your opponent's next turn, prevent all damage from—and effects of—attacks done to this Pokémon."
+    }
+  ],
+  "versions": [
+    {
+      "set": "A3b",
+      "number": 42
+    }
+  ]
+}

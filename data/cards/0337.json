@@ -1,0 +1,32 @@
+{
+  "id": 337,
+  "name": "Glaceon",
+  "card_type": "pokemon",
+  "natdex_number": 471,
+  "element": "Water",
+  "stage": "Stage 1",
+  "hp": 90,
+  "retreat_cost": 1,
+  "weakness": "Metal",
+  "flavor": "It can control its body temperature at will. This enables it to freeze the moisture in the atmosphere, creating flurries of diamond dust.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Ice Beam",
+      "cost": [
+        "Water",
+        "Water"
+      ],
+      "damage": 60,
+      "effect": "Flip a coin. If heads, your opponent's Active Pokémon is now Paralyzed."
+    }
+  ],
+  "evolves_from": "Eevee",
+  "versions": [
+    {
+      "set": "A2",
+      "number": 46
+    }
+  ]
+}

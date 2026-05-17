@@ -1,0 +1,31 @@
+{
+  "id": 1623,
+  "name": "Mankey",
+  "card_type": "pokemon",
+  "natdex_number": 56,
+  "element": "Fighting",
+  "stage": "Basic",
+  "hp": 60,
+  "retreat_cost": 1,
+  "weakness": "Psychic",
+  "flavor": "It is extremely quick to anger. It could be docile one moment, then thrashing away the next instant.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Fury Swipes",
+      "cost": [
+        "Fighting"
+      ],
+      "damage": 10,
+      "damage_suffix": "x",
+      "effect": "Flip 3 coins. This attack does 10 damage for each heads."
+    }
+  ],
+  "versions": [
+    {
+      "set": "B2a",
+      "number": 55
+    }
+  ]
+}

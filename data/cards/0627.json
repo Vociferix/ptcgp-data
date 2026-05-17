@@ -1,0 +1,57 @@
+{
+  "id": 627,
+  "name": "Incineroar ex",
+  "card_type": "pokemon",
+  "natdex_number": 727,
+  "element": "Fire",
+  "stage": "Stage 2",
+  "hp": 180,
+  "retreat_cost": 2,
+  "weakness": "Water",
+  "is_ex": true,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Fire Fang",
+      "cost": [
+        "Fire"
+      ],
+      "damage": 30,
+      "effect": "Your opponent's Active Pokémon is now Burned."
+    },
+    {
+      "name": "Scar-Charged Smash",
+      "cost": [
+        "Fire",
+        "Fire",
+        "Colorless"
+      ],
+      "damage": 80,
+      "damage_suffix": "+",
+      "effect": "If this Pokémon has damage on it, this attack does 60 more damage."
+    }
+  ],
+  "evolves_from": "Torracat",
+  "versions": [
+    {
+      "set": "A3",
+      "number": 33
+    },
+    {
+      "set": "A3",
+      "number": 182
+    },
+    {
+      "set": "A3",
+      "number": 200
+    },
+    {
+      "set": "A4b",
+      "number": 82
+    },
+    {
+      "set": "B1",
+      "number": 318
+    }
+  ]
+}

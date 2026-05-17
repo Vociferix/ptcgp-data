@@ -1,0 +1,33 @@
+{
+  "id": 545,
+  "name": "Electrode",
+  "card_type": "pokemon",
+  "natdex_number": 101,
+  "element": "Lightning",
+  "stage": "Stage 1",
+  "hp": 90,
+  "retreat_cost": 1,
+  "weakness": "Fighting",
+  "flavor": "The more energy it charges up, the faster it gets. But this also makes it more likely to explode.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Tumbling Attack",
+      "cost": [
+        "Lightning",
+        "Lightning"
+      ],
+      "damage": 50,
+      "damage_suffix": "+",
+      "effect": "Flip a coin. If heads, this attack does 30 more damage."
+    }
+  ],
+  "evolves_from": "Voltorb",
+  "versions": [
+    {
+      "set": "A2b",
+      "number": 24
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "id": 459,
+  "name": "Heatran",
+  "card_type": "pokemon",
+  "natdex_number": 485,
+  "element": "Fire",
+  "stage": "Basic",
+  "hp": 110,
+  "retreat_cost": 3,
+  "weakness": "Water",
+  "flavor": "It dwells in volcanic caves. It digs in with its cross-shaped feet to crawl on ceilings and walls.",
+  "is_ex": false,
+  "is_mega": false,
+  "ability": {
+    "name": "Speed Link",
+    "effect": "If you have Arceus or Arceus ex in play, this Pokémon has no Retreat Cost."
+  },
+  "attacks": [
+    {
+      "name": "Ragin’ Mad Strike",
+      "cost": [
+        "Fire",
+        "Fire"
+      ],
+      "damage": 40,
+      "damage_suffix": "+",
+      "effect": "If this Pokémon has damage on it, this attack does 40 more damage."
+    }
+  ],
+  "versions": [
+    {
+      "set": "A2a",
+      "number": 13
+    },
+    {
+      "set": "A4b",
+      "number": 76
+    },
+    {
+      "set": "A4b",
+      "number": 77
+    }
+  ]
+}

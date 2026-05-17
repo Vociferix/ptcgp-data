@@ -1,0 +1,41 @@
+{
+  "id": 1706,
+  "name": "Mega Scizor ex",
+  "card_type": "pokemon",
+  "natdex_number": 212,
+  "element": "Metal",
+  "stage": "Stage 1",
+  "hp": 200,
+  "retreat_cost": 2,
+  "weakness": "Fire",
+  "is_ex": true,
+  "is_mega": true,
+  "attacks": [
+    {
+      "name": "Bullet Slugger",
+      "cost": [
+        "Metal",
+        "Metal",
+        "Colorless"
+      ],
+      "damage": 100,
+      "damage_suffix": "+",
+      "effect": "If this Pokémon moved from your Bench to the Active Spot this turn, this attack does 50 more damage."
+    }
+  ],
+  "evolves_from": "Scyther",
+  "versions": [
+    {
+      "set": "B2b",
+      "number": 47
+    },
+    {
+      "set": "B2b",
+      "number": 80
+    },
+    {
+      "set": "B2b",
+      "number": 115
+    }
+  ]
+}

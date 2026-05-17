@@ -1,0 +1,38 @@
+{
+  "id": 1679,
+  "name": "Empoleon",
+  "card_type": "pokemon",
+  "natdex_number": 395,
+  "element": "Water",
+  "stage": "Stage 2",
+  "hp": 130,
+  "retreat_cost": 1,
+  "weakness": "Lightning",
+  "flavor": "It avoids unnecessary disputes, but it will mercilessly decimate anything that threatens the safety of its colony.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Emperor’s Strike",
+      "cost": [
+        "Water",
+        "Water",
+        "Colorless"
+      ],
+      "damage": 80,
+      "damage_suffix": "+",
+      "effect": "If your opponent's Active Pokémon has more remaining HP than this Pokémon, this attack does 60 more damage."
+    }
+  ],
+  "evolves_from": "Prinplup",
+  "versions": [
+    {
+      "set": "B2b",
+      "number": 20
+    },
+    {
+      "set": "B2b",
+      "number": 71
+    }
+  ]
+}

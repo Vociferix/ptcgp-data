@@ -1,0 +1,33 @@
+{
+  "id": 1583,
+  "name": "Wo-Chien",
+  "card_type": "pokemon",
+  "natdex_number": 1001,
+  "element": "Grass",
+  "stage": "Basic",
+  "hp": 120,
+  "retreat_cost": 3,
+  "weakness": "Fire",
+  "flavor": "It drains the life-force from vegetation, causing nearby forests to instantly wither and fields to turn barren.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Binding Greed",
+      "cost": [
+        "Grass",
+        "Grass",
+        "Grass",
+        "Colorless"
+      ],
+      "damage": 90,
+      "effect": "During your opponent's next turn, attacks used by the Defending Pokémon cost 2 [C] more."
+    }
+  ],
+  "versions": [
+    {
+      "set": "B2a",
+      "number": 15
+    }
+  ]
+}

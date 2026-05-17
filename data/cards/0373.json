@@ -1,0 +1,38 @@
+{
+  "id": 373,
+  "name": "Rhyperior",
+  "card_type": "pokemon",
+  "natdex_number": 464,
+  "element": "Fighting",
+  "stage": "Stage 2",
+  "hp": 160,
+  "retreat_cost": 4,
+  "weakness": "Grass",
+  "flavor": "It can load up to three projectiles per arm into the holes in its hands. What launches out of those holes could be either rocks or Roggenrola.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Mountain Swing",
+      "cost": [
+        "Fighting",
+        "Fighting",
+        "Fighting",
+        "Colorless"
+      ],
+      "damage": 150,
+      "effect": "Discard the top 3 cards of your deck."
+    }
+  ],
+  "evolves_from": "Rhydon",
+  "versions": [
+    {
+      "set": "A2",
+      "number": 82
+    },
+    {
+      "set": "A2",
+      "number": 169
+    }
+  ]
+}

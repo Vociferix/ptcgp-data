@@ -1,0 +1,44 @@
+{
+  "id": 271,
+  "name": "Marshadow",
+  "card_type": "pokemon",
+  "natdex_number": 802,
+  "element": "Fighting",
+  "stage": "Basic",
+  "hp": 80,
+  "retreat_cost": 1,
+  "weakness": "Psychic",
+  "flavor": "It slips into the shadows of others and mimics their powers and movements. As it improves, it becomes stronger than those it’s imitating.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Revenge",
+      "cost": [
+        "Fighting",
+        "Colorless"
+      ],
+      "damage": 40,
+      "damage_suffix": "+",
+      "effect": "If any of your Pokémon were Knocked Out by damage from an attack during your opponent's last turn, this attack does 60 more damage."
+    }
+  ],
+  "versions": [
+    {
+      "set": "A1a",
+      "number": 47
+    },
+    {
+      "set": "A1a",
+      "number": 74
+    },
+    {
+      "set": "A4b",
+      "number": 224
+    },
+    {
+      "set": "A4b",
+      "number": 225
+    }
+  ]
+}

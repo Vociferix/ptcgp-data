@@ -1,0 +1,32 @@
+{
+  "id": 1749,
+  "name": "Numel",
+  "card_type": "pokemon",
+  "natdex_number": 322,
+  "element": "Fire",
+  "stage": "Basic",
+  "hp": 70,
+  "retreat_cost": 2,
+  "weakness": "Water",
+  "flavor": "The flaming magma it stores in the hump on its back is the source of its tremendous power.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Knock Away",
+      "cost": [
+        "Fire",
+        "Colorless"
+      ],
+      "damage": 20,
+      "damage_suffix": "+",
+      "effect": "Flip a coin. If heads, this attack does 30 more damage."
+    }
+  ],
+  "versions": [
+    {
+      "set": "B3",
+      "number": 21
+    }
+  ]
+}

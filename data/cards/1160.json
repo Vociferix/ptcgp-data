@@ -1,0 +1,35 @@
+{
+  "id": 1160,
+  "name": "Darmanitan",
+  "card_type": "pokemon",
+  "natdex_number": 555,
+  "element": "Fire",
+  "stage": "Stage 1",
+  "hp": 130,
+  "retreat_cost": 3,
+  "weakness": "Water",
+  "flavor": "This Pokémon’s power level rises along with the temperature of its fire, which can reach 2,500 degrees Fahrenheit.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Darmani-Hands",
+      "cost": [
+        "Fire",
+        "Fire",
+        "Fire",
+        "Colorless"
+      ],
+      "damage": 80,
+      "damage_suffix": "+",
+      "effect": "Flip 2 coins. This attack does 30 more damage for each heads."
+    }
+  ],
+  "evolves_from": "Darumaka",
+  "versions": [
+    {
+      "set": "B1",
+      "number": 40
+    }
+  ]
+}

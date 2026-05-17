@@ -1,0 +1,33 @@
+{
+  "id": 1187,
+  "name": "Carracosta",
+  "card_type": "pokemon",
+  "natdex_number": 565,
+  "element": "Water",
+  "stage": "Stage 2",
+  "hp": 150,
+  "retreat_cost": 3,
+  "weakness": "Lightning",
+  "flavor": "This Pokémon emerges from the water in search of prey despite the fact that it moves more slowly on land.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Blocking Shell",
+      "cost": [
+        "Water",
+        "Water",
+        "Colorless"
+      ],
+      "damage": 100,
+      "effect": "Prevent all damage done to this Pokémon by attacks from Basic Pokémon during your opponent's next turn."
+    }
+  ],
+  "evolves_from": "Tirtouga",
+  "versions": [
+    {
+      "set": "B1",
+      "number": 67
+    }
+  ]
+}

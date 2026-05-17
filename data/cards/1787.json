@@ -1,0 +1,36 @@
+{
+  "id": 1787,
+  "name": "Zekrom",
+  "card_type": "pokemon",
+  "natdex_number": 644,
+  "element": "Lightning",
+  "stage": "Basic",
+  "hp": 120,
+  "retreat_cost": 2,
+  "weakness": "Fighting",
+  "flavor": "Mythology tells us that if people lose the righteousness in their hearts, their kingdoms will be razed by Zekrom’s lightning.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Bolt Strike",
+      "cost": [
+        "Lightning",
+        "Lightning",
+        "Lightning"
+      ],
+      "damage": 110,
+      "effect": "Flip a coin. If tails, this Pokémon also does 30 damage to itself."
+    }
+  ],
+  "versions": [
+    {
+      "set": "B3",
+      "number": 59
+    },
+    {
+      "set": "B3",
+      "number": 163
+    }
+  ]
+}

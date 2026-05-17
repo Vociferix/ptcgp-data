@@ -1,0 +1,55 @@
+{
+  "id": 493,
+  "name": "Garchomp ex",
+  "card_type": "pokemon",
+  "natdex_number": 445,
+  "element": "Fighting",
+  "stage": "Stage 2",
+  "hp": 170,
+  "retreat_cost": 1,
+  "weakness": "Grass",
+  "is_ex": true,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Linear Attack",
+      "cost": [
+        "Fighting"
+      ],
+      "damage": 0,
+      "effect": "This attack does 50 damage to 1 of your opponent's Pokémon."
+    },
+    {
+      "name": "Dragon Claw",
+      "cost": [
+        "Fighting",
+        "Fighting",
+        "Colorless"
+      ],
+      "damage": 100
+    }
+  ],
+  "evolves_from": "Gabite",
+  "versions": [
+    {
+      "set": "A2a",
+      "number": 47
+    },
+    {
+      "set": "A2a",
+      "number": 84
+    },
+    {
+      "set": "A2a",
+      "number": 93
+    },
+    {
+      "set": "A4a",
+      "number": 103
+    },
+    {
+      "set": "A4b",
+      "number": 209
+    }
+  ]
+}

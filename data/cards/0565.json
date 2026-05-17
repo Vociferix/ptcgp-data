@@ -1,0 +1,32 @@
+{
+  "id": 565,
+  "name": "Flamigo",
+  "card_type": "pokemon",
+  "natdex_number": 973,
+  "element": "Fighting",
+  "stage": "Basic",
+  "hp": 80,
+  "retreat_cost": 1,
+  "weakness": "Psychic",
+  "flavor": "This Pokémon apparently ties the base of its neck into a knot so that energy stored in its belly does not escape from its beak.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Double Kick",
+      "cost": [
+        "Fighting",
+        "Fighting"
+      ],
+      "damage": 50,
+      "damage_suffix": "x",
+      "effect": "Flip 2 coins. This attack does 50 damage for each heads."
+    }
+  ],
+  "versions": [
+    {
+      "set": "A2b",
+      "number": 44
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "id": 251,
+  "name": "Raichu",
+  "card_type": "pokemon",
+  "natdex_number": 26,
+  "element": "Lightning",
+  "stage": "Stage 1",
+  "hp": 120,
+  "retreat_cost": 2,
+  "weakness": "Fighting",
+  "flavor": "Its tail discharges electricity into the ground, protecting it from getting shocked.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Gigashock",
+      "cost": [
+        "Lightning",
+        "Lightning",
+        "Lightning"
+      ],
+      "damage": 60,
+      "effect": "This attack also does 20 damage to each of your opponent's Benched Pokémon."
+    }
+  ],
+  "evolves_from": "Pikachu",
+  "versions": [
+    {
+      "set": "A1a",
+      "number": 26
+    }
+  ]
+}

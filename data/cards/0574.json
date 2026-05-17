@@ -1,0 +1,41 @@
+{
+  "id": 574,
+  "name": "Tinkatuff",
+  "card_type": "pokemon",
+  "natdex_number": 958,
+  "element": "Metal",
+  "stage": "Stage 1",
+  "hp": 90,
+  "retreat_cost": 2,
+  "weakness": "Fire",
+  "flavor": "This Pokémon will attack groups of Pawniard and Bisharp, gathering metal from them in order to create a large and sturdy hammer.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Tenacious Hammer",
+      "cost": [
+        "Metal",
+        "Metal"
+      ],
+      "damage": 30,
+      "damage_suffix": "+",
+      "effect": "Flip a coin. If heads, this attack does 30 more damage."
+    }
+  ],
+  "evolves_from": "Tinkatink",
+  "versions": [
+    {
+      "set": "A2b",
+      "number": 53
+    },
+    {
+      "set": "A4b",
+      "number": 264
+    },
+    {
+      "set": "A4b",
+      "number": 265
+    }
+  ]
+}

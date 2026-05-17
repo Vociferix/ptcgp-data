@@ -1,0 +1,35 @@
+{
+  "id": 1095,
+  "name": "Crustle",
+  "card_type": "pokemon",
+  "natdex_number": 558,
+  "element": "Fighting",
+  "stage": "Stage 1",
+  "hp": 140,
+  "retreat_cost": 4,
+  "weakness": "Grass",
+  "flavor": "This highly territorial Pokémon prefers dry climates. It won’t come out of its boulder on rainy days.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Stone Edge",
+      "cost": [
+        "Fighting",
+        "Fighting",
+        "Fighting",
+        "Colorless"
+      ],
+      "damage": 100,
+      "damage_suffix": "+",
+      "effect": "Flip a coin. If heads, this attack does 50 more damage."
+    }
+  ],
+  "evolves_from": "Dwebble",
+  "versions": [
+    {
+      "set": "A4a",
+      "number": 47
+    }
+  ]
+}

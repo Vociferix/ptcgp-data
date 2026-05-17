@@ -1,0 +1,35 @@
+{
+  "id": 100,
+  "name": "Electrode",
+  "card_type": "pokemon",
+  "natdex_number": 101,
+  "element": "Lightning",
+  "stage": "Stage 1",
+  "hp": 80,
+  "retreat_cost": 0,
+  "weakness": "Fighting",
+  "flavor": "The more energy it charges up, the faster it gets. But this also makes it more likely to explode.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Electro Ball",
+      "cost": [
+        "Lightning",
+        "Lightning"
+      ],
+      "damage": 70
+    }
+  ],
+  "evolves_from": "Voltorb",
+  "versions": [
+    {
+      "set": "A1",
+      "number": 100
+    },
+    {
+      "set": "A1",
+      "number": 235
+    }
+  ]
+}

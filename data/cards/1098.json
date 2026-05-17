@@ -1,0 +1,39 @@
+{
+  "id": 1098,
+  "name": "Zoroark",
+  "card_type": "pokemon",
+  "natdex_number": 571,
+  "element": "Darkness",
+  "stage": "Stage 1",
+  "hp": 100,
+  "retreat_cost": 2,
+  "weakness": "Grass",
+  "flavor": "Stories say those who tried to catch Zoroark were trapped in an illusion and punished.",
+  "is_ex": false,
+  "is_mega": false,
+  "ability": {
+    "name": "Illusive Trickery",
+    "effect": "If your opponent's Pokémon is Knocked Out by damage from this Pokémon's attacks, during your opponent's next turn, prevent all damage from—and effects of—attacks done to this Pokémon."
+  },
+  "attacks": [
+    {
+      "name": "Night Daze",
+      "cost": [
+        "Darkness",
+        "Darkness"
+      ],
+      "damage": 70
+    }
+  ],
+  "evolves_from": "Zorua",
+  "versions": [
+    {
+      "set": "A4a",
+      "number": 50
+    },
+    {
+      "set": "P-A",
+      "number": 106
+    }
+  ]
+}

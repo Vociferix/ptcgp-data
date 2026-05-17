@@ -1,0 +1,34 @@
+{
+  "id": 265,
+  "name": "Mankey",
+  "card_type": "pokemon",
+  "natdex_number": 56,
+  "element": "Fighting",
+  "stage": "Basic",
+  "hp": 50,
+  "retreat_cost": 1,
+  "weakness": "Psychic",
+  "flavor": "It lives in groups in the treetops. If it loses sight of its group, it becomes infuriated by its loneliness.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Focus Fist",
+      "cost": [
+        "Fighting"
+      ],
+      "damage": 50,
+      "effect": "Flip a coin. If tails, this attack does nothing."
+    }
+  ],
+  "versions": [
+    {
+      "set": "A1a",
+      "number": 41
+    },
+    {
+      "set": "A4",
+      "number": 221
+    }
+  ]
+}

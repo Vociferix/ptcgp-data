@@ -1,0 +1,43 @@
+{
+  "id": 1854,
+  "name": "Flygon ex",
+  "card_type": "pokemon",
+  "natdex_number": 330,
+  "element": "Dragon",
+  "stage": "Stage 2",
+  "hp": 180,
+  "retreat_cost": 2,
+  "is_ex": true,
+  "is_mega": false,
+  "ability": {
+    "name": "Sand Slammer",
+    "effect": "During Pokémon Checkup, if this Pokémon is in the Active Spot, do 10 damage to each of your opponent's Pokémon."
+  },
+  "attacks": [
+    {
+      "name": "Dragon Pulse",
+      "cost": [
+        "Grass",
+        "Fighting",
+        "Colorless"
+      ],
+      "damage": 140,
+      "effect": "Discard the top card of your deck."
+    }
+  ],
+  "evolves_from": "Vibrava",
+  "versions": [
+    {
+      "set": "B3",
+      "number": 126
+    },
+    {
+      "set": "B3",
+      "number": 188
+    },
+    {
+      "set": "B3",
+      "number": 201
+    }
+  ]
+}

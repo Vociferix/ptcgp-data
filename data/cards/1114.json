@@ -1,0 +1,31 @@
+{
+  "id": 1114,
+  "name": "Fletchling",
+  "card_type": "pokemon",
+  "natdex_number": 661,
+  "element": "Colorless",
+  "stage": "Basic",
+  "hp": 50,
+  "retreat_cost": 1,
+  "weakness": "Lightning",
+  "flavor": "This Pokémon is normally calm, but once it enters battle, its hormonal balance changes and it becomes aggressive.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Quick Attack",
+      "cost": [
+        "Colorless"
+      ],
+      "damage": 10,
+      "damage_suffix": "+",
+      "effect": "Flip a coin. If heads, this attack does 30 more damage."
+    }
+  ],
+  "versions": [
+    {
+      "set": "A4a",
+      "number": 66
+    }
+  ]
+}

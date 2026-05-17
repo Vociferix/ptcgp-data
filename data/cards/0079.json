@@ -1,0 +1,39 @@
+{
+  "id": 79,
+  "name": "Lapras",
+  "card_type": "pokemon",
+  "natdex_number": 131,
+  "element": "Water",
+  "stage": "Basic",
+  "hp": 100,
+  "retreat_cost": 2,
+  "weakness": "Lightning",
+  "flavor": "A smart and kindhearted Pokémon, it glides across the surface of the sea while its beautiful song echoes around it.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Hydro Pump",
+      "cost": [
+        "Water"
+      ],
+      "damage": 20,
+      "damage_suffix": "+",
+      "effect": "If this Pokémon has at least 3 extra [W] Energy attached, this attack does 70 more damage."
+    }
+  ],
+  "versions": [
+    {
+      "set": "A1",
+      "number": 79
+    },
+    {
+      "set": "A1",
+      "number": 234
+    },
+    {
+      "set": "A3b",
+      "number": 94
+    }
+  ]
+}

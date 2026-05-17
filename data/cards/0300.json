@@ -1,0 +1,32 @@
+{
+  "id": 300,
+  "name": "Roserade",
+  "card_type": "pokemon",
+  "natdex_number": 407,
+  "element": "Grass",
+  "stage": "Stage 1",
+  "hp": 100,
+  "retreat_cost": 2,
+  "weakness": "Fire",
+  "flavor": "After captivating opponents with its sweet scent, it lashes them with its thorny whips.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Poisonous Whip",
+      "cost": [
+        "Grass",
+        "Colorless"
+      ],
+      "damage": 50,
+      "effect": "Your opponent's Active Pokémon is now Poisoned."
+    }
+  ],
+  "evolves_from": "Roselia",
+  "versions": [
+    {
+      "set": "A2",
+      "number": 9
+    }
+  ]
+}

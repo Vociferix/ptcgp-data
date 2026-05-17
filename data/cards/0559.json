@@ -1,0 +1,33 @@
+{
+  "id": 559,
+  "name": "Machoke",
+  "card_type": "pokemon",
+  "natdex_number": 67,
+  "element": "Fighting",
+  "stage": "Stage 1",
+  "hp": 100,
+  "retreat_cost": 2,
+  "weakness": "Psychic",
+  "flavor": "Its muscular body is so powerful, it must wear a power-save belt to be able to regulate its motions.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Pummel",
+      "cost": [
+        "Fighting",
+        "Fighting"
+      ],
+      "damage": 30,
+      "damage_suffix": "+",
+      "effect": "Flip a coin. If heads, this attack does 30 more damage."
+    }
+  ],
+  "evolves_from": "Machop",
+  "versions": [
+    {
+      "set": "A2b",
+      "number": 38
+    }
+  ]
+}

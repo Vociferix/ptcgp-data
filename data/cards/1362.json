@@ -1,0 +1,36 @@
+{
+  "id": 1362,
+  "name": "Wartortle",
+  "card_type": "pokemon",
+  "natdex_number": 8,
+  "element": "Water",
+  "stage": "Stage 1",
+  "hp": 90,
+  "retreat_cost": 2,
+  "weakness": "Lightning",
+  "flavor": "It cleverly controls its furry ears and tail to maintain its balance while swimming.",
+  "is_ex": false,
+  "is_mega": false,
+  "ability": {
+    "name": "Shell Shield",
+    "effect": "As long as this Pokémon is on your Bench, prevent all damage done to this Pokémon by attacks."
+  },
+  "attacks": [
+    {
+      "name": "Waterfall",
+      "cost": [
+        "Water",
+        "Water",
+        "Colorless"
+      ],
+      "damage": 60
+    }
+  ],
+  "evolves_from": "Squirtle",
+  "versions": [
+    {
+      "set": "B1a",
+      "number": 18
+    }
+  ]
+}

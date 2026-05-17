@@ -1,0 +1,39 @@
+{
+  "id": 828,
+  "name": "Torkoal",
+  "card_type": "pokemon",
+  "natdex_number": 324,
+  "element": "Fire",
+  "stage": "Basic",
+  "hp": 100,
+  "retreat_cost": 2,
+  "weakness": "Water",
+  "flavor": "It burns coal inside its shell for energy. It blows out black soot if it is endangered.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Flamethrower",
+      "cost": [
+        "Fire",
+        "Fire"
+      ],
+      "damage": 70,
+      "effect": "Discard a [R] Energy from this Pokémon."
+    }
+  ],
+  "versions": [
+    {
+      "set": "A3b",
+      "number": 10
+    },
+    {
+      "set": "A4b",
+      "number": 69
+    },
+    {
+      "set": "A4b",
+      "number": 70
+    }
+  ]
+}

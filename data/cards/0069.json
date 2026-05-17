@@ -1,0 +1,38 @@
+{
+  "id": 69,
+  "name": "Kingler",
+  "card_type": "pokemon",
+  "natdex_number": 99,
+  "element": "Water",
+  "stage": "Stage 1",
+  "hp": 120,
+  "retreat_cost": 3,
+  "weakness": "Lightning",
+  "flavor": "Its large and hard pincer has 10,000-horsepower strength. However, being so big, it is unwieldy to move.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "KO Crab",
+      "cost": [
+        "Water",
+        "Water",
+        "Colorless"
+      ],
+      "damage": 80,
+      "damage_suffix": "+",
+      "effect": "Flip 2 coins. If both of them are heads, this attack does 80 more damage."
+    }
+  ],
+  "evolves_from": "Krabby",
+  "versions": [
+    {
+      "set": "A1",
+      "number": 69
+    },
+    {
+      "set": "A4a",
+      "number": 96
+    }
+  ]
+}

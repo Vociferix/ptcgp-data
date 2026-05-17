@@ -1,0 +1,62 @@
+{
+  "id": 36,
+  "name": "Charizard ex",
+  "card_type": "pokemon",
+  "natdex_number": 6,
+  "element": "Fire",
+  "stage": "Stage 2",
+  "hp": 180,
+  "retreat_cost": 2,
+  "weakness": "Water",
+  "is_ex": true,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Slash",
+      "cost": [
+        "Fire",
+        "Colorless",
+        "Colorless"
+      ],
+      "damage": 60
+    },
+    {
+      "name": "Crimson Storm",
+      "cost": [
+        "Fire",
+        "Fire",
+        "Colorless",
+        "Colorless"
+      ],
+      "damage": 200,
+      "effect": "Discard 2 [R] Energy from this Pokémon."
+    }
+  ],
+  "evolves_from": "Charmeleon",
+  "versions": [
+    {
+      "set": "A1",
+      "number": 36
+    },
+    {
+      "set": "A1",
+      "number": 253
+    },
+    {
+      "set": "A1",
+      "number": 280
+    },
+    {
+      "set": "A1",
+      "number": 284
+    },
+    {
+      "set": "A4b",
+      "number": 59
+    },
+    {
+      "set": "A4b",
+      "number": 361
+    }
+  ]
+}

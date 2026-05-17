@@ -1,0 +1,37 @@
+{
+  "id": 182,
+  "name": "Melmetal",
+  "card_type": "pokemon",
+  "natdex_number": 809,
+  "element": "Metal",
+  "stage": "Stage 1",
+  "hp": 130,
+  "retreat_cost": 3,
+  "weakness": "Fire",
+  "flavor": "At the end of its life-span, Melmetal will rust and fall apart. The small shards left behind will eventually be reborn as Meltan.",
+  "is_ex": false,
+  "is_mega": false,
+  "ability": {
+    "name": "Hard Coat",
+    "effect": "This Pokémon takes -20 damage from attacks."
+  },
+  "attacks": [
+    {
+      "name": "Heavy Impact",
+      "cost": [
+        "Metal",
+        "Metal",
+        "Metal",
+        "Colorless"
+      ],
+      "damage": 120
+    }
+  ],
+  "evolves_from": "Meltan",
+  "versions": [
+    {
+      "set": "A1",
+      "number": 182
+    }
+  ]
+}

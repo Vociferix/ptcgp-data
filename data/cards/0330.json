@@ -1,0 +1,32 @@
+{
+  "id": 330,
+  "name": "Floatzel",
+  "card_type": "pokemon",
+  "natdex_number": 419,
+  "element": "Water",
+  "stage": "Stage 1",
+  "hp": 90,
+  "retreat_cost": 1,
+  "weakness": "Lightning",
+  "flavor": "With its flotation sac inflated, it can carry people on its back. It deflates the sac before it dives.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Jet Screw",
+      "cost": [
+        "Water"
+      ],
+      "damage": 30,
+      "damage_suffix": "+",
+      "effect": "Flip a coin. If heads, this attack does 30 more damage."
+    }
+  ],
+  "evolves_from": "Buizel",
+  "versions": [
+    {
+      "set": "A2",
+      "number": 39
+    }
+  ]
+}

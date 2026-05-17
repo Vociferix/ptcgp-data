@@ -1,0 +1,34 @@
+{
+  "id": 1171,
+  "name": "Gyarados",
+  "card_type": "pokemon",
+  "natdex_number": 130,
+  "element": "Water",
+  "stage": "Stage 1",
+  "hp": 140,
+  "retreat_cost": 3,
+  "weakness": "Lightning",
+  "flavor": "It appears whenever there is world conflict, burning down any place it travels through.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Hammering Tail",
+      "cost": [
+        "Water",
+        "Water",
+        "Water",
+        "Colorless"
+      ],
+      "damage": 100,
+      "effect": "Discard the top card of your opponent's deck."
+    }
+  ],
+  "evolves_from": "Magikarp",
+  "versions": [
+    {
+      "set": "B1",
+      "number": 51
+    }
+  ]
+}

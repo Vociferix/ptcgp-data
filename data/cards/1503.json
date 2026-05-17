@@ -1,0 +1,38 @@
+{
+  "id": 1503,
+  "name": "Tyrantrum",
+  "card_type": "pokemon",
+  "natdex_number": 697,
+  "element": "Fighting",
+  "stage": "Stage 2",
+  "hp": 150,
+  "retreat_cost": 3,
+  "weakness": "Grass",
+  "flavor": "A single bite of Tyrantrum’s massive jaws will demolish a car. This Pokémon was the king of the ancient world.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Tyrannical Fang",
+      "cost": [
+        "Fighting",
+        "Fighting",
+        "Fighting"
+      ],
+      "damage": 100,
+      "damage_suffix": "+",
+      "effect": "If you have fewer Pokémon in play than your opponent, this attack does 80 more damage."
+    }
+  ],
+  "evolves_from": "Tyrunt",
+  "versions": [
+    {
+      "set": "B2",
+      "number": 90
+    },
+    {
+      "set": "B2",
+      "number": 171
+    }
+  ]
+}

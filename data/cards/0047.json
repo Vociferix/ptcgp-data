@@ -1,0 +1,58 @@
+{
+  "id": 47,
+  "name": "Moltres ex",
+  "card_type": "pokemon",
+  "natdex_number": 146,
+  "element": "Fire",
+  "stage": "Basic",
+  "hp": 140,
+  "retreat_cost": 2,
+  "weakness": "Lightning",
+  "is_ex": true,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Inferno Dance",
+      "cost": [
+        "Fire"
+      ],
+      "damage": 0,
+      "effect": "Flip 3 coins. Take an amount of [R] Energy from your Energy Zone equal to the number of heads and attach it to your Benched [R] Pokémon in any way you like."
+    },
+    {
+      "name": "Heat Blast",
+      "cost": [
+        "Fire",
+        "Colorless",
+        "Colorless"
+      ],
+      "damage": 70
+    }
+  ],
+  "versions": [
+    {
+      "set": "A1",
+      "number": 47
+    },
+    {
+      "set": "A1",
+      "number": 255
+    },
+    {
+      "set": "A1",
+      "number": 274
+    },
+    {
+      "set": "A3b",
+      "number": 103
+    },
+    {
+      "set": "A4b",
+      "number": 67
+    },
+    {
+      "set": "P-A",
+      "number": 25
+    }
+  ]
+}

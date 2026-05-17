@@ -1,0 +1,33 @@
+{
+  "id": 790,
+  "name": "Krookodile",
+  "card_type": "pokemon",
+  "natdex_number": 553,
+  "element": "Darkness",
+  "stage": "Stage 2",
+  "hp": 140,
+  "retreat_cost": 3,
+  "weakness": "Grass",
+  "flavor": "After clamping down with its powerful jaws, it twists its body around to rip its prey in half.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Poaching Fangs",
+      "cost": [
+        "Darkness",
+        "Darkness",
+        "Colorless"
+      ],
+      "damage": 90,
+      "effect": "Flip 3 coins. For each heads, a card is chosen at random from your opponent's hand. Your opponent reveals that card and shuffles it into their deck."
+    }
+  ],
+  "evolves_from": "Krokorok",
+  "versions": [
+    {
+      "set": "A3a",
+      "number": 41
+    }
+  ]
+}

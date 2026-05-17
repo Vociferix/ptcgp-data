@@ -1,0 +1,37 @@
+{
+  "id": 284,
+  "name": "Tauros",
+  "card_type": "pokemon",
+  "natdex_number": 128,
+  "element": "Colorless",
+  "stage": "Basic",
+  "hp": 100,
+  "retreat_cost": 2,
+  "weakness": "Fighting",
+  "flavor": "When Tauros begins whipping itself with its tails, it’s a warning that the Pokémon is about to charge with astounding speed.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Fighting Tackle",
+      "cost": [
+        "Colorless",
+        "Colorless",
+        "Colorless"
+      ],
+      "damage": 40,
+      "damage_suffix": "+",
+      "effect": "If your opponent's Active Pokémon is a Pokémon ex, this attack does 80  more damage."
+    }
+  ],
+  "versions": [
+    {
+      "set": "A1a",
+      "number": 60
+    },
+    {
+      "set": "B2",
+      "number": 224
+    }
+  ]
+}

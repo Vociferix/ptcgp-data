@@ -1,0 +1,32 @@
+{
+  "id": 1784,
+  "name": "Electrode",
+  "card_type": "pokemon",
+  "natdex_number": 101,
+  "element": "Lightning",
+  "stage": "Stage 1",
+  "hp": 90,
+  "retreat_cost": 1,
+  "weakness": "Fighting",
+  "flavor": "The more energy it charges up, the faster it gets. But this also makes it more likely to explode.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Electroblast",
+      "cost": [
+        "Lightning"
+      ],
+      "damage": 20,
+      "damage_suffix": "+",
+      "effect": "Flip 2 coins. This attack does 30 more damage for each heads."
+    }
+  ],
+  "evolves_from": "Voltorb",
+  "versions": [
+    {
+      "set": "B3",
+      "number": 56
+    }
+  ]
+}

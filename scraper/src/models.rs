@@ -2,16 +2,18 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
+// ── Set metadata ──────────────────────────────────────────────────────────────
+
 /// One entry in data/sets.json
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SetSummary {
     pub code: String,
     pub name: String,
     pub series: String,
+    /// YYYY-MM-DD, null for promo sets
     pub release_date: Option<String>,
     pub is_promo: bool,
     pub card_count: Option<u32>,
-    pub icon_url: String,
 }
 
 /// Full set detail — data/sets/{SET}/set.json
@@ -23,73 +25,138 @@ pub struct SetDetail {
     pub release_date: Option<String>,
     pub is_promo: bool,
     pub card_count: Option<u32>,
-    pub icon_url: String,
-    pub packs: Vec<PackInfo>,
+    /// Subtitle of each pack in this set (e.g. "Charizard", "Mewtwo")
+    pub packs: Vec<String>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct PackInfo {
-    /// RaenonX pack ID, e.g. "AN001_0010_00_000"
-    pub raenonx_id: Option<String>,
-    /// Display subtitle, e.g. "Mewtwo" (None for single-pack sets)
-    pub subtitle: Option<String>,
-    /// Full display name, e.g. "Mewtwo pack"
-    pub display_name: String,
-}
+// ── Abstract cards and card versions ─────────────────────────────────────────
 
-/// One entry in data/sets/{SET}/cards.json
+/// Abstract card file — data/cards/{ID:04}.json
+///
+/// An abstract card represents the game content shared by all art/rarity
+/// variants of the same card (same name and mechanics). Version-specific
+/// data (rarity, illustrator, packs) lives in CardVersion.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CardSummary {
-    pub number: u32,
+pub struct AbstractCard {
+    pub id: u32,
     pub name: String,
-    pub rarity: String,
-    pub card_type: String,
-    pub element: Option<String>,
-}
-
-/// Full card — data/sets/{SET}/cards/{NUM}.json
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Card {
-    pub set: String,
-    pub number: u32,
-    pub name: String,
-    pub rarity: String,
-    pub illustrator: Option<String>,
     /// "pokemon" or "trainer"
     pub card_type: String,
+    /// National Pokédex number (null for trainers and unknown Pokémon)
+    #[serde(skip_serializing_if = "Option::is_none", default)]
+    pub natdex_number: Option<u32>,
 
     // Pokemon fields (null for trainers)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub element: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stage: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub hp: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub retreat_cost: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub weakness: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub flavor: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_ex: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_mega: Option<bool>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub variants: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ability: Option<Ability>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub attacks: Vec<Attack>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub evolves_from: Option<String>,
+
+    // Trainer fields (null for pokemon)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub trainer_kind: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub trainer_effect: Option<String>,
+
+    /// All known versions of this abstract card
+    pub versions: Vec<VersionRef>,
+}
+
+/// Reference to one specific card version
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct VersionRef {
+    pub set: String,
+    pub number: u32,
+}
+
+/// Card version file — data/sets/{SET}/cards/{NUM:03}.json
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CardVersion {
+    pub set: String,
+    pub number: u32,
+    /// References the abstract card by its sequential ID
+    pub card_id: u32,
+    pub rarity: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub illustrator: Option<String>,
+    /// True when this version is from a promo set (P-A, P-B, …) and carries a promo stamp
+    #[serde(default)]
+    pub is_promo: bool,
+    /// True when this version has a foil/mirror finish (mirrorType "normalMirror" in RaenonX)
+    #[serde(default)]
+    pub is_foil: bool,
+    /// True when an identical version (same rarity, illustrator, promo status, foil status) was released earlier
+    #[serde(default)]
+    pub is_reprint: bool,
+    /// Pack subtitles this version can be obtained from
+    pub packs: Vec<String>,
+    /// Promo source categories (only present for promo cards)
+    #[serde(skip_serializing_if = "Vec::is_empty", default)]
+    pub promo_sources: Vec<String>,
+    /// Other versions with the same rarity, illustrator, and promo status (same physical card)
+    #[serde(skip_serializing_if = "Vec::is_empty", default)]
+    pub duplicates: Vec<VersionRef>,
+}
+
+// ── Card content from Limitless scraping ─────────────────────────────────────
+
+/// Game content scraped from a Limitless card page.
+/// Not serialized to disk directly — used to build AbstractCard.
+#[derive(Debug, Clone)]
+pub struct LimitlessCardData {
+    pub name: String,
+    pub card_type: String,
+
     pub element: Option<String>,
     pub stage: Option<String>,
     pub hp: Option<u32>,
     pub retreat_cost: Option<u32>,
     pub weakness: Option<String>,
     pub flavor: Option<String>,
-    pub is_ex: Option<bool>,
-    pub is_mega: Option<bool>,
+    pub is_ex: bool,
+    pub is_mega: bool,
     pub variants: Vec<String>,
     pub ability: Option<Ability>,
     pub attacks: Vec<Attack>,
+    pub evolves_from: Option<String>,
 
-    // Trainer fields (null for pokemon)
     pub trainer_kind: Option<String>,
     pub trainer_effect: Option<String>,
 
-    /// Pack memberships with display names
-    pub packs: Vec<PackRef>,
-    pub images: CardImages,
-    /// Other prints of the same card (different art / rarity)
-    pub alternate_versions: Vec<AlternateVersion>,
+    /// Version-specific (moves to CardVersion)
+    pub illustrator: Option<String>,
 }
+
+// ── Shared card sub-types ─────────────────────────────────────────────────────
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Attack {
     pub name: String,
-    /// Ordered energy cost, e.g. ["Grass", "Colorless"]
     pub cost: Vec<String>,
     pub damage: u32,
-    /// '+' or '×' suffix on damage number, if any
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub damage_suffix: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub effect: Option<String>,
 }
 
@@ -99,29 +166,16 @@ pub struct Ability {
     pub effect: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CardImages {
-    pub thumbnail: String,
-    pub full: String,
-}
+// ── Reference data ────────────────────────────────────────────────────────────
 
+/// data/base_pokemon.json — one entry per national dex number
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct AlternateVersion {
-    pub set: String,
-    pub number: Option<u32>,
-    pub rarity: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct PackRef {
-    pub raenonx_id: Option<String>,
-    pub display_name: String,
+pub struct BasePokemon {
+    pub name: String,
+    pub natdex_number: u32,
 }
 
 /// data/rarities.json
-///
-/// craft_cost and dupe_dust are populated from RaenonX global-master but are
-/// not yet in the SQLite schema — tracked as a pending schema update.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RarityInfo {
     pub code: String,
@@ -132,11 +186,38 @@ pub struct RarityInfo {
     pub dupe_dust: Option<u32>,
 }
 
+/// One entry in data/promo_sources.json
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PromoSource {
+    pub code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+}
+
+// ── RaenonX global-master parsed data ────────────────────────────────────────
+
+/// One entry from global-master cardEntryMap, with all fields we care about.
+#[derive(Debug, Clone)]
+pub struct CardEntry {
+    pub card_id: String,
+    pub card_type: String,
+    /// Rarity code from RaenonX (e.g. "C", "AR", "UR"). Empty for promos without code.
+    pub rarity: String,
+    /// True when mirrorType == "normalMirror" (foil/mirror finish variant)
+    pub is_foil: bool,
+    /// All (expansion_id, card_number) pairs for this entry (may span multiple sets)
+    pub collection_nums: Vec<(String, u32)>,
+    /// All variant card IDs that share the same abstract card (play.cardIds)
+    pub card_ids_group: Vec<String>,
+    /// Pack IDs this card can be obtained from (source.pack)
+    pub source_packs: Vec<String>,
+    /// Promo source categories derived from source.* fields
+    pub promo_sources: Vec<String>,
+}
+
+// ── Pull rate data ────────────────────────────────────────────────────────────
+
 /// Pull rate as a fraction, preserving the source representation.
-///
-/// When denominator is 1 the numerator is already a decimal fraction
-/// (e.g. numerator=0.01538 means 1.538%). This matches the RaenonX wire
-/// format exactly to avoid precision loss on conversion.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Rate {
     pub numerator: f64,
@@ -153,12 +234,11 @@ impl Rate {
     }
 }
 
-/// data/pull_rates/{PACK_ID}.json
+/// data/pull_rates/{SET}/{SUBTITLE}.json
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PackPullRates {
-    pub pack_id: String,
     pub set: String,
-    pub subtitle: Option<String>,
+    pub subtitle: String,
     pub variants: PackVariants,
 }
 
@@ -180,20 +260,6 @@ pub struct PackVariantRates {
     pub slot_count: u32,
     /// Per-slot rarity breakdown: each element maps rarity code -> probability
     pub rarity_rates_by_slot: Vec<HashMap<String, f64>>,
-    /// Per-card pull rates: RaenonX card ID -> one f64 per slot (null = card
-    /// cannot appear in that slot)
+    /// Per-card pull rates: "{SET}-{NUM:03}" -> one f64 per slot (null = cannot appear)
     pub card_rates: HashMap<String, Vec<Option<f64>>>,
-}
-
-/// Extracted subset of RaenonX global-master — data/raenonx/global_master_summary.json
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct GlobalMasterSummary {
-    /// Regular (openable) pack IDs in the order they appear in the source
-    pub regular_pack_ids: Vec<String>,
-    /// Pack ID -> expansion set code (e.g. "AN001_0010_00_000" -> "A1")
-    pub pack_expansion: HashMap<String, String>,
-    /// Rarity code -> craft cost in pack points
-    pub craft_costs: HashMap<String, u32>,
-    /// Rarity code -> dupe trade-in dust value
-    pub dupe_dust: HashMap<String, u32>,
 }

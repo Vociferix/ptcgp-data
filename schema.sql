@@ -2,7 +2,7 @@ BEGIN;
 
 -- Rarity Groups
 --
--- Currently there are only 4 rarity groups:
+-- Currently the rarity groups are:
 -- * Diamond
 -- * Star
 -- * Shiny
@@ -52,6 +52,14 @@ CREATE TABLE rarities (
     -- Full name of rarity, such as "Common" or "Uncommon"
     name TEXT UNIQUE NOT NULL,
 
+    -- The wonder pick point cost to craft a card of this rarity.
+    -- Null when crafting is not available for this rarity.
+    craft_cost INTEGER,
+
+    -- The wonder pick points awarded for a duplicate card of this rarity.
+    -- Null when duplicates do not yield points for this rarity.
+    dupe_dust INTEGER,
+
     FOREIGN KEY (class_id) REFERENCES rarity_classes (id)
 );
 
@@ -82,18 +90,42 @@ CREATE TABLE sets (
     -- The full name of the set, such as "Genetic Apex"
     name TEXT UNIQUE NOT NULL,
 
-    -- The date the set was released.
-    --
-    -- This is null for promo sets.
-    release_date DATETIME,
-
     FOREIGN KEY (series_id) REFERENCES series (id)
+);
+
+-- Card Set Release Dates
+--
+-- Promo sets don't have a release date, so they will not have a
+-- corresponding row in this table.
+CREATE TABLE set_release_dates (
+    -- sets.id - The set
+    set_id INTEGER UNIQUE NOT NULL,
+
+    -- The release date of the set
+    release_date DATETIME NOT NULL,
+
+    FOREIGN KEY (set_id) REFERENCES sets (id)
 );
 
 -- Listing of Promo Sets
 CREATE TABLE promo_sets (
     -- sets.id - each set in this table is a series promo set
     set_id INTEGER NOT NULL UNIQUE,
+
+    FOREIGN KEY (set_id) REFERENCES sets (id)
+);
+
+-- Set Card Counts
+--
+-- The total number of cards in a set. Not all sets have a known card
+-- count (e.g. promo sets that are still receiving new cards), so this
+-- is stored out-of-line rather than as a nullable column.
+CREATE TABLE set_card_counts (
+    -- sets.id - The set whose card count is described
+    set_id INTEGER UNIQUE NOT NULL,
+
+    -- The total number of cards in the set
+    card_count INTEGER NOT NULL,
 
     FOREIGN KEY (set_id) REFERENCES sets (id)
 );
@@ -178,16 +210,101 @@ CREATE TABLE card_versions (
     -- rarities.id - The rarity of this card
     rarity_id INTEGER NOT NULL,
 
-    -- illustrators.id - The illustrator of this card
-    illustrator_id INTEGER NOT NULL,
-
     -- The number of this card in its set
     number INTEGER,
 
     FOREIGN KEY (card_id) REFERENCES cards (id),
     FOREIGN KEY (set_id) REFERENCES sets (id),
-    FOREIGN KEY (rarity_id) REFERENCES rarities (id),
+    FOREIGN KEY (rarity_id) REFERENCES rarities (id)
+);
+
+-- Card Version Illustrators
+--
+-- The illustrator of a card version's artwork. Not all card versions
+-- have a known illustrator, so this is stored out-of-line.
+CREATE TABLE card_version_illustrators (
+    -- card_versions.id - The card version whose illustrator is described
+    card_version_id INTEGER UNIQUE NOT NULL,
+
+    -- illustrators.id - The illustrator of the card art
+    illustrator_id INTEGER NOT NULL,
+
+    FOREIGN KEY (card_version_id) REFERENCES card_versions (id),
     FOREIGN KEY (illustrator_id) REFERENCES illustrators (id)
+);
+
+-- Promo Card Sources
+--
+-- The various channels through which promo cards can be obtained.
+-- Examples: "Pack", "Wonder Pick", "Gold Shop", "Shop", "Mission"
+CREATE TABLE promo_sources (
+    -- Primary key
+    id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
+
+    -- Short code / display name for this source
+    code TEXT UNIQUE NOT NULL,
+
+    -- Human-readable description
+    description TEXT NOT NULL
+);
+
+-- Promo Card Source Mapping
+--
+-- Each row assigns a promo source to a promo card version.
+-- A promo card can be available from multiple sources.
+CREATE TABLE card_version_promo_sources (
+    -- card_versions.id - The promo card version
+    card_version_id INTEGER NOT NULL,
+
+    -- promo_sources.id - The source for this card
+    promo_source_id INTEGER NOT NULL,
+
+    FOREIGN KEY (card_version_id) REFERENCES card_versions (id),
+    FOREIGN KEY (promo_source_id) REFERENCES promo_sources (id),
+    UNIQUE (card_version_id, promo_source_id) ON CONFLICT IGNORE
+);
+
+-- Promo Stamp Card Versions
+--
+-- Card versions in this table are from a promo set (P-A, P-B, etc.) and
+-- carry a visible promo stamp on the card art, making them visually
+-- distinct from any non-promo printing of the same artwork.
+CREATE TABLE promo_card_versions (
+    -- card_versions.id - The card version with a promo stamp
+    card_version_id INTEGER UNIQUE NOT NULL,
+
+    FOREIGN KEY (card_version_id) REFERENCES card_versions (id)
+);
+
+-- Foil Card Versions
+--
+-- Card versions in this table have a foil/mirror finish
+CREATE TABLE foil_card_versions (
+    -- card_versions.id - The card version with a foil finish
+    card_version_id INTEGER UNIQUE NOT NULL,
+
+    FOREIGN KEY (card_version_id) REFERENCES card_versions (id)
+);
+
+-- Card Version Duplicates
+--
+-- Each row identifies a card version as part of a duplicate group —
+-- cards with identical content (rarity, illustrator, promo stamp, and
+-- foil status) released in different sets. Every member of a group has
+-- a row here, including the original, which carries a self-referential
+-- original_version_id. The original is the earliest release in the group.
+-- Standalone card versions (no duplicates) are absent from this table.
+CREATE TABLE card_version_duplicates (
+    -- card_versions.id - A card version that is part of a duplicate group
+    card_version_id INTEGER UNIQUE NOT NULL,
+
+    -- card_versions.id - The earliest known identical card version (the original).
+    --
+    -- For the original itself, this is self-referential (card_version_id = original_version_id).
+    original_version_id INTEGER NOT NULL,
+
+    FOREIGN KEY (card_version_id) REFERENCES card_versions (id),
+    FOREIGN KEY (original_version_id) REFERENCES card_versions (id)
 );
 
 -- Packs each card is in
@@ -411,8 +528,9 @@ CREATE TABLE base_pokemon (
     -- The name of the pokemon
     name TEXT UNIQUE NOT NULL,
 
-    -- The national pokedex number of the pokemon
-    natdex_number INTEGER UNIQUE NOT NULL
+    -- The national pokedex number of the pokemon.
+    -- Null when not yet populated (requires PokeAPI or manual data).
+    natdex_number INTEGER UNIQUE
 );
 
 -- Pokemon Stages
@@ -456,6 +574,22 @@ CREATE TABLE pokemon_cards (
     FOREIGN KEY (card_id) REFERENCES cards (id),
     FOREIGN KEY (element_id) REFERENCES elements (id),
     FOREIGN KEY (stage_id) REFERENCES stages (id)
+);
+
+-- Pokemon Card Evolutions
+--
+-- Each row describes a card that evolves from another pokemon card.
+-- Evolutions don't require specific cards, but rather cards matching
+-- a specific name.
+CREATE TABLE pokemon_evolves_from (
+    -- cards.id - The evolved card
+    card_id INTEGER UNIQUE NOT NULL,
+
+    -- card_names.id - The name of cards this card evolves from
+    evolves_from_id INTEGER NOT NULL,
+
+    FOREIGN KEY (card_id) REFERENCES cards (id),
+    FOREIGN KEY (evolves_from_id) REFERENCES card_names (id)
 );
 
 -- Pokemon Card Flavor Text
@@ -600,7 +734,7 @@ CREATE TABLE pokemon_variant_tags (
 
 -- Names of Pack Variants
 --
--- Pack variants generally share names across sets, so the
+-- Pack variants generally share names across packs, so the
 -- strings are stored out-of-line.
 CREATE TABLE pack_variant_names (
     -- Primary key
@@ -610,14 +744,11 @@ CREATE TABLE pack_variant_names (
     name TEXT NOT NULL
 );
 
--- Pack Variants for Each Set
+-- Pack Variants
 --
--- Each set generally has multiple variants that can be
--- acquired when opening packs. Each variant has a unique
--- pull rate when opening packs of its set, and has distinct
--- pull rates for rarities and cards from other variants in
--- the same set. Note that pack variants apply to all packs
--- with a set.
+-- Each pack has up to three variants (normal, god, premium)
+-- that can be acquired when opening it. Each variant has its
+-- own pull rate and distinct slot rarity/card pull rates.
 CREATE TABLE pack_variants (
     -- Primary key
     id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
@@ -625,8 +756,8 @@ CREATE TABLE pack_variants (
     -- pack_variant_names.id - The name of the pack variant
     name_id INTEGER NOT NULL,
 
-    -- sets.id - The set this pack variant belongs to
-    set_id INTEGER NOT NULL,
+    -- packs.id - The pack this variant belongs to
+    pack_id INTEGER NOT NULL,
 
     -- The numerator of the pull rate for this pack variant.
     --
@@ -637,8 +768,8 @@ CREATE TABLE pack_variants (
     rate_numerator INTEGER NOT NULL,
 
     FOREIGN KEY (name_id) REFERENCES pack_variant_names (id),
-    FOREIGN KEY (set_id) REFERENCES sets (id),
-    UNIQUE (name_id, set_id) ON CONFLICT FAIL
+    FOREIGN KEY (pack_id) REFERENCES packs (id),
+    UNIQUE (name_id, pack_id) ON CONFLICT FAIL
 );
 
 -- Pack Variant Rate Denominators
@@ -647,13 +778,13 @@ CREATE TABLE pack_variants (
 -- rates. The numerator is specified in the pack_variants
 -- table.
 CREATE TABLE pack_variant_rate_denominators (
-    -- sets.id - The set the pull rate applies to
-    set_id INTEGER UNIQUE NOT NULL,
+    -- packs.id - The pack the pull rate denominator applies to
+    pack_id INTEGER UNIQUE NOT NULL,
 
     -- The pull rate denominator
     rate_denominator INTEGER NOT NULL,
 
-    FOREIGN KEY (set_id) REFERENCES sets (id)
+    FOREIGN KEY (pack_id) REFERENCES packs (id)
 );
 
 -- Pack Variant Card Slots

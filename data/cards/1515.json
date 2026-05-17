@@ -1,0 +1,33 @@
+{
+  "id": 1515,
+  "name": "Skuntank",
+  "card_type": "pokemon",
+  "natdex_number": 435,
+  "element": "Darkness",
+  "stage": "Stage 1",
+  "hp": 110,
+  "retreat_cost": 2,
+  "weakness": "Fighting",
+  "flavor": "It attacks by spraying a repugnant fluid from its tail, but the stench dulls after a few squirts.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Smokescreen Shot",
+      "cost": [
+        "Darkness",
+        "Darkness",
+        "Colorless"
+      ],
+      "damage": 70,
+      "effect": "During your opponent's next turn, if the Defending Pokémon tries to use an attack, your opponent flips a coin. If tails, that attack doesn't happen."
+    }
+  ],
+  "evolves_from": "Stunky",
+  "versions": [
+    {
+      "set": "B2",
+      "number": 102
+    }
+  ]
+}

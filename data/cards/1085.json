@@ -1,0 +1,44 @@
+{
+  "id": 1085,
+  "name": "Latios",
+  "card_type": "pokemon",
+  "natdex_number": 381,
+  "element": "Psychic",
+  "stage": "Basic",
+  "hp": 110,
+  "retreat_cost": 2,
+  "weakness": "Darkness",
+  "flavor": "It understands human speech and is highly intelligent. It is a tender Pokémon that dislikes fighting.",
+  "is_ex": false,
+  "is_mega": false,
+  "ability": {
+    "name": "Fantastical Floating",
+    "effect": "If you have Latias in play, this Pokémon has no Retreat Cost."
+  },
+  "attacks": [
+    {
+      "name": "Luster Purge",
+      "cost": [
+        "Psychic",
+        "Psychic",
+        "Psychic"
+      ],
+      "damage": 120,
+      "effect": "Discard all Energy from this Pokémon."
+    }
+  ],
+  "versions": [
+    {
+      "set": "A4a",
+      "number": 37
+    },
+    {
+      "set": "A4a",
+      "number": 75
+    },
+    {
+      "set": "B2",
+      "number": 217
+    }
+  ]
+}

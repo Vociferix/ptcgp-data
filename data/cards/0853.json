@@ -1,0 +1,35 @@
+{
+  "id": 853,
+  "name": "Mimikyu",
+  "card_type": "pokemon",
+  "natdex_number": 778,
+  "element": "Psychic",
+  "stage": "Basic",
+  "hp": 70,
+  "retreat_cost": 1,
+  "weakness": "Metal",
+  "flavor": "This Pokémon lives in dark places untouched by sunlight. When it appears before humans, it hides itself under a cloth that resembles a Pikachu.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Try to Imitate",
+      "cost": [
+        "Psychic",
+        "Psychic"
+      ],
+      "damage": 0,
+      "effect": "Flip a coin. If heads, choose 1 of your opponent's Active Pokémon's attacks and use it as this attack."
+    }
+  ],
+  "versions": [
+    {
+      "set": "A3b",
+      "number": 35
+    },
+    {
+      "set": "P-A",
+      "number": 113
+    }
+  ]
+}

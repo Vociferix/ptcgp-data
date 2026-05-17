@@ -1,0 +1,36 @@
+{
+  "id": 943,
+  "name": "Octillery",
+  "card_type": "pokemon",
+  "natdex_number": 224,
+  "element": "Water",
+  "stage": "Stage 1",
+  "hp": 100,
+  "retreat_cost": 2,
+  "weakness": "Lightning",
+  "flavor": "Its instinct is to bury itself in holes. It often steals the nesting holes of others to sleep in them.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Octazooka",
+      "cost": [
+        "Water",
+        "Water"
+      ],
+      "damage": 50,
+      "effect": "If the Defending Pokémon tries to use an attack, your opponent flips a coin. If tails, that attack doesn't happen. This effect lasts until the Defending Pokémon leaves the Active Spot, and it doesn't stack."
+    }
+  ],
+  "evolves_from": "Remoraid",
+  "versions": [
+    {
+      "set": "A4",
+      "number": 56
+    },
+    {
+      "set": "A4",
+      "number": 169
+    }
+  ]
+}

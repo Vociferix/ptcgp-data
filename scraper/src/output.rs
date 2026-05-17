@@ -1,17 +1,19 @@
+use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 use anyhow::Result;
 use serde::Serialize;
 
-use crate::models::{Card, CardSummary, PackPullRates, RarityInfo, SetDetail, SetSummary};
+use crate::models::{AbstractCard, BasePokemon, CardVersion, PackPullRates, PromoSource, RarityInfo, SetDetail, SetSummary};
 
 // ── Path helpers ─────────────────────────────────────────────────────────────
 
-/// Root of the data directory (sibling of the `scraper/` crate directory).
 pub fn data_dir() -> PathBuf {
-    // When run via `cargo run` from the workspace root, the working directory
-    // is the workspace root. Adjust if you run from elsewhere.
     PathBuf::from("data")
+}
+
+fn cache_dir() -> PathBuf {
+    PathBuf::from("cache")
 }
 
 fn set_dir(set_code: &str) -> PathBuf {
@@ -22,27 +24,32 @@ fn cards_dir(set_code: &str) -> PathBuf {
     set_dir(set_code).join("cards")
 }
 
-fn pull_rates_dir() -> PathBuf {
-    data_dir().join("pull_rates")
+fn abstract_cards_dir() -> PathBuf {
+    data_dir().join("cards")
 }
 
-fn raenonx_dir() -> PathBuf {
-    data_dir().join("raenonx")
+fn pull_rates_dir(set_code: &str) -> PathBuf {
+    data_dir().join("pull_rates").join(set_code)
 }
 
-/// Create all directories needed for a set's output files.
+fn pack_slug(subtitle: &str) -> String {
+    subtitle.to_lowercase().replace(' ', "_")
+}
+
+// ── Dir setup ─────────────────────────────────────────────────────────────────
+
 pub fn ensure_set_dirs(set_code: &str) -> Result<()> {
     std::fs::create_dir_all(cards_dir(set_code))?;
     Ok(())
 }
 
-pub fn ensure_pull_rates_dir() -> Result<()> {
-    std::fs::create_dir_all(pull_rates_dir())?;
+fn ensure_abstract_cards_dir() -> Result<()> {
+    std::fs::create_dir_all(abstract_cards_dir())?;
     Ok(())
 }
 
-pub fn ensure_raenonx_dir() -> Result<()> {
-    std::fs::create_dir_all(raenonx_dir())?;
+fn ensure_pull_rates_dir(set_code: &str) -> Result<()> {
+    std::fs::create_dir_all(pull_rates_dir(set_code))?;
     Ok(())
 }
 
@@ -56,66 +63,157 @@ fn write_json<T: Serialize + ?Sized>(path: &Path, value: &T) -> Result<()> {
 
 // ── Public write functions ────────────────────────────────────────────────────
 
-/// Write data/sets.json — the top-level set index.
 pub fn write_sets(sets: &[SetSummary]) -> Result<()> {
     std::fs::create_dir_all(data_dir())?;
     write_json(&data_dir().join("sets.json"), sets)
 }
 
-/// Write data/rarities.json
 pub fn write_rarities(rarities: &[RarityInfo]) -> Result<()> {
     std::fs::create_dir_all(data_dir())?;
     write_json(&data_dir().join("rarities.json"), rarities)
 }
 
-/// Write data/sets/{SET}/set.json
+pub fn write_promo_sources(sources: &[PromoSource]) -> Result<()> {
+    std::fs::create_dir_all(data_dir())?;
+    write_json(&data_dir().join("promo_sources.json"), sources)
+}
+
 pub fn write_set_detail(set: &SetDetail) -> Result<()> {
     ensure_set_dirs(&set.code)?;
     write_json(&set_dir(&set.code).join("set.json"), set)
 }
 
-/// Write data/sets/{SET}/cards.json — lightweight index of all cards in the set.
-pub fn write_card_index(set_code: &str, summaries: &[CardSummary]) -> Result<()> {
-    ensure_set_dirs(set_code)?;
-    write_json(&set_dir(set_code).join("cards.json"), summaries)
+/// Write data/sets/{SET}/cards/{NUM:03}.json — card version file.
+pub fn write_card_version(version: &CardVersion) -> Result<()> {
+    ensure_set_dirs(&version.set)?;
+    let filename = format!("{:03}.json", version.number);
+    write_json(&cards_dir(&version.set).join(filename), version)
 }
 
-/// Write data/sets/{SET}/cards/{NUM}.json
-pub fn write_card(card: &Card) -> Result<()> {
-    ensure_set_dirs(&card.set)?;
-    let filename = format!("{:03}.json", card.number);
-    write_json(&cards_dir(&card.set).join(filename), card)
+/// Write data/cards/{ID:04}.json — abstract card file.
+pub fn write_abstract_card(card: &AbstractCard) -> Result<()> {
+    ensure_abstract_cards_dir()?;
+    let filename = format!("{:04}.json", card.id);
+    write_json(&abstract_cards_dir().join(filename), card)
 }
 
-/// Write data/pull_rates/{PACK_ID}.json
+/// Write data/pull_rates/{SET}/{subtitle_slug}.json
 pub fn write_pull_rates(rates: &PackPullRates) -> Result<()> {
-    ensure_pull_rates_dir()?;
-    let filename = format!("{}.json", rates.pack_id);
-    write_json(&pull_rates_dir().join(filename), rates)
+    ensure_pull_rates_dir(&rates.set)?;
+    let filename = format!("{}.json", pack_slug(&rates.subtitle));
+    write_json(&pull_rates_dir(&rates.set).join(filename), rates)
 }
 
-/// Write data/raenonx/global_master.json — raw response for reference.
-pub fn write_global_master_raw(raw: &serde_json::Value) -> Result<()> {
-    ensure_raenonx_dir()?;
-    write_json(&raenonx_dir().join("global_master.json"), raw)
+/// Write the raw global-master JSON to cache/global_master.json.
+pub fn write_global_master(raw: &serde_json::Value) -> Result<()> {
+    std::fs::create_dir_all(cache_dir())?;
+    write_json(&cache_dir().join("global_master.json"), raw)
 }
 
-/// Write data/raenonx/global_master_summary.json — parsed summary.
-pub fn write_global_master_summary(summary: &crate::models::GlobalMasterSummary) -> Result<()> {
-    ensure_raenonx_dir()?;
-    write_json(&raenonx_dir().join("global_master_summary.json"), summary)
+pub fn load_card_versions(set_code: &str) -> Result<Vec<CardVersion>> {
+    let dir = cards_dir(set_code);
+    if !dir.exists() {
+        return Ok(vec![]);
+    }
+    let mut versions = Vec::new();
+    for entry in std::fs::read_dir(&dir)? {
+        let path = entry?.path();
+        if path.extension().map_or(false, |e| e == "json") {
+            let json = std::fs::read_to_string(&path)?;
+            versions.push(serde_json::from_str(&json)?);
+        }
+    }
+    Ok(versions)
 }
 
 // ── Skip-if-exists helpers ───────────────────────────────────────────────────
 
-pub fn card_file_exists(set_code: &str, number: u32) -> bool {
+pub fn card_version_file_exists(set_code: &str, number: u32) -> bool {
     cards_dir(set_code).join(format!("{number:03}.json")).exists()
 }
 
-pub fn pull_rates_file_exists(pack_id: &str) -> bool {
-    pull_rates_dir().join(format!("{pack_id}.json")).exists()
+pub fn abstract_card_file_exists(id: u32) -> bool {
+    abstract_cards_dir().join(format!("{id:04}.json")).exists()
+}
+
+pub fn pull_rates_file_exists(set_code: &str, subtitle: &str) -> bool {
+    pull_rates_dir(set_code).join(format!("{}.json", pack_slug(subtitle))).exists()
 }
 
 pub fn global_master_exists() -> bool {
-    raenonx_dir().join("global_master.json").exists()
+    cache_dir().join("global_master.json").exists()
+        || data_dir().join("global_master.json").exists()
+        || data_dir().join("raenonx").join("global_master.json").exists()
+}
+
+// ── Base Pokémon ──────────────────────────────────────────────────────────────
+
+fn base_pokemon_path() -> PathBuf {
+    data_dir().join("base_pokemon.json")
+}
+
+pub fn base_pokemon_exists() -> bool {
+    base_pokemon_path().exists()
+}
+
+pub fn write_base_pokemon(pokemon: &[BasePokemon]) -> Result<()> {
+    std::fs::create_dir_all(data_dir())?;
+    write_json(&base_pokemon_path(), pokemon)
+}
+
+pub fn load_base_pokemon() -> Result<Vec<BasePokemon>> {
+    let json = std::fs::read_to_string(base_pokemon_path())?;
+    Ok(serde_json::from_str(&json)?)
+}
+
+// ── Pack names ────────────────────────────────────────────────────────────────
+
+fn pack_names_path() -> PathBuf {
+    cache_dir().join("pack_names.json")
+}
+
+pub fn pack_names_exist() -> bool {
+    pack_names_path().exists()
+}
+
+pub fn write_pack_names(names: &HashMap<String, String>) -> Result<()> {
+    std::fs::create_dir_all(cache_dir())?;
+    write_json(&pack_names_path(), names)
+}
+
+pub fn load_pack_names() -> Result<HashMap<String, String>> {
+    let json = std::fs::read_to_string(pack_names_path())?;
+    Ok(serde_json::from_str(&json)?)
+}
+
+/// Load an existing abstract card, update its versions list, and write it back.
+pub fn update_abstract_card_versions(
+    id: u32,
+    versions: &[crate::models::VersionRef],
+) -> Result<()> {
+    let path = abstract_cards_dir().join(format!("{id:04}.json"));
+    let json = std::fs::read_to_string(&path)?;
+    let mut card: AbstractCard = serde_json::from_str(&json)?;
+    card.versions = versions.to_vec();
+    write_json(&path, &card)
+}
+
+/// Load global-master from disk (tries cache/, then legacy data/ paths).
+pub fn load_global_master() -> Result<serde_json::Value> {
+    let cache_path = cache_dir().join("global_master.json");
+    let legacy_data_path = data_dir().join("global_master.json");
+    let legacy_raenonx_path = data_dir().join("raenonx").join("global_master.json");
+
+    let path = if cache_path.exists() {
+        cache_path
+    } else if legacy_data_path.exists() {
+        legacy_data_path
+    } else if legacy_raenonx_path.exists() {
+        legacy_raenonx_path
+    } else {
+        anyhow::bail!("global_master.json not found — run `global-master` command first");
+    };
+
+    let json = std::fs::read_to_string(&path)?;
+    Ok(serde_json::from_str(&json)?)
 }

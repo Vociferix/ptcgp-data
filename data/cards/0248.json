@@ -1,0 +1,33 @@
+{
+  "id": 248,
+  "name": "Drednaw",
+  "card_type": "pokemon",
+  "natdex_number": 834,
+  "element": "Water",
+  "stage": "Stage 1",
+  "hp": 130,
+  "retreat_cost": 3,
+  "weakness": "Lightning",
+  "flavor": "Its massive, jagged teeth can crush a boulder in a single bite. This Pokémon has an extremely vicious disposition.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Crunch",
+      "cost": [
+        "Water",
+        "Water",
+        "Water"
+      ],
+      "damage": 70,
+      "effect": "Flip a coin. If heads, discard a random Energy from your opponent's Active Pokémon."
+    }
+  ],
+  "evolves_from": "Chewtle",
+  "versions": [
+    {
+      "set": "A1a",
+      "number": 23
+    }
+  ]
+}

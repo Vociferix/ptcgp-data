@@ -1,0 +1,37 @@
+{
+  "id": 13,
+  "name": "Vileplume",
+  "card_type": "pokemon",
+  "natdex_number": 45,
+  "element": "Grass",
+  "stage": "Stage 2",
+  "hp": 140,
+  "retreat_cost": 3,
+  "weakness": "Fire",
+  "flavor": "It has the world’s largest petals. With every step, the petals shake out heavy clouds of toxic pollen.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Soothing Scent",
+      "cost": [
+        "Grass",
+        "Grass",
+        "Colorless"
+      ],
+      "damage": 80,
+      "effect": "Your opponent's Active Pokémon is now Asleep."
+    }
+  ],
+  "evolves_from": "Gloom",
+  "versions": [
+    {
+      "set": "A1",
+      "number": 13
+    },
+    {
+      "set": "B1a",
+      "number": 90
+    }
+  ]
+}

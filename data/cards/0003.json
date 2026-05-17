@@ -1,0 +1,42 @@
+{
+  "id": 3,
+  "name": "Venusaur",
+  "card_type": "pokemon",
+  "natdex_number": 3,
+  "element": "Grass",
+  "stage": "Stage 2",
+  "hp": 160,
+  "retreat_cost": 3,
+  "weakness": "Fire",
+  "flavor": "Its plant blooms when it is absorbing solar energy. It stays on the move to seek sunlight.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Mega Drain",
+      "cost": [
+        "Grass",
+        "Grass",
+        "Colorless",
+        "Colorless"
+      ],
+      "damage": 80,
+      "effect": "Heal 30 damage from this Pokémon."
+    }
+  ],
+  "evolves_from": "Ivysaur",
+  "versions": [
+    {
+      "set": "A1",
+      "number": 3
+    },
+    {
+      "set": "A3",
+      "number": 212
+    },
+    {
+      "set": "P-A",
+      "number": 18
+    }
+  ]
+}

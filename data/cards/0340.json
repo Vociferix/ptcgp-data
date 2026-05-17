@@ -1,0 +1,63 @@
+{
+  "id": 340,
+  "name": "Palkia ex",
+  "card_type": "pokemon",
+  "natdex_number": 484,
+  "element": "Water",
+  "stage": "Basic",
+  "hp": 150,
+  "retreat_cost": 2,
+  "weakness": "Lightning",
+  "is_ex": true,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Slash",
+      "cost": [
+        "Water"
+      ],
+      "damage": 30
+    },
+    {
+      "name": "Dimensional Storm",
+      "cost": [
+        "Water",
+        "Water",
+        "Water",
+        "Colorless"
+      ],
+      "damage": 150,
+      "effect": "Discard 3 [W] Energy from this Pokémon. This attack also does 20 damage to each of your opponent's Benched Pokémon."
+    }
+  ],
+  "versions": [
+    {
+      "set": "A2",
+      "number": 49
+    },
+    {
+      "set": "A2",
+      "number": 182
+    },
+    {
+      "set": "A2",
+      "number": 204
+    },
+    {
+      "set": "A2",
+      "number": 206
+    },
+    {
+      "set": "A4b",
+      "number": 107
+    },
+    {
+      "set": "A4b",
+      "number": 363
+    },
+    {
+      "set": "B1",
+      "number": 319
+    }
+  ]
+}

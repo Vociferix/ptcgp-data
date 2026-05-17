@@ -1,0 +1,62 @@
+{
+  "id": 256,
+  "name": "Mew ex",
+  "card_type": "pokemon",
+  "natdex_number": 151,
+  "element": "Psychic",
+  "stage": "Basic",
+  "hp": 130,
+  "retreat_cost": 1,
+  "weakness": "Darkness",
+  "is_ex": true,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Psyshot",
+      "cost": [
+        "Psychic"
+      ],
+      "damage": 20
+    },
+    {
+      "name": "Genome Hacking",
+      "cost": [
+        "Colorless",
+        "Colorless",
+        "Colorless"
+      ],
+      "damage": 0,
+      "effect": "Choose 1 of your opponent's Active Pokémon's attacks and use it as this attack."
+    }
+  ],
+  "versions": [
+    {
+      "set": "A1a",
+      "number": 32
+    },
+    {
+      "set": "A1a",
+      "number": 77
+    },
+    {
+      "set": "A1a",
+      "number": 83
+    },
+    {
+      "set": "A1a",
+      "number": 86
+    },
+    {
+      "set": "A4a",
+      "number": 102
+    },
+    {
+      "set": "A4b",
+      "number": 159
+    },
+    {
+      "set": "A4b",
+      "number": 366
+    }
+  ]
+}

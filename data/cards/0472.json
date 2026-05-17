@@ -1,0 +1,40 @@
+{
+  "id": 472,
+  "name": "Raichu",
+  "card_type": "pokemon",
+  "natdex_number": 26,
+  "element": "Lightning",
+  "stage": "Stage 1",
+  "hp": 90,
+  "retreat_cost": 1,
+  "weakness": "Fighting",
+  "flavor": "Its tail discharges electricity into the ground, protecting it from getting shocked.",
+  "is_ex": false,
+  "is_mega": false,
+  "ability": {
+    "name": "Resilience Link",
+    "effect": "If you have Arceus or Arceus ex in play, this Pokémon takes −30 damage from attacks."
+  },
+  "attacks": [
+    {
+      "name": "Spark",
+      "cost": [
+        "Lightning",
+        "Lightning"
+      ],
+      "damage": 40,
+      "effect": "This attack also does 20 damage to 1 of your opponent's Benched Pokémon."
+    }
+  ],
+  "evolves_from": "Pikachu",
+  "versions": [
+    {
+      "set": "A2a",
+      "number": 26
+    },
+    {
+      "set": "P-A",
+      "number": 44
+    }
+  ]
+}

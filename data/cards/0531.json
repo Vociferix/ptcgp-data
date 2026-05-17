@@ -1,0 +1,53 @@
+{
+  "id": 531,
+  "name": "Charizard ex",
+  "card_type": "pokemon",
+  "natdex_number": 6,
+  "element": "Fire",
+  "stage": "Stage 2",
+  "hp": 180,
+  "retreat_cost": 3,
+  "weakness": "Water",
+  "is_ex": true,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Stoke",
+      "cost": [
+        "Fire"
+      ],
+      "damage": 0,
+      "effect": "Take 3 [R] Energy from your Energy Zone and attach it to this Pokémon."
+    },
+    {
+      "name": "Steam Artillery",
+      "cost": [
+        "Fire",
+        "Fire",
+        "Fire",
+        "Colorless",
+        "Colorless"
+      ],
+      "damage": 150
+    }
+  ],
+  "evolves_from": "Charmeleon",
+  "versions": [
+    {
+      "set": "A2b",
+      "number": 10
+    },
+    {
+      "set": "A2b",
+      "number": 80
+    },
+    {
+      "set": "A2b",
+      "number": 108
+    },
+    {
+      "set": "A4b",
+      "number": 60
+    }
+  ]
+}

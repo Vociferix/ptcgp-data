@@ -1,0 +1,36 @@
+{
+  "id": 46,
+  "name": "Moltres",
+  "card_type": "pokemon",
+  "natdex_number": 146,
+  "element": "Fire",
+  "stage": "Basic",
+  "hp": 100,
+  "retreat_cost": 1,
+  "weakness": "Lightning",
+  "flavor": "It’s one of the legendary bird Pokémon. When Moltres flaps its flaming wings, they glimmer with a dazzling red glow.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Sky Attack",
+      "cost": [
+        "Fire",
+        "Colorless",
+        "Colorless"
+      ],
+      "damage": 130,
+      "effect": "Flip a coin. If tails, this attack does nothing."
+    }
+  ],
+  "versions": [
+    {
+      "set": "A1",
+      "number": 46
+    },
+    {
+      "set": "B1",
+      "number": 292
+    }
+  ]
+}

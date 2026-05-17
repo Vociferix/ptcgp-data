@@ -1,0 +1,32 @@
+{
+  "id": 375,
+  "name": "Gliscor",
+  "card_type": "pokemon",
+  "natdex_number": 472,
+  "element": "Fighting",
+  "stage": "Stage 1",
+  "hp": 100,
+  "retreat_cost": 2,
+  "weakness": "Grass",
+  "flavor": "It observes prey while hanging inverted from branches. When the chance presents itself, it swoops!",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Acrobatics",
+      "cost": [
+        "Fighting"
+      ],
+      "damage": 20,
+      "damage_suffix": "+",
+      "effect": "Flip 2 coins. This attack does 20 more damage for each heads."
+    }
+  ],
+  "evolves_from": "Gligar",
+  "versions": [
+    {
+      "set": "A2",
+      "number": 84
+    }
+  ]
+}

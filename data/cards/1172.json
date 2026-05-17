@@ -1,0 +1,41 @@
+{
+  "id": 1172,
+  "name": "Mega Gyarados ex",
+  "card_type": "pokemon",
+  "natdex_number": 130,
+  "element": "Water",
+  "stage": "Stage 1",
+  "hp": 210,
+  "retreat_cost": 3,
+  "weakness": "Lightning",
+  "is_ex": true,
+  "is_mega": true,
+  "attacks": [
+    {
+      "name": "Mega Blaster",
+      "cost": [
+        "Water",
+        "Water",
+        "Water",
+        "Colorless"
+      ],
+      "damage": 140,
+      "effect": "Discard the top 3 cards of your opponent's deck."
+    }
+  ],
+  "evolves_from": "Magikarp",
+  "versions": [
+    {
+      "set": "B1",
+      "number": 52
+    },
+    {
+      "set": "B1",
+      "number": 255
+    },
+    {
+      "set": "B1",
+      "number": 285
+    }
+  ]
+}

@@ -3,7 +3,7 @@ use scraper::{Html, Selector};
 use tracing::warn;
 
 use crate::client::Client;
-use crate::models::{Ability, AlternateVersion, Attack, Card, CardImages, CardSummary, PackRef, SetSummary};
+use crate::models::{Ability, Attack, LimitlessCardData, SetSummary};
 
 const BASE: &str = "https://pocket.limitlesstcg.com";
 
@@ -17,47 +17,33 @@ macro_rules! sel {
 
 // ── Public entry points ──────────────────────────────────────────────────────
 
-/// Scrape the set index page and return a stub for every set listed.
-/// Pack info is not available here — use `scrape_set_packs` for that.
 pub async fn scrape_sets(client: &Client) -> Result<Vec<SetSummary>> {
     let html = client.get_text(&format!("{BASE}/cards")).await?;
     parse_sets_index(&html)
 }
 
-/// Return the pack display names found on a set's card-listing page.
-/// The returned vec is ordered as displayed (pack 1, pack 2, ...).
-pub async fn scrape_set_packs(client: &Client, set_code: &str) -> Result<Vec<String>> {
-    let html = client.get_text(&format!("{BASE}/cards/{set_code}")).await?;
-    parse_set_packs(&html)
-}
-
-/// Return the card numbers listed on a set's card-listing page.
 pub async fn scrape_card_numbers(client: &Client, set_code: &str) -> Result<Vec<u32>> {
     let html = client.get_text(&format!("{BASE}/cards/{set_code}")).await?;
     parse_card_numbers(&html)
 }
 
-/// Scrape a single card page. Returns both the full `Card` and a lightweight
-/// `CardSummary` suitable for the set index file.
 pub async fn scrape_card(
     client: &Client,
     set_code: &str,
     number: u32,
-) -> Result<(Card, CardSummary)> {
+) -> Result<LimitlessCardData> {
     let html = client.get_text(&format!("{BASE}/cards/{set_code}/{number}")).await?;
-    parse_card(&html, set_code, number)
+    parse_card(&html, set_code)
 }
 
-// ── Parsers ──────────────────────────────────────────────────────────────────
+// ── Set index parser ─────────────────────────────────────────────────────────
 
 fn parse_sets_index(html: &str) -> Result<Vec<SetSummary>> {
     let doc = Html::parse_document(html);
     let row_sel = sel!("table.sets-table tr");
+    let td_sel = sel!("td");
     let link_sel = sel!("td a");
     let code_sel = sel!("span.code.annotation");
-    let date_sel = sel!("td.date");
-    let count_sel = sel!("td.count");
-    let name_sel = sel!("td.name");
 
     let mut sets = Vec::new();
 
@@ -65,52 +51,40 @@ fn parse_sets_index(html: &str) -> Result<Vec<SetSummary>> {
         let Some(link) = row.select(&link_sel).next() else { continue };
         let href = link.value().attr("href").unwrap_or("");
 
-        // href is "/cards/A1" — extract the set code
         let set_code = match href.strip_prefix("/cards/") {
             Some(c) if !c.is_empty() => c.to_string(),
             _ => continue,
         };
 
-        let name = row
-            .select(&name_sel)
-            .next()
-            .map(|e| e.text().collect::<String>().trim().to_string())
-            .unwrap_or_else(|| link.text().collect::<String>().trim().to_string());
-
-        // Prefer explicit code annotation; fall back to the href segment
         let code = row
             .select(&code_sel)
             .next()
             .map(|e| e.text().collect::<String>().trim().to_string())
             .unwrap_or_else(|| set_code.clone());
 
-        let release_date = row
-            .select(&date_sel)
-            .next()
-            .map(|e| e.text().collect::<String>().trim().to_string())
-            .filter(|s| !s.is_empty() && s != "—");
+        let link_text = link.text().collect::<String>();
+        let name = link_text
+            .replace(&code, "")
+            .split_whitespace()
+            .collect::<Vec<_>>()
+            .join(" ");
 
-        let card_count = row
-            .select(&count_sel)
-            .next()
+        let tds: Vec<_> = row.select(&td_sel).collect();
+
+        let release_date = tds
+            .get(1)
+            .map(|e| e.text().collect::<String>().trim().to_string())
+            .filter(|s| !s.is_empty() && s != "—")
+            .and_then(|s| parse_release_date(&s));
+
+        let card_count = tds
+            .get(2)
             .and_then(|e| e.text().collect::<String>().trim().parse::<u32>().ok());
 
-        // Series is the leading letter(s) before the digits, or "Promo" for P-A etc.
         let series = parse_series(&code);
-        let is_promo = code.contains('P') && !code.starts_with("P-");
+        let is_promo = code.starts_with("P-");
 
-        let icon_url =
-            format!("https://s3.limitlesstcg.com/pocket/sets/{code}.webp");
-
-        sets.push(SetSummary {
-            code,
-            name,
-            series,
-            release_date,
-            is_promo,
-            card_count,
-            icon_url,
-        });
+        sets.push(SetSummary { code, name, series, release_date, is_promo, card_count });
     }
 
     if sets.is_empty() {
@@ -119,18 +93,7 @@ fn parse_sets_index(html: &str) -> Result<Vec<SetSummary>> {
     Ok(sets)
 }
 
-fn parse_set_packs(html: &str) -> Result<Vec<String>> {
-    let doc = Html::parse_document(html);
-    let btn_sel = sel!("div.pack-selection button[data-value]");
-
-    let packs: Vec<String> = doc
-        .select(&btn_sel)
-        .map(|e| e.text().collect::<String>().trim().to_string())
-        .filter(|s| !s.is_empty())
-        .collect();
-
-    Ok(packs)
-}
+// ── Card number list parser ──────────────────────────────────────────────────
 
 fn parse_card_numbers(html: &str) -> Result<Vec<u32>> {
     let doc = Html::parse_document(html);
@@ -139,7 +102,6 @@ fn parse_card_numbers(html: &str) -> Result<Vec<u32>> {
     let mut numbers = Vec::new();
     for el in doc.select(&link_sel) {
         let href = el.value().attr("href").unwrap_or("");
-        // href is "/cards/A1/1"
         if let Some(num_str) = href.split('/').last() {
             if let Ok(n) = num_str.parse::<u32>() {
                 numbers.push(n);
@@ -152,42 +114,41 @@ fn parse_card_numbers(html: &str) -> Result<Vec<u32>> {
     Ok(numbers)
 }
 
-fn parse_card(html: &str, set_code: &str, number: u32) -> Result<(Card, CardSummary)> {
+// ── Individual card parser ───────────────────────────────────────────────────
+
+fn parse_card(html: &str, set_code: &str) -> Result<LimitlessCardData> {
     let doc = Html::parse_document(html);
 
-    // ── Title: "Name - Element - HP HP" or "Name - Element" ─────────────────
+    let name_sel = sel!("span.card-text-name");
+    let name = doc
+        .select(&name_sel)
+        .next()
+        .map(|e| e.text().collect::<String>().trim().to_string())
+        .unwrap_or_default();
+
     let title_sel = sel!("p.card-text-title");
     let title_text = doc
         .select(&title_sel)
         .next()
         .map(|e| e.text().collect::<String>())
         .unwrap_or_default();
-    let title_text = title_text.trim();
 
-    // ── Type line: "Pokémon - Basic", "Trainer - Item", etc. ────────────────
     let type_sel = sel!("p.card-text-type");
     let type_text = doc
         .select(&type_sel)
         .next()
         .map(|e| e.text().collect::<String>())
         .unwrap_or_default();
-    let type_text = type_text.trim();
 
-    let (card_type, stage, trainer_kind) = parse_type_line(type_text);
+    let (card_type, stage, trainer_kind) = parse_type_line(type_text.trim());
+    let evolves_from = parse_evolves_from(type_text.trim());
 
-    // ── Parse title based on card type ──────────────────────────────────────
-    let (name, element, hp) = parse_title(title_text, &card_type);
+    let (element, hp) = if card_type == "pokemon" {
+        parse_element_hp(&title_text, &name)
+    } else {
+        (None, None)
+    };
 
-    // ── Rarity + pack name from current-print line ───────────────────────────
-    let prints_sel = sel!("div.card-prints-current");
-    let prints_text = doc
-        .select(&prints_sel)
-        .next()
-        .map(|e| e.text().collect::<String>())
-        .unwrap_or_default();
-    let (rarity, pack_display_names) = parse_prints_current(&prints_text);
-
-    // ── Weakness / Retreat ───────────────────────────────────────────────────
     let wrr_sel = sel!("p.card-text-wrr");
     let wrr_text = doc
         .select(&wrr_sel)
@@ -196,7 +157,6 @@ fn parse_card(html: &str, set_code: &str, number: u32) -> Result<(Card, CardSumm
         .unwrap_or_default();
     let (weakness, retreat_cost) = parse_wrr(&wrr_text);
 
-    // ── Flavor text ──────────────────────────────────────────────────────────
     let flavor_sel = sel!("div.card-text-flavor");
     let flavor = doc
         .select(&flavor_sel)
@@ -204,7 +164,6 @@ fn parse_card(html: &str, set_code: &str, number: u32) -> Result<(Card, CardSumm
         .map(|e| e.text().collect::<String>().trim().to_string())
         .filter(|s| !s.is_empty());
 
-    // ── Illustrator ──────────────────────────────────────────────────────────
     let artist_sel = sel!("div.card-text-artist a");
     let illustrator = doc
         .select(&artist_sel)
@@ -212,119 +171,60 @@ fn parse_card(html: &str, set_code: &str, number: u32) -> Result<(Card, CardSumm
         .map(|e| e.text().collect::<String>().trim().to_string())
         .filter(|s| !s.is_empty());
 
-    // ── Attacks ──────────────────────────────────────────────────────────────
     let attack_sel = sel!("div.card-text-attack");
-    let attacks: Vec<Attack> = doc
-        .select(&attack_sel)
-        .filter_map(|el| parse_attack(el))
-        .collect();
+    let attacks: Vec<Attack> = doc.select(&attack_sel).filter_map(parse_attack).collect();
 
-    // ── Ability ──────────────────────────────────────────────────────────────
     let ability_sel = sel!("div.card-text-ability");
     let ability = doc.select(&ability_sel).next().and_then(parse_ability);
 
-    // ── Trainer effect ───────────────────────────────────────────────────────
-    let effect_sel = sel!("div.card-text-effect");
-    let trainer_effect = doc
-        .select(&effect_sel)
-        .next()
-        .map(|e| e.text().collect::<String>().trim().to_string())
-        .filter(|s| !s.is_empty());
-
-    // ── Alternate versions ───────────────────────────────────────────────────
-    let alt_row_sel = sel!("table.card-prints-versions tr");
-    let alt_link_sel = sel!("td a[href]");
-    let alt_rarity_sel = sel!("td.rarity");
-    let mut alternate_versions = Vec::new();
-    for row in doc.select(&alt_row_sel) {
-        let href = row
-            .select(&alt_link_sel)
-            .next()
-            .and_then(|e| e.value().attr("href"))
-            .unwrap_or("");
-        // "/cards/A1a/5" → set=A1a, number=5
-        let parts: Vec<&str> = href.trim_start_matches('/').split('/').collect();
-        if parts.len() >= 3 && parts[0] == "cards" {
-            let alt_set = parts[1].to_string();
-            let alt_num = parts[2].parse::<u32>().ok();
-            let alt_rarity = row
-                .select(&alt_rarity_sel)
-                .next()
-                .map(|e| e.text().collect::<String>().trim().to_string())
-                .unwrap_or_default();
-            // Skip the current card's own entry
-            if alt_set != set_code || alt_num != Some(number) {
-                alternate_versions.push(AlternateVersion {
-                    set: alt_set,
-                    number: alt_num,
-                    rarity: alt_rarity,
+    let section_sel = sel!("div.card-text-section");
+    let trainer_effect = if card_type == "trainer" {
+        doc.select(&section_sel)
+            .find(|el| {
+                let title_child = Selector::parse("p.card-text-title").ok();
+                let has_title = title_child
+                    .map(|s| el.select(&s).next().is_some())
+                    .unwrap_or(false);
+                let classes = el.value().classes().collect::<Vec<_>>();
+                let is_artist_or_flavor = classes.iter().any(|c| {
+                    *c == "card-text-artist" || *c == "card-text-flavor"
                 });
-            }
-        }
-    }
+                !has_title && !is_artist_or_flavor
+            })
+            .map(|el| render_card_text(el))
+            .filter(|s| !s.is_empty())
+    } else {
+        None
+    };
 
-    // ── Images ───────────────────────────────────────────────────────────────
-    let img_sel = sel!("img.card");
-    let (thumb_url, full_url) = doc
-        .select(&img_sel)
-        .next()
-        .map(|el| {
-            let src = el.value().attr("src").unwrap_or("").to_string();
-            let data_src = el.value().attr("data-src").unwrap_or("").to_string();
-            (src, data_src)
-        })
-        .unwrap_or_else(|| {
-            // Construct from CDN pattern if img tag is missing
-            (cdn_thumb_url(set_code, number), cdn_full_url(set_code, number))
-        });
-
-    let thumbnail = if thumb_url.is_empty() { cdn_thumb_url(set_code, number) } else { thumb_url };
-    let full = if full_url.is_empty() { cdn_full_url(set_code, number) } else { full_url };
-
-    // ── is_ex / is_mega / variants ───────────────────────────────────────────
     let is_ex = name.ends_with(" ex") || name.contains(" ex ");
     let is_mega = name.starts_with("Mega ") || name.contains(" Mega ");
     let variants = extract_variants(&name);
 
-    let packs: Vec<PackRef> = pack_display_names
-        .into_iter()
-        .map(|display_name| PackRef { raenonx_id: None, display_name })
-        .collect();
+    // Warn if we couldn't parse the name — indicates a selector issue
+    if name.is_empty() {
+        warn!(set = set_code, "card name is empty — selector may be stale");
+    }
 
-    let card = Card {
-        set: set_code.to_string(),
-        number,
-        name: name.clone(),
-        rarity: rarity.clone(),
-        illustrator,
-        card_type: card_type.clone(),
-        element: element.clone(),
+    Ok(LimitlessCardData {
+        name,
+        card_type,
+        element,
         stage,
         hp,
         retreat_cost,
         weakness,
         flavor,
-        is_ex: if card_type == "pokemon" { Some(is_ex) } else { None },
-        is_mega: if card_type == "pokemon" { Some(is_mega) } else { None },
+        is_ex,
+        is_mega,
         variants,
         ability,
         attacks,
+        evolves_from,
         trainer_kind,
         trainer_effect,
-        packs,
-        images: CardImages { thumbnail, full },
-        alternate_versions,
-    };
-
-    let summary = CardSummary {
-        number,
-        name,
-        rarity,
-        card_type,
-        element,
-    };
-
-    Ok((card, summary))
+        illustrator,
+    })
 }
 
 // ── Sub-parsers ──────────────────────────────────────────────────────────────
@@ -335,11 +235,12 @@ fn parse_type_line(text: &str) -> (String, Option<String>, Option<String>) {
     let parts: Vec<&str> = text.splitn(2, '-').map(str::trim).collect();
     match parts.as_slice() {
         [kind, sub] => {
+            let sub_first = sub.lines().next().unwrap_or(sub).trim();
             let kind_lower = kind.to_lowercase();
             if kind_lower.contains("pokémon") || kind_lower.contains("pokemon") {
-                ("pokemon".into(), Some(sub.to_string()), None)
+                ("pokemon".into(), Some(sub_first.to_string()), None)
             } else if kind_lower.contains("trainer") {
-                ("trainer".into(), None, Some(sub.to_string()))
+                ("trainer".into(), None, Some(sub_first.to_string()))
             } else {
                 warn!("unknown card type line: {text:?}");
                 ("unknown".into(), None, None)
@@ -352,58 +253,56 @@ fn parse_type_line(text: &str) -> (String, Option<String>, Option<String>) {
     }
 }
 
-/// "Bulbasaur - Grass - 70 HP" → ("Bulbasaur", Some("Grass"), Some(70))
-/// "Potion - Item"             → ("Potion", None, None)  [already split by type line]
-fn parse_title(
-    text: &str,
-    card_type: &str,
-) -> (String, Option<String>, Option<u32>) {
-    let parts: Vec<&str> = text.splitn(3, '-').map(str::trim).collect();
-    match (card_type, parts.as_slice()) {
-        // Pokemon: Name - Element - N HP
-        ("pokemon", [name, element, hp_part]) => {
-            let hp = hp_part
-                .split_whitespace()
-                .next()
-                .and_then(|s| s.parse::<u32>().ok());
-            (name.to_string(), Some(element.to_string()), hp)
+/// Extract "Evolves from X" from the type line text.
+///
+/// Limitless renders the evolved-from name as an <a> link, so `.text()` puts
+/// "Evolves from" and the name on consecutive lines rather than one line.
+fn parse_evolves_from(type_text: &str) -> Option<String> {
+    let mut lines = type_text.lines().map(|l| l.trim());
+    while let Some(line) = lines.next() {
+        let without_dash = line.trim_start_matches('-').trim();
+        if let Some(name) = without_dash.strip_prefix("Evolves from ") {
+            // Inline: "Evolves from Bulbasaur"
+            let name = name.trim();
+            if !name.is_empty() {
+                return Some(name.to_string());
+            }
+        } else if without_dash == "Evolves from" {
+            // Linked: name is on the next non-empty line (inside an <a> tag)
+            return lines.find(|l| !l.is_empty()).map(str::to_string);
         }
-        // Pokemon with no HP shown (some promos / unusual cards)
-        ("pokemon", [name, element]) => {
-            (name.to_string(), Some(element.to_string()), None)
-        }
-        // Trainer or any unrecognised format: just take the first segment as the name
-        (_, [name, ..]) => (name.to_string(), None, None),
-        _ => (text.to_string(), None, None),
     }
+    None
 }
 
-/// "#1 · ◊ · Mewtwo pack" → ("C", vec!["Mewtwo pack"])
-/// "#1 · ◊ · Shared"      → ("C", vec!["Shared"])
-fn parse_prints_current(text: &str) -> (String, Vec<String>) {
-    let parts: Vec<&str> = text.split('·').map(str::trim).collect();
-    let rarity_raw = parts.get(1).copied().unwrap_or("").trim();
-    let rarity = symbol_to_rarity_code(rarity_raw)
-        .map(str::to_string)
-        .unwrap_or_else(|| rarity_raw.to_string());
+fn parse_element_hp(title_text: &str, name: &str) -> (Option<String>, Option<u32>) {
+    let after = title_text
+        .find(name)
+        .map(|i| &title_text[i + name.len()..])
+        .unwrap_or(title_text);
 
-    let pack_names: Vec<String> = parts
-        .get(2..)
-        .unwrap_or(&[])
-        .iter()
-        .map(|s| s.trim().to_string())
-        .filter(|s| !s.is_empty())
-        .collect();
+    let parts: Vec<&str> = after.split('-').map(str::trim).filter(|s| !s.is_empty()).collect();
 
-    (rarity, pack_names)
+    let element = parts
+        .first()
+        .map(|s| s.split_whitespace().collect::<Vec<_>>().join(" "))
+        .filter(|s| !s.is_empty());
+
+    let hp = parts.get(1).and_then(|s| {
+        s.split_whitespace().next().and_then(|w| w.parse::<u32>().ok())
+    });
+
+    (element, hp)
 }
 
-/// "Weakness: Fire ×2 Retreat: ●●" → (Some("Fire"), Some(2))
+/// "Weakness: Fire\nRetreat: 1\n" → (Some("Fire"), Some(1))
 fn parse_wrr(text: &str) -> (Option<String>, Option<u32>) {
-    let text = text.replace('\n', " ");
-    let weakness = parse_wrr_field(&text, "Weakness");
-    let retreat_str = parse_wrr_field(&text, "Retreat");
-    let retreat_cost = retreat_str.as_deref().map(count_retreat_pips);
+    let weakness = parse_wrr_field(text, "Weakness");
+    let retreat_str = parse_wrr_field(text, "Retreat");
+    let retreat_cost = retreat_str
+        .as_deref()
+        .and_then(|s| s.split_whitespace().next())
+        .and_then(|s| s.parse::<u32>().ok());
     (weakness, retreat_cost)
 }
 
@@ -411,7 +310,6 @@ fn parse_wrr_field(text: &str, key: &str) -> Option<String> {
     let search = format!("{key}:");
     let start = text.find(&search)? + search.len();
     let remainder = text[start..].trim();
-    // Value ends at the next keyword or end-of-string
     let end = ["Weakness:", "Retreat:", "Resistance:"]
         .iter()
         .filter_map(|kw| remainder.find(kw))
@@ -425,97 +323,108 @@ fn parse_wrr_field(text: &str, key: &str) -> Option<String> {
     }
 }
 
-/// Count the number of ● or C (colorless) pip characters in a retreat string.
-fn count_retreat_pips(s: &str) -> u32 {
-    // The site uses filled circles or similar; count them
-    let pip_chars: &[char] = &['●', '•', 'C'];
-    let count = s.chars().filter(|c| pip_chars.contains(c)).count() as u32;
-    if count == 0 {
-        // Fallback: try to parse a number directly
-        s.split_whitespace()
-            .find_map(|w| w.parse::<u32>().ok())
-            .unwrap_or(0)
-    } else {
-        count
+/// Render card text, substituting energy symbol spans with [ElementName].
+fn render_card_text(el: scraper::ElementRef) -> String {
+    let mut out = String::new();
+    for node in el.children() {
+        if let Some(child) = scraper::ElementRef::wrap(node) {
+            let tag = child.value().name();
+            if tag == "br" {
+                out.push(' ');
+                continue;
+            }
+            if child.value().classes().any(|c| c == "copy-only") {
+                continue;
+            }
+            if let Some(tip) = child.value().attr("data-tooltip") {
+                out.push('[');
+                out.push_str(tip);
+                out.push(']');
+            } else {
+                out.push_str(&child.text().collect::<String>());
+            }
+        } else if let Some(text) = node.value().as_text() {
+            out.push_str(text);
+        }
     }
+    out.split_whitespace().collect::<Vec<_>>().join(" ")
 }
 
 fn parse_attack(el: scraper::ElementRef) -> Option<Attack> {
-    // Energy cost symbols
+    let info_sel = sel!("p.card-text-attack-info");
     let sym_sel = sel!("span.ptcg-symbol");
-    let cost: Vec<String> = el
+    let effect_sel = sel!("p.card-text-attack-effect");
+
+    let info = el.select(&info_sel).next()?;
+
+    let cost: Vec<String> = info
         .select(&sym_sel)
-        .map(|s| element_from_symbol_span(s))
-        .collect();
-
-    // Attack name: first non-symbol, non-damage text node in the info line
-    let name_sel = sel!("span.card-text-attack-name");
-    let name = el
-        .select(&name_sel)
         .next()
-        .map(|e| e.text().collect::<String>().trim().to_string())
-        .filter(|s| !s.is_empty());
-
-    // Damage
-    let dmg_sel = sel!("span.card-text-attack-damage");
-    let damage_raw = el
-        .select(&dmg_sel)
-        .next()
-        .map(|e| e.text().collect::<String>().trim().to_string())
+        .map(|s| {
+            s.text()
+                .collect::<String>()
+                .chars()
+                .filter_map(|c| letter_to_element(&c.to_string()).map(str::to_string))
+                .collect()
+        })
         .unwrap_or_default();
 
-    let (damage, damage_suffix) = parse_damage(&damage_raw);
-
-    // Effect text
-    let fx_sel = sel!("div.card-text-attack-effect, p.card-text-attack-effect");
-    let effect = el
-        .select(&fx_sel)
+    let symbol_text = info
+        .select(&sym_sel)
         .next()
-        .map(|e| e.text().collect::<String>().trim().to_string())
-        .filter(|s| !s.is_empty());
+        .map(|s| s.text().collect::<String>())
+        .unwrap_or_default();
+    let info_text = info.text().collect::<String>();
+    let name_dmg = match info_text.find(&symbol_text) {
+        Some(pos) => info_text[pos + symbol_text.len()..].trim(),
+        None => info_text.trim(),
+    };
 
-    // If we couldn't get a name at all, try to extract it from plain text
-    // between the cost symbols and the damage number
-    let name = name.unwrap_or_else(|| {
-        // Walk child text nodes; skip leading symbols and trailing damage
-        let all_text: String = el
-            .text()
-            .map(str::trim)
-            .filter(|t| !t.is_empty())
-            .collect::<Vec<_>>()
-            .join(" ");
-        all_text
-            .split_whitespace()
-            .filter(|w| !w.chars().all(|c| "●◆◇☆♛+×0123456789".contains(c)))
-            .take_while(|w| w.parse::<u32>().is_err())
-            .collect::<Vec<_>>()
-            .join(" ")
-    });
-
-    if name.is_empty() {
-        warn!("could not parse attack name from element");
+    let tokens: Vec<&str> = name_dmg.split_whitespace().collect();
+    if tokens.is_empty() {
         return None;
     }
 
-    Some(Attack { name, cost, damage, damage_suffix, effect })
-}
+    let (name, damage_raw) = match tokens.split_last() {
+        Some((last, rest)) if last.chars().any(|c| c.is_ascii_digit()) => {
+            (rest.join(" "), last.to_string())
+        }
+        _ => (tokens.join(" "), String::new()),
+    };
 
-/// Parse the ability block. Limitless renders it similarly to an attack but
-/// with a different container and an "Ability" label.
-fn parse_ability(el: scraper::ElementRef) -> Option<Ability> {
-    let name_sel = sel!("span.card-text-ability-name, p.card-text-ability-name");
-    let effect_sel = sel!("div.card-text-ability-effect, p.card-text-ability-effect");
+    if name.is_empty() {
+        warn!("could not extract attack name from: {name_dmg:?}");
+        return None;
+    }
 
-    let name = el
-        .select(&name_sel)
-        .next()
-        .map(|e| e.text().collect::<String>().trim().to_string())
-        .filter(|s| !s.is_empty())?;
+    let (damage, damage_suffix) = parse_damage(&damage_raw);
 
     let effect = el
         .select(&effect_sel)
         .next()
         .map(|e| e.text().collect::<String>().trim().to_string())
+        .filter(|s| !s.is_empty());
+
+    Some(Attack { name, cost, damage, damage_suffix, effect })
+}
+
+fn parse_ability(el: scraper::ElementRef) -> Option<Ability> {
+    let info_sel = sel!("p.card-text-ability-info");
+    let effect_sel = sel!("p.card-text-ability-effect");
+
+    let name = el
+        .select(&info_sel)
+        .next()
+        .map(|e| {
+            let text = e.text().collect::<String>();
+            text.split(':').nth(1).unwrap_or(&text).trim().to_string()
+        })
+        .filter(|s| !s.is_empty())?;
+
+    let effect = el
+        .select(&effect_sel)
+        .next()
+        .map(|e| render_card_text(e))
         .unwrap_or_default();
 
     Some(Ability { name, effect })
@@ -523,33 +432,10 @@ fn parse_ability(el: scraper::ElementRef) -> Option<Ability> {
 
 // ── Energy / symbol helpers ──────────────────────────────────────────────────
 
-/// Extract the element name from a `span.ptcg-symbol` element.
-///
-/// Limitless encodes element type as an extra class such as `ptcg-symbol-G`
-/// (single letter) or `ptcg-symbol-grass` (full name). Falls back to the
-/// span's text content when no recognised class is found.
-fn element_from_symbol_span(el: scraper::ElementRef) -> String {
-    let classes = el.value().classes();
-    for cls in classes {
-        if let Some(suffix) = cls.strip_prefix("ptcg-symbol-") {
-            if let Some(name) = letter_to_element(suffix) {
-                return name.to_string();
-            }
-            // Full-name class e.g. "ptcg-symbol-grass"
-            let titled = title_case(suffix);
-            return titled;
-        }
-    }
-    // Fall back to text content
-    let text = el.text().collect::<String>();
-    let text = text.trim();
-    letter_to_element(text)
-        .map(str::to_string)
-        .unwrap_or_else(|| text.to_string())
-}
-
 fn letter_to_element(s: &str) -> Option<&'static str> {
-    match s.to_uppercase().as_str() {
+    // Single-letter energy codes are part of the PTCGP card encoding used by
+    // Limitless. This mapping must be maintained manually if new types are added.
+    let element = match s.to_uppercase().as_str() {
         "G" => Some("Grass"),
         "R" => Some("Fire"),
         "W" => Some("Water"),
@@ -561,23 +447,18 @@ fn letter_to_element(s: &str) -> Option<&'static str> {
         "Y" | "N" => Some("Dragon"),
         "C" => Some("Colorless"),
         _ => None,
+    };
+    if element.is_none() && !s.is_empty() {
+        warn!(letter = s, "unknown energy symbol — add to letter_to_element in limitless.rs");
     }
+    element
 }
 
-/// "20+" → (20, Some("+"))
-/// "80×" → (80, Some("×"))
-/// "40"  → (40, None)
-/// ""    → (0, None)
 fn parse_damage(raw: &str) -> (u32, Option<String>) {
     if raw.is_empty() {
         return (0, None);
     }
-    let mut digits = String::new();
-    for c in raw.chars() {
-        if c.is_ascii_digit() {
-            digits.push(c);
-        }
-    }
+    let digits: String = raw.chars().filter(|c| c.is_ascii_digit()).collect();
     let damage = digits.parse::<u32>().unwrap_or(0);
     let suffix = raw
         .chars()
@@ -586,37 +467,13 @@ fn parse_damage(raw: &str) -> (u32, Option<String>) {
     (damage, suffix)
 }
 
-/// Map rarity display symbols to internal codes.
-fn symbol_to_rarity_code(sym: &str) -> Option<&'static str> {
-    match sym {
-        "◊" => Some("C"),
-        "◊◊" => Some("U"),
-        "◊◊◊" => Some("R"),
-        "◊◊◊◊" => Some("RR"),
-        // Single star — could be AR or S; we can't distinguish from the symbol alone.
-        // The full rarity code appears in the alternate-versions table; use "AR" as
-        // the default and let the DB builder refine via the global-master data.
-        "☆" => Some("AR"),
-        "☆☆" => Some("SR"),
-        "☆☆☆" => Some("IM"),
-        "♛" => Some("UR"),
-        _ => None,
-    }
-}
+// ── Pokemon name helpers ─────────────────────────────────────────────────────
 
-// ── Pokemon variant / ex helpers ─────────────────────────────────────────────
-
-/// Extract named variant identifiers from a card name.
-/// e.g. "Alolan Vulpix" → ["Alolan"]
-///      "Galarian Slowpoke ex" → ["Galarian"]
 fn extract_variants(name: &str) -> Vec<String> {
-    const KNOWN_PREFIXES: &[&str] = &[
-        "Alolan", "Galarian", "Hisuian", "Paldean",
-    ];
+    const KNOWN_PREFIXES: &[&str] = &["Alolan", "Galarian", "Hisuian", "Paldean"];
     const KNOWN_SUFFIXES: &[&str] = &[
         "Teal Mask", "Hearthflame Mask", "Wellspring Mask", "Cornerstone Mask",
     ];
-
     let mut variants = Vec::new();
     for prefix in KNOWN_PREFIXES {
         if name.starts_with(prefix) {
@@ -631,38 +488,36 @@ fn extract_variants(name: &str) -> Vec<String> {
     variants
 }
 
-// ── CDN URL helpers ──────────────────────────────────────────────────────────
+// ── Date parsing ─────────────────────────────────────────────────────────────
 
-pub fn cdn_thumb_url(set_code: &str, number: u32) -> String {
-    format!(
-        "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/pocket/{set_code}/{set_code}_{number:03}_EN_SM.webp"
-    )
-}
-
-pub fn cdn_full_url(set_code: &str, number: u32) -> String {
-    format!(
-        "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/pocket/{set_code}/{set_code}_{number:03}_EN.png"
-    )
-}
-
-pub fn set_icon_url(set_code: &str) -> String {
-    format!("https://s3.limitlesstcg.com/pocket/sets/{set_code}.webp")
+/// Parse "30 Oct 24" → Some("2024-10-30"), or already-formatted dates pass through.
+pub fn parse_release_date(s: &str) -> Option<String> {
+    let s = s.trim();
+    // Already in YYYY-MM-DD format
+    if s.len() == 10 && s.chars().nth(4) == Some('-') {
+        return Some(s.to_string());
+    }
+    let parts: Vec<&str> = s.split_whitespace().collect();
+    if parts.len() != 3 {
+        return None;
+    }
+    let day: u32 = parts[0].parse().ok()?;
+    let month = match parts[1].to_lowercase().as_str() {
+        "jan" => 1u32, "feb" => 2, "mar" => 3, "apr" => 4,
+        "may" => 5, "jun" => 6, "jul" => 7, "aug" => 8,
+        "sep" => 9, "oct" => 10, "nov" => 11, "dec" => 12,
+        _ => return None,
+    };
+    let year_short: u32 = parts[2].parse().ok()?;
+    let year = if year_short < 100 { 2000 + year_short } else { year_short };
+    Some(format!("{year:04}-{month:02}-{day:02}"))
 }
 
 // ── Misc helpers ─────────────────────────────────────────────────────────────
 
 fn parse_series(code: &str) -> String {
-    // "A1" → "A", "B2a" → "B", "P-A" → "A" (promo)
     if code.starts_with("P-") {
         return code.trim_start_matches("P-").chars().next().unwrap_or('A').to_string();
     }
     code.chars().next().map(|c| c.to_string()).unwrap_or_default()
-}
-
-fn title_case(s: &str) -> String {
-    let mut c = s.chars();
-    match c.next() {
-        None => String::new(),
-        Some(f) => f.to_uppercase().collect::<String>() + c.as_str(),
-    }
 }

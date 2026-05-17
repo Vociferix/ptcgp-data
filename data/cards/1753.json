@@ -1,0 +1,38 @@
+{
+  "id": 1753,
+  "name": "Victini",
+  "card_type": "pokemon",
+  "natdex_number": 494,
+  "element": "Fire",
+  "stage": "Basic",
+  "hp": 70,
+  "retreat_cost": 1,
+  "weakness": "Water",
+  "flavor": "When it shares the infinite energy it creates, that being’s entire body will be overflowing with power.",
+  "is_ex": false,
+  "is_mega": false,
+  "ability": {
+    "name": "Victory Star",
+    "effect": "Once during your turn, after you flip any coins for an attack of 1 of your [Fire] Pokémon, you may ignore all results of those coin flips and begin flipping those coins again. You can't use more than 1 Victory Star Ability each turn."
+  },
+  "attacks": [
+    {
+      "name": "V-Flame",
+      "cost": [
+        "Fire",
+        "Colorless"
+      ],
+      "damage": 40
+    }
+  ],
+  "versions": [
+    {
+      "set": "B3",
+      "number": 25
+    },
+    {
+      "set": "P-B",
+      "number": 49
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "id": 1170,
+  "name": "Magikarp",
+  "card_type": "pokemon",
+  "natdex_number": 129,
+  "element": "Water",
+  "stage": "Basic",
+  "hp": 30,
+  "retreat_cost": 1,
+  "weakness": "Lightning",
+  "flavor": "In the distant past, it was somewhat stronger than the horribly weak descendants that exist today.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Waterfall Evolution",
+      "cost": [
+        "Water",
+        "Water",
+        "Colorless"
+      ],
+      "damage": 0,
+      "effect": "Put a random card from your deck that evolves from this Pokémon onto this Pokémon to evolve it."
+    }
+  ],
+  "versions": [
+    {
+      "set": "B1",
+      "number": 50
+    },
+    {
+      "set": "B1",
+      "number": 232
+    }
+  ]
+}

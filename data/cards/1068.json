@@ -1,0 +1,47 @@
+{
+  "id": 1068,
+  "name": "Suicune ex",
+  "card_type": "pokemon",
+  "natdex_number": 245,
+  "element": "Water",
+  "stage": "Basic",
+  "hp": 140,
+  "retreat_cost": 2,
+  "weakness": "Lightning",
+  "is_ex": true,
+  "is_mega": false,
+  "ability": {
+    "name": "Legendary Pulse",
+    "effect": "At the end of your turn, if this Pokémon is in the Active Spot, draw a card."
+  },
+  "attacks": [
+    {
+      "name": "Crystal Waltz",
+      "cost": [
+        "Water",
+        "Water"
+      ],
+      "damage": 20,
+      "damage_suffix": "x",
+      "effect": "This attack does 20 damage for each Benched Pokémon (both yours and your opponent's)."
+    }
+  ],
+  "versions": [
+    {
+      "set": "A4a",
+      "number": 20
+    },
+    {
+      "set": "A4a",
+      "number": 80
+    },
+    {
+      "set": "A4a",
+      "number": 90
+    },
+    {
+      "set": "B2a",
+      "number": 127
+    }
+  ]
+}

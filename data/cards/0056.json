@@ -1,0 +1,53 @@
+{
+  "id": 56,
+  "name": "Blastoise ex",
+  "card_type": "pokemon",
+  "natdex_number": 9,
+  "element": "Water",
+  "stage": "Stage 2",
+  "hp": 180,
+  "retreat_cost": 3,
+  "weakness": "Lightning",
+  "is_ex": true,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Surf",
+      "cost": [
+        "Water",
+        "Colorless"
+      ],
+      "damage": 40
+    },
+    {
+      "name": "Hydro Bazooka",
+      "cost": [
+        "Water",
+        "Water",
+        "Colorless"
+      ],
+      "damage": 100,
+      "damage_suffix": "+",
+      "effect": "If this Pokémon has at least 2 extra [W] Energy attached, this attack does 60 more damage."
+    }
+  ],
+  "evolves_from": "Wartortle",
+  "versions": [
+    {
+      "set": "A1",
+      "number": 56
+    },
+    {
+      "set": "A1",
+      "number": 256
+    },
+    {
+      "set": "A3",
+      "number": 232
+    },
+    {
+      "set": "A4b",
+      "number": 87
+    }
+  ]
+}

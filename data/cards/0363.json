@@ -1,0 +1,36 @@
+{
+  "id": 363,
+  "name": "Dusknoir",
+  "card_type": "pokemon",
+  "natdex_number": 477,
+  "element": "Psychic",
+  "stage": "Stage 2",
+  "hp": 130,
+  "retreat_cost": 2,
+  "weakness": "Darkness",
+  "flavor": "At the bidding of transmissions from the spirit world, it steals people and Pokémon away. No one knows whether it has a will of its own.",
+  "is_ex": false,
+  "is_mega": false,
+  "ability": {
+    "name": "Shadow Void",
+    "effect": "As often as you like during your turn, you may choose 1 of your Pokémon that has damage on it, and move all of its damage to this Pokémon."
+  },
+  "attacks": [
+    {
+      "name": "Devour Soul",
+      "cost": [
+        "Psychic",
+        "Colorless",
+        "Colorless"
+      ],
+      "damage": 70
+    }
+  ],
+  "evolves_from": "Dusclops",
+  "versions": [
+    {
+      "set": "A2",
+      "number": 72
+    }
+  ]
+}

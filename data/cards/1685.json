@@ -1,0 +1,35 @@
+{
+  "id": 1685,
+  "name": "Electrike",
+  "card_type": "pokemon",
+  "natdex_number": 309,
+  "element": "Lightning",
+  "stage": "Basic",
+  "hp": 60,
+  "retreat_cost": 1,
+  "weakness": "Fighting",
+  "flavor": "It stores electricity in its fur. It gives off sparks from all over its body in seasons when the air is dry.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Quick Attack",
+      "cost": [
+        "Lightning"
+      ],
+      "damage": 10,
+      "damage_suffix": "+",
+      "effect": "Flip a coin. If heads, this attack does 30 more damage."
+    }
+  ],
+  "versions": [
+    {
+      "set": "B2b",
+      "number": 26
+    },
+    {
+      "set": "B2b",
+      "number": 98
+    }
+  ]
+}

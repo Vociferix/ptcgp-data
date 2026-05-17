@@ -1,0 +1,40 @@
+{
+  "id": 125,
+  "name": "Hypno",
+  "card_type": "pokemon",
+  "natdex_number": 97,
+  "element": "Psychic",
+  "stage": "Stage 1",
+  "hp": 100,
+  "retreat_cost": 2,
+  "weakness": "Darkness",
+  "flavor": "When it locks eyes with an enemy, it will use a mix of psi moves, such as Hypnosis and Confusion.",
+  "is_ex": false,
+  "is_mega": false,
+  "ability": {
+    "name": "Sleep Pendulum",
+    "effect": "Once during your turn, you may flip a coin. If heads, your opponent's Active Pokémon is now Asleep."
+  },
+  "attacks": [
+    {
+      "name": "Psypunch",
+      "cost": [
+        "Psychic",
+        "Psychic",
+        "Colorless"
+      ],
+      "damage": 50
+    }
+  ],
+  "evolves_from": "Drowzee",
+  "versions": [
+    {
+      "set": "A1",
+      "number": 125
+    },
+    {
+      "set": "B1",
+      "number": 306
+    }
+  ]
+}

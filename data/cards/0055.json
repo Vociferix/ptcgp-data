@@ -1,0 +1,42 @@
+{
+  "id": 55,
+  "name": "Blastoise",
+  "card_type": "pokemon",
+  "natdex_number": 9,
+  "element": "Water",
+  "stage": "Stage 2",
+  "hp": 150,
+  "retreat_cost": 3,
+  "weakness": "Lightning",
+  "flavor": "It crushes its foe under its heavy body to cause fainting. In a pinch, it will withdraw inside its shell.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Hydro Pump",
+      "cost": [
+        "Water",
+        "Water",
+        "Colorless"
+      ],
+      "damage": 80,
+      "damage_suffix": "+",
+      "effect": "If this Pokémon has at least 2 extra [W] Energy attached, this attack does 60 more damage."
+    }
+  ],
+  "evolves_from": "Wartortle",
+  "versions": [
+    {
+      "set": "A1",
+      "number": 55
+    },
+    {
+      "set": "A3",
+      "number": 217
+    },
+    {
+      "set": "P-A",
+      "number": 29
+    }
+  ]
+}

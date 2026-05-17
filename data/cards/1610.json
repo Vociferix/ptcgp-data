@@ -1,0 +1,40 @@
+{
+  "id": 1610,
+  "name": "Bellibolt ex",
+  "card_type": "pokemon",
+  "natdex_number": 939,
+  "element": "Lightning",
+  "stage": "Stage 1",
+  "hp": 160,
+  "retreat_cost": 3,
+  "weakness": "Fighting",
+  "is_ex": true,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "High-Voltage Cannon",
+      "cost": [
+        "Lightning",
+        "Lightning"
+      ],
+      "damage": 70,
+      "damage_suffix": "+",
+      "effect": "If you have 4 or more [L] Energy in play, this attack does 70 more damage."
+    }
+  ],
+  "evolves_from": "Tadbulb",
+  "versions": [
+    {
+      "set": "B2a",
+      "number": 42
+    },
+    {
+      "set": "B2a",
+      "number": 103
+    },
+    {
+      "set": "B2a",
+      "number": 113
+    }
+  ]
+}

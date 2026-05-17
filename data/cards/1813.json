@@ -1,0 +1,32 @@
+{
+  "id": 1813,
+  "name": "Throh",
+  "card_type": "pokemon",
+  "natdex_number": 538,
+  "element": "Fighting",
+  "stage": "Basic",
+  "hp": 100,
+  "retreat_cost": 3,
+  "weakness": "Psychic",
+  "flavor": "It performs throwing moves with first-rate skill. Over the course of many battles, Throh’s belt grows darker as it absorbs its wearer’s sweat.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Circle Throw",
+      "cost": [
+        "Fighting",
+        "Fighting",
+        "Fighting"
+      ],
+      "damage": 70,
+      "effect": "Switch out your opponent's Active Pokémon to the Bench. (Your opponent chooses the new Active Pokémon.)"
+    }
+  ],
+  "versions": [
+    {
+      "set": "B3",
+      "number": 85
+    }
+  ]
+}

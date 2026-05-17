@@ -1,0 +1,36 @@
+{
+  "id": 83,
+  "name": "Articuno",
+  "card_type": "pokemon",
+  "natdex_number": 144,
+  "element": "Water",
+  "stage": "Basic",
+  "hp": 100,
+  "retreat_cost": 1,
+  "weakness": "Lightning",
+  "flavor": "It’s said that this Pokémon’s beautiful blue wings are made of ice. Articuno flies over snowy mountains, its long tail fluttering along behind it.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Ice Beam",
+      "cost": [
+        "Water",
+        "Water",
+        "Colorless"
+      ],
+      "damage": 60,
+      "effect": "Flip a coin. If heads, your opponent's Active Pokémon is now Paralyzed."
+    }
+  ],
+  "versions": [
+    {
+      "set": "A1",
+      "number": 83
+    },
+    {
+      "set": "B1",
+      "number": 298
+    }
+  ]
+}

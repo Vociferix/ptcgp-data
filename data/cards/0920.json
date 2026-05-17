@@ -1,0 +1,33 @@
+{
+  "id": 920,
+  "name": "Entei",
+  "card_type": "pokemon",
+  "natdex_number": 244,
+  "element": "Fire",
+  "stage": "Basic",
+  "hp": 110,
+  "retreat_cost": 2,
+  "weakness": "Water",
+  "flavor": "A Pokémon that races across the land. It is said that one is born every time a new volcano appears.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Strong Flare",
+      "cost": [
+        "Fire",
+        "Colorless",
+        "Colorless",
+        "Colorless"
+      ],
+      "damage": 110,
+      "effect": "Flip a coin. If tails, discard 2 random Energy from this Pokémon."
+    }
+  ],
+  "versions": [
+    {
+      "set": "A4",
+      "number": 33
+    }
+  ]
+}

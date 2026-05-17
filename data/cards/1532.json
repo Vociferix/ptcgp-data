@@ -1,0 +1,33 @@
+{
+  "id": 1532,
+  "name": "Doublade",
+  "card_type": "pokemon",
+  "natdex_number": 680,
+  "element": "Metal",
+  "stage": "Stage 1",
+  "hp": 90,
+  "retreat_cost": 2,
+  "weakness": "Fire",
+  "flavor": "The two swords employ a strategy of rapidly alternating between offense and defense to bring down their prey.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Dual Blades",
+      "cost": [
+        "Metal",
+        "Metal"
+      ],
+      "damage": 40,
+      "damage_suffix": "x",
+      "effect": "Flip 2 coins. This attack does 40 damage for each heads."
+    }
+  ],
+  "evolves_from": "Honedge",
+  "versions": [
+    {
+      "set": "B2",
+      "number": 119
+    }
+  ]
+}

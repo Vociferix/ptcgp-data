@@ -1,0 +1,37 @@
+{
+  "id": 1010,
+  "name": "Scizor",
+  "card_type": "pokemon",
+  "natdex_number": 212,
+  "element": "Metal",
+  "stage": "Stage 1",
+  "hp": 100,
+  "retreat_cost": 1,
+  "weakness": "Fire",
+  "flavor": "This Pokémon’s pincers, which contain steel, can crush any hard object they get ahold of into bits.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Gale Thrust",
+      "cost": [
+        "Metal",
+        "Metal"
+      ],
+      "damage": 50,
+      "damage_suffix": "+",
+      "effect": "If this Pokémon moved from your Bench to the Active Spot this turn, this attack does 50 more damage."
+    }
+  ],
+  "evolves_from": "Scyther",
+  "versions": [
+    {
+      "set": "A4",
+      "number": 123
+    },
+    {
+      "set": "A4",
+      "number": 180
+    }
+  ]
+}

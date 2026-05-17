@@ -1,0 +1,37 @@
+{
+  "id": 128,
+  "name": "Mewtwo",
+  "card_type": "pokemon",
+  "natdex_number": 150,
+  "element": "Psychic",
+  "stage": "Basic",
+  "hp": 120,
+  "retreat_cost": 2,
+  "weakness": "Darkness",
+  "flavor": "It was created by a scientist after years of horrific gene-splicing and DNA-engineering experiments.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Power Blast",
+      "cost": [
+        "Psychic",
+        "Psychic",
+        "Colorless",
+        "Colorless"
+      ],
+      "damage": 120,
+      "effect": "Discard 2 [P] Energy from this Pokémon."
+    }
+  ],
+  "versions": [
+    {
+      "set": "A1",
+      "number": 128
+    },
+    {
+      "set": "P-A",
+      "number": 10
+    }
+  ]
+}

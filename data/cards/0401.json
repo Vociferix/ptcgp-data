@@ -1,0 +1,54 @@
+{
+  "id": 401,
+  "name": "Darkrai ex",
+  "card_type": "pokemon",
+  "natdex_number": 491,
+  "element": "Darkness",
+  "stage": "Basic",
+  "hp": 140,
+  "retreat_cost": 2,
+  "weakness": "Grass",
+  "is_ex": true,
+  "is_mega": false,
+  "ability": {
+    "name": "Nightmare Aura",
+    "effect": "Whenever you attach a [Darkness] Energy from your Energy Zone to this Pokémon, do 20 damage to your opponent's Active Pokémon."
+  },
+  "attacks": [
+    {
+      "name": "Dark Prism",
+      "cost": [
+        "Darkness",
+        "Darkness",
+        "Colorless"
+      ],
+      "damage": 80
+    }
+  ],
+  "versions": [
+    {
+      "set": "A2",
+      "number": 110
+    },
+    {
+      "set": "A2",
+      "number": 187
+    },
+    {
+      "set": "A2",
+      "number": 202
+    },
+    {
+      "set": "A4b",
+      "number": 245
+    },
+    {
+      "set": "A4b",
+      "number": 378
+    },
+    {
+      "set": "P-A",
+      "number": 42
+    }
+  ]
+}

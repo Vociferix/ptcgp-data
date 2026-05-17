@@ -1,0 +1,35 @@
+{
+  "id": 409,
+  "name": "Probopass",
+  "card_type": "pokemon",
+  "natdex_number": 476,
+  "element": "Metal",
+  "stage": "Stage 1",
+  "hp": 130,
+  "retreat_cost": 4,
+  "weakness": "Fire",
+  "flavor": "Although it can control its units known as Mini-Noses, they sometimes get lost and don’t come back.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Triple Nose",
+      "cost": [
+        "Metal",
+        "Metal",
+        "Metal",
+        "Colorless"
+      ],
+      "damage": 30,
+      "damage_suffix": "+",
+      "effect": "Flip 3 coins. This attack does 50 more damage for each heads."
+    }
+  ],
+  "evolves_from": "Nosepass",
+  "versions": [
+    {
+      "set": "A2",
+      "number": 118
+    }
+  ]
+}

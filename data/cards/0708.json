@@ -1,0 +1,33 @@
+{
+  "id": 708,
+  "name": "Garbodor",
+  "card_type": "pokemon",
+  "natdex_number": 569,
+  "element": "Darkness",
+  "stage": "Stage 1",
+  "hp": 120,
+  "retreat_cost": 3,
+  "weakness": "Fighting",
+  "flavor": "This Pokémon eats trash, which turns into poison inside its body. The main component of the poison depends on what sort of trash was eaten.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Super Poison Breath",
+      "cost": [
+        "Darkness",
+        "Darkness",
+        "Colorless"
+      ],
+      "damage": 70,
+      "effect": "Your opponent's Active Pokémon is now Poisoned."
+    }
+  ],
+  "evolves_from": "Trubbish",
+  "versions": [
+    {
+      "set": "A3",
+      "number": 114
+    }
+  ]
+}

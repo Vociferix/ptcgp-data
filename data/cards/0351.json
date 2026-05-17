@@ -1,0 +1,33 @@
+{
+  "id": 351,
+  "name": "Luxray",
+  "card_type": "pokemon",
+  "natdex_number": 405,
+  "element": "Lightning",
+  "stage": "Stage 2",
+  "hp": 130,
+  "retreat_cost": 0,
+  "weakness": "Fighting",
+  "flavor": "It can see clearly through walls to track down its prey and seek its lost young.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Volt Bolt",
+      "cost": [
+        "Lightning",
+        "Lightning",
+        "Lightning"
+      ],
+      "damage": 0,
+      "effect": "Discard all [L] Energy from this Pokémon. This attack does 120 damage to 1 of your opponent's Pokémon."
+    }
+  ],
+  "evolves_from": "Luxio",
+  "versions": [
+    {
+      "set": "A2",
+      "number": 60
+    }
+  ]
+}

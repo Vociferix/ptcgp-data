@@ -1,0 +1,31 @@
+{
+  "id": 112,
+  "name": "Pincurchin",
+  "card_type": "pokemon",
+  "natdex_number": 871,
+  "element": "Lightning",
+  "stage": "Basic",
+  "hp": 70,
+  "retreat_cost": 1,
+  "weakness": "Fighting",
+  "flavor": "This Pokémon generates electricity when it digests food. It uses its five hard teeth to scrape seaweed off surfaces and eat it.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Thunder Shock",
+      "cost": [
+        "Lightning",
+        "Lightning"
+      ],
+      "damage": 30,
+      "effect": "Flip a coin. If heads, your opponent's Active Pokémon is now Paralyzed."
+    }
+  ],
+  "versions": [
+    {
+      "set": "A1",
+      "number": 112
+    }
+  ]
+}

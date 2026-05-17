@@ -1,0 +1,47 @@
+{
+  "id": 543,
+  "name": "Pikachu ex",
+  "card_type": "pokemon",
+  "natdex_number": 25,
+  "element": "Lightning",
+  "stage": "Basic",
+  "hp": 120,
+  "retreat_cost": 1,
+  "weakness": "Fighting",
+  "is_ex": true,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Thunderbolt",
+      "cost": [
+        "Lightning",
+        "Lightning",
+        "Lightning"
+      ],
+      "damage": 150,
+      "effect": "Discard all Energy from this Pokémon."
+    }
+  ],
+  "versions": [
+    {
+      "set": "A2b",
+      "number": 22
+    },
+    {
+      "set": "A2b",
+      "number": 82
+    },
+    {
+      "set": "A2b",
+      "number": 92
+    },
+    {
+      "set": "A4b",
+      "number": 132
+    },
+    {
+      "set": "B1",
+      "number": 321
+    }
+  ]
+}

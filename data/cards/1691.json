@@ -1,0 +1,32 @@
+{
+  "id": 1691,
+  "name": "Grumpig",
+  "card_type": "pokemon",
+  "natdex_number": 326,
+  "element": "Psychic",
+  "stage": "Stage 1",
+  "hp": 110,
+  "retreat_cost": 3,
+  "weakness": "Darkness",
+  "flavor": "It uses black pearls to amplify its psychic power. It does a strange dance to control foes’ minds.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Swaying Dance",
+      "cost": [
+        "Psychic"
+      ],
+      "damage": 40,
+      "damage_suffix": "+",
+      "effect": "If your opponent has exactly 2, 4, or 6 cards in their hand, this attack does 40 more damage."
+    }
+  ],
+  "evolves_from": "Spoink",
+  "versions": [
+    {
+      "set": "B2b",
+      "number": 32
+    }
+  ]
+}

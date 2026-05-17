@@ -1,0 +1,40 @@
+{
+  "id": 1364,
+  "name": "Mega Blastoise ex",
+  "card_type": "pokemon",
+  "natdex_number": 9,
+  "element": "Water",
+  "stage": "Stage 2",
+  "hp": 230,
+  "retreat_cost": 3,
+  "weakness": "Lightning",
+  "is_ex": true,
+  "is_mega": true,
+  "attacks": [
+    {
+      "name": "Triple Bombardment",
+      "cost": [
+        "Water",
+        "Water",
+        "Colorless"
+      ],
+      "damage": 130,
+      "effect": "If this Pokémon has at least 3 extra [W] Energy attached, this attack also does 50 damage to 2 of your opponent's Benched Pokémon."
+    }
+  ],
+  "evolves_from": "Wartortle",
+  "versions": [
+    {
+      "set": "B1a",
+      "number": 20
+    },
+    {
+      "set": "B1a",
+      "number": 78
+    },
+    {
+      "set": "B1a",
+      "number": 84
+    }
+  ]
+}

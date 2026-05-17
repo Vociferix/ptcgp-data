@@ -1,0 +1,58 @@
+{
+  "id": 768,
+  "name": "Tapu Koko ex",
+  "card_type": "pokemon",
+  "natdex_number": 785,
+  "element": "Lightning",
+  "stage": "Basic",
+  "hp": 130,
+  "retreat_cost": 1,
+  "weakness": "Fighting",
+  "is_ex": true,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Plasma Hurricane",
+      "cost": [
+        "Lightning"
+      ],
+      "damage": 20,
+      "effect": "Take a [L] Energy from your Energy Zone and attach it to this Pokémon."
+    },
+    {
+      "name": "Mach Bolt",
+      "cost": [
+        "Lightning",
+        "Lightning",
+        "Colorless"
+      ],
+      "damage": 90
+    }
+  ],
+  "versions": [
+    {
+      "set": "A3a",
+      "number": 19
+    },
+    {
+      "set": "A3a",
+      "number": 77
+    },
+    {
+      "set": "A3a",
+      "number": 84
+    },
+    {
+      "set": "A4b",
+      "number": 148
+    },
+    {
+      "set": "B1",
+      "number": 322
+    },
+    {
+      "set": "P-A",
+      "number": 84
+    }
+  ]
+}

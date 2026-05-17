@@ -1,0 +1,32 @@
+{
+  "id": 1245,
+  "name": "Sudowoodo",
+  "card_type": "pokemon",
+  "natdex_number": 185,
+  "element": "Fighting",
+  "stage": "Basic",
+  "hp": 90,
+  "retreat_cost": 2,
+  "weakness": "Grass",
+  "flavor": "To avoid being attacked, it does nothing but mimic a tree. It hates water and flees from rain.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Fight Back",
+      "cost": [
+        "Fighting",
+        "Fighting"
+      ],
+      "damage": 30,
+      "damage_suffix": "+",
+      "effect": "If this Pokémon has damage on it, this attack does 50 more damage."
+    }
+  ],
+  "versions": [
+    {
+      "set": "B1",
+      "number": 125
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "id": 662,
+  "name": "Tapu Koko",
+  "card_type": "pokemon",
+  "natdex_number": 785,
+  "element": "Lightning",
+  "stage": "Basic",
+  "hp": 100,
+  "retreat_cost": 1,
+  "weakness": "Fighting",
+  "flavor": "Although it’s called a guardian deity, if a person or Pokémon puts it in a bad mood, it will become a malevolent deity and attack.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Volt Switch",
+      "cost": [
+        "Lightning",
+        "Lightning",
+        "Lightning"
+      ],
+      "damage": 70,
+      "effect": "Switch this Pokémon with 1 of your Benched [L] Pokémon."
+    }
+  ],
+  "versions": [
+    {
+      "set": "A3",
+      "number": 68
+    },
+    {
+      "set": "A3",
+      "number": 166
+    }
+  ]
+}

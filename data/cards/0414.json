@@ -1,0 +1,38 @@
+{
+  "id": 414,
+  "name": "Garchomp",
+  "card_type": "pokemon",
+  "natdex_number": 445,
+  "element": "Dragon",
+  "stage": "Stage 2",
+  "hp": 140,
+  "retreat_cost": 1,
+  "flavor": "It is said that when one runs at high speed, its wings create blades of wind that can fell nearby trees.",
+  "is_ex": false,
+  "is_mega": false,
+  "ability": {
+    "name": "Reckless Shearing",
+    "effect": "You must discard a card from your hand in order to use this Ability. Once during your turn, you may draw a card."
+  },
+  "attacks": [
+    {
+      "name": "Dragon Claw",
+      "cost": [
+        "Water",
+        "Fighting"
+      ],
+      "damage": 100
+    }
+  ],
+  "evolves_from": "Gabite",
+  "versions": [
+    {
+      "set": "A2",
+      "number": 123
+    },
+    {
+      "set": "A2",
+      "number": 175
+    }
+  ]
+}

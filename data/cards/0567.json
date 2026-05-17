@@ -1,0 +1,33 @@
+{
+  "id": 567,
+  "name": "Arbok",
+  "card_type": "pokemon",
+  "natdex_number": 24,
+  "element": "Darkness",
+  "stage": "Stage 1",
+  "hp": 110,
+  "retreat_cost": 2,
+  "weakness": "Fighting",
+  "flavor": "After stunning its opponents with the pattern on its stomach, it quickly wraps them up in its body and waits for them to stop moving.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Venomous Fang",
+      "cost": [
+        "Darkness",
+        "Darkness",
+        "Colorless"
+      ],
+      "damage": 70,
+      "effect": "Your opponent's Active Pokémon is now Poisoned."
+    }
+  ],
+  "evolves_from": "Ekans",
+  "versions": [
+    {
+      "set": "A2b",
+      "number": 46
+    }
+  ]
+}

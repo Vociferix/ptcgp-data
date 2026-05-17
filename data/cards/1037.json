@@ -1,0 +1,33 @@
+{
+  "id": 1037,
+  "name": "Bouffalant",
+  "card_type": "pokemon",
+  "natdex_number": 626,
+  "element": "Colorless",
+  "stage": "Basic",
+  "hp": 100,
+  "retreat_cost": 2,
+  "weakness": "Fighting",
+  "flavor": "These Pokémon can crush a car with no more than a headbutt. Bouffalant with more hair on their heads hold higher positions within the herd.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Continuous Headbutt",
+      "cost": [
+        "Colorless",
+        "Colorless",
+        "Colorless"
+      ],
+      "damage": 70,
+      "damage_suffix": "x",
+      "effect": "Flip a coin until you get tails. This attack does 70 damage for each heads."
+    }
+  ],
+  "versions": [
+    {
+      "set": "A4",
+      "number": 150
+    }
+  ]
+}

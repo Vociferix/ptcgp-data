@@ -1,0 +1,33 @@
+{
+  "id": 1520,
+  "name": "Scrafty",
+  "card_type": "pokemon",
+  "natdex_number": 560,
+  "element": "Darkness",
+  "stage": "Stage 1",
+  "hp": 110,
+  "retreat_cost": 2,
+  "weakness": "Grass",
+  "flavor": "This Pokémon may be rude, but it takes very good care of its family, its friends, and its turf.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Crush the Weak",
+      "cost": [
+        "Darkness",
+        "Darkness"
+      ],
+      "damage": 50,
+      "damage_suffix": "+",
+      "effect": "If this Pokémon has more Energy attached than your opponent's Active Pokémon, this attack does 50 more damage."
+    }
+  ],
+  "evolves_from": "Scraggy",
+  "versions": [
+    {
+      "set": "B2",
+      "number": 107
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": 1070,
+  "name": "Milotic",
+  "card_type": "pokemon",
+  "natdex_number": 350,
+  "element": "Water",
+  "stage": "Stage 1",
+  "hp": 120,
+  "retreat_cost": 2,
+  "weakness": "Lightning",
+  "flavor": "Milotic has provided inspiration to many artists. It has even been referred to as the most beautiful Pokémon of all.",
+  "is_ex": false,
+  "is_mega": false,
+  "ability": {
+    "name": "Healing Ripples",
+    "effect": "Once during your turn, when you play this Pokémon from your hand to evolve 1 of your Pokémon, you may heal 60 damage from 1 of your [Water] Pokémon."
+  },
+  "attacks": [
+    {
+      "name": "Aqua Edge",
+      "cost": [
+        "Water",
+        "Colorless"
+      ],
+      "damage": 60
+    }
+  ],
+  "evolves_from": "Feebas",
+  "versions": [
+    {
+      "set": "A4a",
+      "number": 22
+    },
+    {
+      "set": "A4a",
+      "number": 72
+    },
+    {
+      "set": "P-A",
+      "number": 104
+    }
+  ]
+}

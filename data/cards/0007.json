@@ -1,0 +1,40 @@
+{
+  "id": 7,
+  "name": "Butterfree",
+  "card_type": "pokemon",
+  "natdex_number": 12,
+  "element": "Grass",
+  "stage": "Stage 2",
+  "hp": 120,
+  "retreat_cost": 1,
+  "weakness": "Fire",
+  "flavor": "In battle, it flaps its wings at great speed to release highly toxic dust into the air.",
+  "is_ex": false,
+  "is_mega": false,
+  "ability": {
+    "name": "Powder Heal",
+    "effect": "Once during your turn, you may heal 20 damage from each of your Pokémon."
+  },
+  "attacks": [
+    {
+      "name": "Gust",
+      "cost": [
+        "Grass",
+        "Colorless",
+        "Colorless"
+      ],
+      "damage": 60
+    }
+  ],
+  "evolves_from": "Metapod",
+  "versions": [
+    {
+      "set": "A1",
+      "number": 7
+    },
+    {
+      "set": "P-A",
+      "number": 13
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "id": 1152,
+  "name": "Ho-Oh",
+  "card_type": "pokemon",
+  "natdex_number": 250,
+  "element": "Fire",
+  "stage": "Basic",
+  "hp": 120,
+  "retreat_cost": 2,
+  "weakness": "Lightning",
+  "flavor": "It will reveal itself before a pure-hearted Trainer by shining its bright, rainbow-colored wings.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Blessed Burn",
+      "cost": [
+        "Fire",
+        "Fire",
+        "Colorless",
+        "Colorless"
+      ],
+      "damage": 100,
+      "effect": "Heal 30 damage from each of your Benched Basic Pokémon."
+    }
+  ],
+  "versions": [
+    {
+      "set": "B1",
+      "number": 32
+    }
+  ]
+}

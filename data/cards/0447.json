@@ -1,0 +1,33 @@
+{
+  "id": 447,
+  "name": "Heracross",
+  "card_type": "pokemon",
+  "natdex_number": 214,
+  "element": "Grass",
+  "stage": "Basic",
+  "hp": 100,
+  "retreat_cost": 2,
+  "weakness": "Fire",
+  "flavor": "It loves sweet nectar. To keep all the nectar to itself, it hurls rivals away with its prized horn.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Single-Horn Throw",
+      "cost": [
+        "Grass",
+        "Colorless",
+        "Colorless"
+      ],
+      "damage": 50,
+      "damage_suffix": "+",
+      "effect": "Flip 2 coins. If both of them are heads, this attack does 70 more damage."
+    }
+  ],
+  "versions": [
+    {
+      "set": "A2a",
+      "number": 1
+    }
+  ]
+}

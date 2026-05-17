@@ -1,0 +1,34 @@
+{
+  "id": 1598,
+  "name": "Cetitan",
+  "card_type": "pokemon",
+  "natdex_number": 975,
+  "element": "Water",
+  "stage": "Stage 1",
+  "hp": 150,
+  "retreat_cost": 4,
+  "weakness": "Metal",
+  "flavor": "Ice energy builds up in the horn on its upper jaw, causing the horn to reach cryogenic temperatures that freeze its surroundings.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Ice Punch",
+      "cost": [
+        "Water",
+        "Water",
+        "Colorless",
+        "Colorless"
+      ],
+      "damage": 80,
+      "effect": "Flip a coin. If heads, your opponent's Active Pokémon is now Paralyzed."
+    }
+  ],
+  "evolves_from": "Cetoddle",
+  "versions": [
+    {
+      "set": "B2a",
+      "number": 30
+    }
+  ]
+}

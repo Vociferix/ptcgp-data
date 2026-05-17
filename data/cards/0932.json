@@ -1,0 +1,37 @@
+{
+  "id": 932,
+  "name": "Gyarados",
+  "card_type": "pokemon",
+  "natdex_number": 130,
+  "element": "Water",
+  "stage": "Stage 1",
+  "hp": 130,
+  "retreat_cost": 3,
+  "weakness": "Lightning",
+  "flavor": "Once it appears, it goes on a rampage. It remains enraged until it demolishes everything around it.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Wild Swing",
+      "cost": [
+        "Water",
+        "Water"
+      ],
+      "damage": 20,
+      "damage_suffix": "+",
+      "effect": "You may discard any number of your Benched [W] Pokémon. This attack does 40 more damage for each Benched Pokémon you discarded in this way."
+    }
+  ],
+  "evolves_from": "Magikarp",
+  "versions": [
+    {
+      "set": "A4",
+      "number": 45
+    },
+    {
+      "set": "A4",
+      "number": 215
+    }
+  ]
+}
