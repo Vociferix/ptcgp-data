@@ -790,8 +790,8 @@ fn remap_pull_rate_card_ids(
 
     for variant in [
         rates.variants.normal.as_mut(),
-        rates.variants.god.as_mut(),
-        rates.variants.premium.as_mut(),
+        rates.variants.rare.as_mut(),
+        rates.variants.plus1.as_mut(),
     ]
     .into_iter()
     .flatten()

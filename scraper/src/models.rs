@@ -245,10 +245,10 @@ pub struct PackPullRates {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PackVariants {
     pub normal: Option<PackVariantRates>,
-    /// God pack — 0.05% base rate, all 5 slots are rare
-    pub god: Option<PackVariantRates>,
-    /// Premium subscriber pack — 6 cards, last slot shiny-only
-    pub premium: Option<PackVariantRates>,
+    /// Rare pack ("god pack") — 0.05% base rate, all 5 slots are rare
+    pub rare: Option<PackVariantRates>,
+    /// Plus-1 pack — 6 cards, last slot shiny-only
+    pub plus1: Option<PackVariantRates>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

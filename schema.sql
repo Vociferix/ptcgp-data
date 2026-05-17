@@ -746,7 +746,7 @@ CREATE TABLE pack_variant_names (
 
 -- Pack Variants
 --
--- Each pack has up to three variants (normal, god, premium)
+-- Each pack has up to three variants (normal, rare, plus1)
 -- that can be acquired when opening it. Each variant has its
 -- own pull rate and distinct slot rarity/card pull rates.
 CREATE TABLE pack_variants (

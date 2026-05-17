@@ -396,27 +396,27 @@ fn build_variants(
         .and_then(parse_rate_obj)
         .unwrap_or(Rate { numerator: 1.0, denominator: 1.0 });
 
-    let god_rate = type_rates
+    let rare_rate = type_rates
         .and_then(|m| m.get("rare"))
         .and_then(parse_rate_obj);
 
-    let premium_rate = type_rates
+    let plus1_rate = type_rates
         .and_then(|m| m.get("plus1"))
         .and_then(parse_rate_obj);
 
     let by_rarity = pack_data.and_then(|d| d.get("byRarity"));
 
     let normal_rarity = slot_rarity_rates(by_rarity, "normal");
-    let god_rarity = slot_rarity_rates(by_rarity, "rare");
-    let premium_rarity = slot_rarity_rates(by_rarity, "plus1");
+    let rare_rarity = slot_rarity_rates(by_rarity, "rare");
+    let plus1_rarity = slot_rarity_rates(by_rarity, "plus1");
 
     let card_obj = card_map
         .as_object()
         .ok_or_else(|| anyhow!("cardPullProbabilityMap is not an object"))?;
 
     let mut normal_cards: HashMap<String, Vec<Option<f64>>> = HashMap::new();
-    let mut god_cards: HashMap<String, Vec<Option<f64>>> = HashMap::new();
-    let mut premium_cards: HashMap<String, Vec<Option<f64>>> = HashMap::new();
+    let mut rare_cards: HashMap<String, Vec<Option<f64>>> = HashMap::new();
+    let mut plus1_cards: HashMap<String, Vec<Option<f64>>> = HashMap::new();
 
     for (card_id, card_val) in card_obj {
         let by_pack = card_val.get("byPack").and_then(Value::as_object);
@@ -429,21 +429,21 @@ fn build_variants(
             normal_cards.insert(card_id.clone(), parse_slot_rates(slots));
         }
         if let Some(slots) = probs.get("rare") {
-            god_cards.insert(card_id.clone(), parse_slot_rates(slots));
+            rare_cards.insert(card_id.clone(), parse_slot_rates(slots));
         }
         if let Some(slots) = probs.get("plus1") {
-            premium_cards.insert(card_id.clone(), parse_slot_rates(slots));
+            plus1_cards.insert(card_id.clone(), parse_slot_rates(slots));
         }
     }
 
     let normal_slot_count = normal_rarity.len().max(
         normal_cards.values().map(Vec::len).max().unwrap_or(5),
     );
-    let god_slot_count = god_rarity.len().max(
-        god_cards.values().map(Vec::len).max().unwrap_or(5),
+    let rare_slot_count = rare_rarity.len().max(
+        rare_cards.values().map(Vec::len).max().unwrap_or(5),
     );
-    let premium_slot_count = premium_rarity.len().max(
-        premium_cards.values().map(Vec::len).max().unwrap_or(6),
+    let plus1_slot_count = plus1_rarity.len().max(
+        plus1_cards.values().map(Vec::len).max().unwrap_or(6),
     );
 
     let normal = Some(PackVariantRates {
@@ -455,25 +455,25 @@ fn build_variants(
         card_rates: normal_cards,
     });
 
-    let god = god_rate.map(|r| PackVariantRates {
+    let rare = rare_rate.map(|r| PackVariantRates {
         rate: r.as_f64(),
         rate_numerator: r.numerator,
         rate_denominator: r.denominator,
-        slot_count: god_slot_count as u32,
-        rarity_rates_by_slot: god_rarity,
-        card_rates: god_cards,
+        slot_count: rare_slot_count as u32,
+        rarity_rates_by_slot: rare_rarity,
+        card_rates: rare_cards,
     });
 
-    let premium = premium_rate.map(|r| PackVariantRates {
+    let plus1 = plus1_rate.map(|r| PackVariantRates {
         rate: r.as_f64(),
         rate_numerator: r.numerator,
         rate_denominator: r.denominator,
-        slot_count: premium_slot_count as u32,
-        rarity_rates_by_slot: premium_rarity,
-        card_rates: premium_cards,
+        slot_count: plus1_slot_count as u32,
+        rarity_rates_by_slot: plus1_rarity,
+        card_rates: plus1_cards,
     });
 
-    Ok(PackVariants { normal, god, premium })
+    Ok(PackVariants { normal, rare, plus1 })
 }
 
 fn parse_slot_rates(val: &Value) -> Vec<Option<f64>> {
