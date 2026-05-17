@@ -37,7 +37,14 @@ impl Client {
         let _permit = self.semaphore.acquire().await?;
         sleep(Duration::from_millis(MIN_DELAY_MS)).await;
         debug!("GET {url}");
-        let text = self.inner.get(url).send().await?.error_for_status()?.text().await?;
+        let text = self
+            .inner
+            .get(url)
+            .send()
+            .await?
+            .error_for_status()?
+            .text()
+            .await?;
         Ok(text)
     }
 

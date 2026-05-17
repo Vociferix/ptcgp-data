@@ -3,8 +3,8 @@ use std::collections::{HashMap, HashSet};
 use anyhow::{anyhow, bail, Result};
 use regex::Regex;
 use serde::Deserialize;
-use tracing::warn;
 use serde_json::Value;
+use tracing::warn;
 
 use crate::client::Client;
 use crate::models::{CardEntry, PackPullRates, PackVariantRates, PackVariants, Rate};
@@ -86,7 +86,12 @@ pub fn parse_card_entries(raw: &Value) -> Result<Vec<CardEntry>> {
             .get("play")
             .and_then(|p| p.get("cardIds"))
             .and_then(Value::as_array)
-            .map(|arr| arr.iter().filter_map(Value::as_str).map(str::to_string).collect())
+            .map(|arr| {
+                arr.iter()
+                    .filter_map(Value::as_str)
+                    .map(str::to_string)
+                    .collect()
+            })
             .unwrap_or_else(|| vec![card_id.clone()]);
 
         let source = val.get("source");
@@ -94,15 +99,17 @@ pub fn parse_card_entries(raw: &Value) -> Result<Vec<CardEntry>> {
         let source_packs: Vec<String> = source
             .and_then(|s| s.get("pack"))
             .and_then(Value::as_array)
-            .map(|arr| arr.iter().filter_map(Value::as_str).map(str::to_string).collect())
+            .map(|arr| {
+                arr.iter()
+                    .filter_map(Value::as_str)
+                    .map(str::to_string)
+                    .collect()
+            })
             .unwrap_or_default();
 
         let promo_sources = extract_promo_sources(source);
 
-        let is_foil = val
-            .get("mirrorType")
-            .and_then(Value::as_str)
-            .map_or(false, |m| m == "normalMirror");
+        let is_foil = val.get("mirrorType").and_then(Value::as_str) == Some("normalMirror");
 
         entries.push(CardEntry {
             card_id: card_id.clone(),
@@ -182,7 +189,10 @@ pub fn parse_pack_expansion(raw: &Value) -> HashMap<String, String> {
         .iter()
         .filter_map(|(pack_id, val)| {
             let exp_id = val.get("expansionId").and_then(Value::as_str)?;
-            let set_code = exp_to_code.get(exp_id).cloned().unwrap_or_else(|| normalize_expansion_id(exp_id));
+            let set_code = exp_to_code
+                .get(exp_id)
+                .cloned()
+                .unwrap_or_else(|| normalize_expansion_id(exp_id));
             Some((pack_id.clone(), set_code))
         })
         .collect()
@@ -201,7 +211,7 @@ pub fn parse_promo_pack_subtitles(raw: &Value) -> HashMap<String, String> {
         .filter(|(_, val)| {
             val.get("descriptionId")
                 .and_then(Value::as_str)
-                .map_or(false, |d| d.starts_with("PROMO_"))
+                .is_some_and(|d| d.starts_with("PROMO_"))
         })
         .filter_map(|(pack_id, val)| {
             let desc = val.get("descriptionId").and_then(Value::as_str)?;
@@ -224,7 +234,7 @@ pub fn parse_named_pack_ids(raw: &Value) -> Vec<String> {
         .filter(|(_, v)| {
             !v.get("descriptionId")
                 .and_then(Value::as_str)
-                .map_or(false, |d| d.starts_with("PROMO_"))
+                .is_some_and(|d| d.starts_with("PROMO_"))
         })
         .map(|(k, _)| k.clone())
         .collect();
@@ -241,16 +251,20 @@ pub fn parse_pack_name_from_title(html: &str) -> Option<String> {
     let start = html.find("<title>")?;
     let end = html.find("</title>")?;
     let title = &html[start + 7..end];
-    let after_dash = title.splitn(2, " - ").nth(1)?;
+    let after_dash = title.split_once(" - ")?.1;
     let chunk = after_dash.split(" | ").next()?.trim();
     // Multi-pack: "Set Name: Pack Name" → take the part after ": "
     // Single-pack: "Set Name" → use as-is
-    let name = if let Some(after_colon) = chunk.splitn(2, ": ").nth(1) {
+    let name = if let Some((_, after_colon)) = chunk.split_once(": ") {
         after_colon.trim()
     } else {
         chunk
     };
-    if name.is_empty() { None } else { Some(name.to_string()) }
+    if name.is_empty() {
+        None
+    } else {
+        Some(name.to_string())
+    }
 }
 
 /// Parse craft costs from cardPackPointMap.
@@ -283,8 +297,9 @@ pub fn parse_promo_source_codes(raw: &Value) -> Vec<String> {
 
         for (field, v) in source {
             if field == "pack" {
-                if v.as_array().map_or(false, |arr| {
-                    arr.iter().any(|p| p.as_str().map_or(false, |s| s.starts_with("AP")))
+                if v.as_array().is_some_and(|arr| {
+                    arr.iter()
+                        .any(|p| p.as_str().is_some_and(|s| s.starts_with("AP")))
                 }) {
                     has_ap_packs = true;
                 }
@@ -297,7 +312,10 @@ pub fn parse_promo_source_codes(raw: &Value) -> Vec<String> {
                 .get(field.as_str())
                 .map(|s| s.to_string())
                 .unwrap_or_else(|| {
-                    warn!(field, "unknown promo source field — add to PROMO_SOURCE_FIELDS in raenonx.rs");
+                    warn!(
+                        field,
+                        "unknown promo source field — add to PROMO_SOURCE_FIELDS in raenonx.rs"
+                    );
                     field.clone()
                 });
             seen.insert(code);
@@ -350,7 +368,10 @@ pub fn normalize_expansion_id(id: &str) -> String {
     if id.chars().all(|c| c.is_ascii_alphanumeric()) {
         return id.to_string();
     }
-    warn!(id, "unrecognized expansion ID pattern — normalization may be wrong");
+    warn!(
+        id,
+        "unrecognized expansion ID pattern — normalization may be wrong"
+    );
     id.to_string()
 }
 
@@ -390,7 +411,10 @@ fn extract_promo_sources(source: Option<&Value>) -> Vec<String> {
             .get(field.as_str())
             .map(|s| s.to_string())
             .unwrap_or_else(|| {
-                warn!(field, "unknown promo source field — add to PROMO_SOURCE_FIELDS in raenonx.rs");
+                warn!(
+                    field,
+                    "unknown promo source field — add to PROMO_SOURCE_FIELDS in raenonx.rs"
+                );
                 field.clone()
             });
         seen.insert(code);
@@ -413,7 +437,7 @@ fn source_field_has_content(val: &Value) -> bool {
     match val {
         Value::Null => false,
         Value::Bool(b) => *b,
-        Value::Number(n) => n.as_f64().map_or(false, |f| f != 0.0),
+        Value::Number(n) => n.as_f64().is_some_and(|f| f != 0.0),
         Value::String(s) => !s.is_empty(),
         Value::Array(arr) => !arr.is_empty(),
         Value::Object(obj) => obj.values().any(source_field_has_content),
@@ -467,8 +491,8 @@ fn extract_json_at_key(text: &str, key: &str) -> Result<Value> {
     let value_start = pos + search.len();
 
     let mut de = serde_json::Deserializer::from_str(&text[value_start..]);
-    let value = Value::deserialize(&mut de)
-        .map_err(|e| anyhow!("JSON parse at key {key:?}: {e}"))?;
+    let value =
+        Value::deserialize(&mut de).map_err(|e| anyhow!("JSON parse at key {key:?}: {e}"))?;
     Ok(value)
 }
 
@@ -486,7 +510,10 @@ fn build_variants(
     let normal_rate = type_rates
         .and_then(|m| m.get("normal"))
         .and_then(parse_rate_obj)
-        .unwrap_or(Rate { numerator: 1.0, denominator: 1.0 });
+        .unwrap_or(Rate {
+            numerator: 1.0,
+            denominator: 1.0,
+        });
 
     let rare_rate = type_rates
         .and_then(|m| m.get("rare"))
@@ -513,7 +540,9 @@ fn build_variants(
     for (card_id, card_val) in card_obj {
         let by_pack = card_val.get("byPack").and_then(Value::as_object);
         let Some(by_pack) = by_pack else { continue };
-        let Some(pack_entry) = by_pack.get(pack_id) else { continue };
+        let Some(pack_entry) = by_pack.get(pack_id) else {
+            continue;
+        };
         let probs = pack_entry.get("cardProbability").and_then(Value::as_object);
         let Some(probs) = probs else { continue };
 
@@ -528,47 +557,56 @@ fn build_variants(
         }
     }
 
-    let normal_slot_count = normal_rarity.len().max(
-        normal_cards.values().map(Vec::len).max().unwrap_or(0),
-    );
-    let rare_slot_count = rare_rarity.len().max(
-        rare_cards.values().map(Vec::len).max().unwrap_or(0),
-    );
-    let plus1_slot_count = plus1_rarity.len().max(
-        plus1_cards.values().map(Vec::len).max().unwrap_or(0),
-    );
+    let normal_slot_count = normal_rarity
+        .len()
+        .max(normal_cards.values().map(Vec::len).max().unwrap_or(0));
+    let rare_slot_count = rare_rarity
+        .len()
+        .max(rare_cards.values().map(Vec::len).max().unwrap_or(0));
+    let plus1_slot_count = plus1_rarity
+        .len()
+        .max(plus1_cards.values().map(Vec::len).max().unwrap_or(0));
 
     let mut variants = PackVariants::new();
 
-    variants.insert("normal".to_string(), PackVariantRates {
-        rate: normal_rate.as_f64(),
-        rate_numerator: normal_rate.numerator,
-        rate_denominator: normal_rate.denominator,
-        slot_count: normal_slot_count as u32,
-        rarity_rates_by_slot: normal_rarity,
-        card_rates: normal_cards,
-    });
+    variants.insert(
+        "normal".to_string(),
+        PackVariantRates {
+            rate: normal_rate.as_f64(),
+            rate_numerator: normal_rate.numerator,
+            rate_denominator: normal_rate.denominator,
+            slot_count: normal_slot_count as u32,
+            rarity_rates_by_slot: normal_rarity,
+            card_rates: normal_cards,
+        },
+    );
 
     if let Some(r) = rare_rate {
-        variants.insert("rare".to_string(), PackVariantRates {
-            rate: r.as_f64(),
-            rate_numerator: r.numerator,
-            rate_denominator: r.denominator,
-            slot_count: rare_slot_count as u32,
-            rarity_rates_by_slot: rare_rarity,
-            card_rates: rare_cards,
-        });
+        variants.insert(
+            "rare".to_string(),
+            PackVariantRates {
+                rate: r.as_f64(),
+                rate_numerator: r.numerator,
+                rate_denominator: r.denominator,
+                slot_count: rare_slot_count as u32,
+                rarity_rates_by_slot: rare_rarity,
+                card_rates: rare_cards,
+            },
+        );
     }
 
     if let Some(r) = plus1_rate {
-        variants.insert("plus1".to_string(), PackVariantRates {
-            rate: r.as_f64(),
-            rate_numerator: r.numerator,
-            rate_denominator: r.denominator,
-            slot_count: plus1_slot_count as u32,
-            rarity_rates_by_slot: plus1_rarity,
-            card_rates: plus1_cards,
-        });
+        variants.insert(
+            "plus1".to_string(),
+            PackVariantRates {
+                rate: r.as_f64(),
+                rate_numerator: r.numerator,
+                rate_denominator: r.denominator,
+                slot_count: plus1_slot_count as u32,
+                rarity_rates_by_slot: plus1_rarity,
+                card_rates: plus1_cards,
+            },
+        );
     }
 
     Ok(variants)
@@ -593,13 +631,13 @@ fn parse_slot_rates(val: &Value) -> Vec<Option<f64>> {
 fn parse_rate_obj(val: &Value) -> Option<Rate> {
     let num = val.get("numerator")?.as_f64()?;
     let den = val.get("denominator")?.as_f64()?;
-    Some(Rate { numerator: num, denominator: den })
+    Some(Rate {
+        numerator: num,
+        denominator: den,
+    })
 }
 
-fn slot_rarity_rates(
-    by_rarity: Option<&Value>,
-    variant: &str,
-) -> Vec<HashMap<String, f64>> {
+fn slot_rarity_rates(by_rarity: Option<&Value>, variant: &str) -> Vec<HashMap<String, f64>> {
     let slots = by_rarity
         .and_then(|br| br.get(variant))
         .and_then(Value::as_array);

@@ -32,7 +32,9 @@ pub async fn scrape_card(
     set_code: &str,
     number: u32,
 ) -> Result<LimitlessCardData> {
-    let html = client.get_text(&format!("{BASE}/cards/{set_code}/{number}")).await?;
+    let html = client
+        .get_text(&format!("{BASE}/cards/{set_code}/{number}"))
+        .await?;
     parse_card(&html, set_code)
 }
 
@@ -48,7 +50,9 @@ fn parse_sets_index(html: &str) -> Result<Vec<SetSummary>> {
     let mut sets = Vec::new();
 
     for row in doc.select(&row_sel) {
-        let Some(link) = row.select(&link_sel).next() else { continue };
+        let Some(link) = row.select(&link_sel).next() else {
+            continue;
+        };
         let href = link.value().attr("href").unwrap_or("");
 
         let set_code = match href.strip_prefix("/cards/") {
@@ -84,7 +88,14 @@ fn parse_sets_index(html: &str) -> Result<Vec<SetSummary>> {
         let series = parse_series(&code);
         let is_promo = code.starts_with("P-");
 
-        sets.push(SetSummary { code, name, series, release_date, is_promo, card_count });
+        sets.push(SetSummary {
+            code,
+            name,
+            series,
+            release_date,
+            is_promo,
+            card_count,
+        });
     }
 
     if sets.is_empty() {
@@ -102,7 +113,7 @@ fn parse_card_numbers(html: &str) -> Result<Vec<u32>> {
     let mut numbers = Vec::new();
     for el in doc.select(&link_sel) {
         let href = el.value().attr("href").unwrap_or("");
-        if let Some(num_str) = href.split('/').last() {
+        if let Some(num_str) = href.split('/').next_back() {
             if let Ok(n) = num_str.parse::<u32>() {
                 numbers.push(n);
             }
@@ -186,9 +197,9 @@ fn parse_card(html: &str, set_code: &str) -> Result<LimitlessCardData> {
                     .map(|s| el.select(&s).next().is_some())
                     .unwrap_or(false);
                 let classes = el.value().classes().collect::<Vec<_>>();
-                let is_artist_or_flavor = classes.iter().any(|c| {
-                    *c == "card-text-artist" || *c == "card-text-flavor"
-                });
+                let is_artist_or_flavor = classes
+                    .iter()
+                    .any(|c| *c == "card-text-artist" || *c == "card-text-flavor");
                 !has_title && !is_artist_or_flavor
             })
             .map(|el| render_card_text(el))
@@ -279,7 +290,11 @@ fn parse_element_hp(title_text: &str, name: &str) -> (Option<String>, Option<u32
         .map(|i| &title_text[i + name.len()..])
         .unwrap_or(title_text);
 
-    let parts: Vec<&str> = after.split('-').map(str::trim).filter(|s| !s.is_empty()).collect();
+    let parts: Vec<&str> = after
+        .split('-')
+        .map(str::trim)
+        .filter(|s| !s.is_empty())
+        .collect();
 
     let element = parts
         .first()
@@ -287,7 +302,9 @@ fn parse_element_hp(title_text: &str, name: &str) -> (Option<String>, Option<u32
         .filter(|s| !s.is_empty());
 
     let hp = parts.get(1).and_then(|s| {
-        s.split_whitespace().next().and_then(|w| w.parse::<u32>().ok())
+        s.split_whitespace()
+            .next()
+            .and_then(|w| w.parse::<u32>().ok())
     });
 
     (element, hp)
@@ -403,7 +420,13 @@ fn parse_attack(el: scraper::ElementRef) -> Option<Attack> {
         .map(|e| e.text().collect::<String>().trim().to_string())
         .filter(|s| !s.is_empty());
 
-    Some(Attack { name, cost, damage, damage_suffix, effect })
+    Some(Attack {
+        name,
+        cost,
+        damage,
+        damage_suffix,
+        effect,
+    })
 }
 
 fn parse_ability(el: scraper::ElementRef) -> Option<Ability> {
@@ -447,7 +470,10 @@ fn letter_to_element(s: &str) -> Option<&'static str> {
         _ => None,
     };
     if element.is_none() && !s.is_empty() {
-        warn!(letter = s, "unknown energy symbol — add to letter_to_element in limitless.rs");
+        warn!(
+            letter = s,
+            "unknown energy symbol — add to letter_to_element in limitless.rs"
+        );
     }
     element
 }
@@ -480,13 +506,26 @@ pub fn parse_release_date(s: &str) -> Option<String> {
     }
     let day: u32 = parts[0].parse().ok()?;
     let month = match parts[1].to_lowercase().as_str() {
-        "jan" => 1u32, "feb" => 2, "mar" => 3, "apr" => 4,
-        "may" => 5, "jun" => 6, "jul" => 7, "aug" => 8,
-        "sep" => 9, "oct" => 10, "nov" => 11, "dec" => 12,
+        "jan" => 1u32,
+        "feb" => 2,
+        "mar" => 3,
+        "apr" => 4,
+        "may" => 5,
+        "jun" => 6,
+        "jul" => 7,
+        "aug" => 8,
+        "sep" => 9,
+        "oct" => 10,
+        "nov" => 11,
+        "dec" => 12,
         _ => return None,
     };
     let year_short: u32 = parts[2].parse().ok()?;
-    let year = if year_short < 100 { 2000 + year_short } else { year_short };
+    let year = if year_short < 100 {
+        2000 + year_short
+    } else {
+        year_short
+    };
     Some(format!("{year:04}-{month:02}-{day:02}"))
 }
 
@@ -494,7 +533,15 @@ pub fn parse_release_date(s: &str) -> Option<String> {
 
 fn parse_series(code: &str) -> String {
     if code.starts_with("P-") {
-        return code.trim_start_matches("P-").chars().next().unwrap_or('A').to_string();
+        return code
+            .trim_start_matches("P-")
+            .chars()
+            .next()
+            .unwrap_or('A')
+            .to_string();
     }
-    code.chars().next().map(|c| c.to_string()).unwrap_or_default()
+    code.chars()
+        .next()
+        .map(|c| c.to_string())
+        .unwrap_or_default()
 }

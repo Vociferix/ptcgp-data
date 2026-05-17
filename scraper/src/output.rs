@@ -4,7 +4,10 @@ use std::path::{Path, PathBuf};
 use anyhow::Result;
 use serde::Serialize;
 
-use crate::models::{AbstractCard, BasePokemon, CardVersion, PackPullRates, PromoSource, RarityInfo, SetDetail, SetSummary};
+use crate::models::{
+    AbstractCard, BasePokemon, CardVersion, PackPullRates, PromoSource, RarityInfo, SetDetail,
+    SetSummary,
+};
 
 // ── Path helpers ─────────────────────────────────────────────────────────────
 
@@ -118,7 +121,7 @@ pub fn load_card_versions(set_code: &str) -> Result<Vec<CardVersion>> {
     let mut versions = Vec::new();
     for entry in std::fs::read_dir(&dir)? {
         let path = entry?.path();
-        if path.extension().map_or(false, |e| e == "json") {
+        if path.extension().is_some_and(|e| e == "json") {
             let json = std::fs::read_to_string(&path)?;
             versions.push(serde_json::from_str(&json)?);
         }
@@ -129,7 +132,9 @@ pub fn load_card_versions(set_code: &str) -> Result<Vec<CardVersion>> {
 // ── Skip-if-exists helpers ───────────────────────────────────────────────────
 
 pub fn card_version_file_exists(set_code: &str, number: u32) -> bool {
-    cards_dir(set_code).join(format!("{number:03}.json")).exists()
+    cards_dir(set_code)
+        .join(format!("{number:03}.json"))
+        .exists()
 }
 
 pub fn abstract_card_file_exists(id: u32) -> bool {
@@ -137,13 +142,18 @@ pub fn abstract_card_file_exists(id: u32) -> bool {
 }
 
 pub fn pull_rates_file_exists(set_code: &str, subtitle: &str) -> bool {
-    pull_rates_dir(set_code).join(format!("{}.json", pack_slug(subtitle))).exists()
+    pull_rates_dir(set_code)
+        .join(format!("{}.json", pack_slug(subtitle)))
+        .exists()
 }
 
 pub fn global_master_exists() -> bool {
     cache_dir().join("global_master.json").exists()
         || data_dir().join("global_master.json").exists()
-        || data_dir().join("raenonx").join("global_master.json").exists()
+        || data_dir()
+            .join("raenonx")
+            .join("global_master.json")
+            .exists()
 }
 
 // ── Base Pokémon ──────────────────────────────────────────────────────────────

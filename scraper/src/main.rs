@@ -79,7 +79,9 @@ async fn main() -> Result<()> {
         Command::Sets => cmd_sets(&client).await?,
         Command::BasePokemon => cmd_base_pokemon(&client).await?,
         Command::Cards { set, force } => cmd_cards(&client, set.as_deref(), force).await?,
-        Command::PullRates { pack, force } => cmd_pull_rates(&client, pack.as_deref(), force).await?,
+        Command::PullRates { pack, force } => {
+            cmd_pull_rates(&client, pack.as_deref(), force).await?
+        }
         Command::All { force } => {
             cmd_global_master(&client).await?;
             cmd_sets(&client).await?;
@@ -281,7 +283,7 @@ async fn cmd_cards(
     // Filter sets to scrape
     let sets_to_scrape: Vec<&SetSummary> = all_sets
         .iter()
-        .filter(|s| filter_set.map_or(true, |f| s.code == f))
+        .filter(|s| filter_set.is_none_or(|f| s.code == f))
         .collect();
 
     if sets_to_scrape.is_empty() {
@@ -354,7 +356,11 @@ async fn cmd_cards(
         let abstract_id = match version_to_abstract.get(&(set.clone(), *num)) {
             Some(id) => *id,
             None => {
-                warn!(set, number = num, "no abstract mapping found, skipping version");
+                warn!(
+                    set,
+                    number = num,
+                    "no abstract mapping found, skipping version"
+                );
                 continue;
             }
         };
@@ -402,11 +408,15 @@ async fn cmd_cards(
             }
 
             let (canonical_set, canonical_num) = &group.canonical;
-            let card_data =
-                all_card_data.get(&(canonical_set.clone(), *canonical_num));
+            let card_data = all_card_data.get(&(canonical_set.clone(), *canonical_num));
 
-            let abstract_card =
-                build_abstract_card(group.abstract_id, group, &card_entries, card_data, &pokemon_map);
+            let abstract_card = build_abstract_card(
+                group.abstract_id,
+                group,
+                &card_entries,
+                card_data,
+                &pokemon_map,
+            );
 
             if let Err(e) = output::write_abstract_card(&abstract_card) {
                 error!(id = group.abstract_id, "write failed: {e}");
@@ -415,7 +425,12 @@ async fn cmd_cards(
             }
         }
 
-        info!(written, updated, total = groups.len(), "abstract cards done");
+        info!(
+            written,
+            updated,
+            total = groups.len(),
+            "abstract cards done"
+        );
     }
 
     compute_and_write_duplicates(&all_sets, &release_dates)?;
@@ -445,7 +460,7 @@ async fn cmd_pull_rates(
 
     let packs: Vec<&String> = regular_packs
         .iter()
-        .filter(|id| filter_pack.map_or(true, |f| id.as_str() == f))
+        .filter(|id| filter_pack.is_none_or(|f| id.as_str() == f))
         .collect();
 
     if packs.is_empty() {
@@ -473,10 +488,18 @@ async fn cmd_pull_rates(
             Ok(mut rates) => {
                 remap_pull_rate_card_ids(&mut rates, &card_id_to_versions);
                 output::write_pull_rates(&rates)?;
-                let card_count = rates.variants.get("normal")
+                let card_count = rates
+                    .variants
+                    .get("normal")
                     .map(|v| v.card_rates.len())
                     .unwrap_or(0);
-                info!(pack = pack_id, set = set_code, subtitle, cards = card_count, "written");
+                info!(
+                    pack = pack_id,
+                    set = set_code,
+                    subtitle,
+                    cards = card_count,
+                    "written"
+                );
             }
             Err(e) => error!(pack = pack_id, "pull rate fetch failed: {e}"),
         }
@@ -494,9 +517,8 @@ fn compute_and_write_duplicates(
     // Read every card version currently on disk
     let mut all_versions: Vec<CardVersion> = Vec::new();
     for set in all_sets {
-        match output::load_card_versions(&set.code) {
-            Ok(mut vs) => all_versions.append(&mut vs),
-            Err(_) => {}
+        if let Ok(mut vs) = output::load_card_versions(&set.code) {
+            all_versions.append(&mut vs);
         }
     }
     if all_versions.is_empty() {
@@ -504,11 +526,20 @@ fn compute_and_write_duplicates(
     }
 
     // Group versions by identity: same physical card in PTCGP's eyes
-    let mut identity_groups: HashMap<(u32, String, Option<String>, bool, bool), Vec<(String, u32)>> =
-        HashMap::new();
+    type VersionIdentity = (u32, String, Option<String>, bool, bool);
+    let mut identity_groups: HashMap<VersionIdentity, Vec<(String, u32)>> = HashMap::new();
     for v in &all_versions {
-        let key = (v.card_id, v.rarity.clone(), v.illustrator.clone(), v.is_promo, v.is_foil);
-        identity_groups.entry(key).or_default().push((v.set.clone(), v.number));
+        let key = (
+            v.card_id,
+            v.rarity.clone(),
+            v.illustrator.clone(),
+            v.is_promo,
+            v.is_foil,
+        );
+        identity_groups
+            .entry(key)
+            .or_default()
+            .push((v.set.clone(), v.number));
     }
 
     // Compute final (is_reprint, duplicates) for every version
@@ -516,8 +547,14 @@ fn compute_and_write_duplicates(
     for versions in identity_groups.values() {
         let mut sorted = versions.clone();
         sorted.sort_by(|(a_s, a_n), (b_s, b_n)| {
-            let a_d = release_dates.get(a_s.as_str()).map(String::as_str).unwrap_or("9999-99-99");
-            let b_d = release_dates.get(b_s.as_str()).map(String::as_str).unwrap_or("9999-99-99");
+            let a_d = release_dates
+                .get(a_s.as_str())
+                .map(String::as_str)
+                .unwrap_or("9999-99-99");
+            let b_d = release_dates
+                .get(b_s.as_str())
+                .map(String::as_str)
+                .unwrap_or("9999-99-99");
             a_d.cmp(b_d).then(a_n.cmp(b_n))
         });
         for (i, (set, num)) in sorted.iter().enumerate() {
@@ -525,7 +562,10 @@ fn compute_and_write_duplicates(
             let dups: Vec<VersionRef> = sorted
                 .iter()
                 .filter(|(s, n)| !(s == set && n == num))
-                .map(|(s, n)| VersionRef { set: s.clone(), number: *n })
+                .map(|(s, n)| VersionRef {
+                    set: s.clone(),
+                    number: *n,
+                })
                 .collect();
             new_state.insert((set.clone(), *num), (is_reprint, dups));
         }
@@ -587,14 +627,23 @@ fn build_abstract_groups(
                 .flat_map(|&i| card_entries[i].collection_nums.iter().cloned())
                 .collect();
             versions.sort_by(|(a_s, a_n), (b_s, b_n)| {
-                let a_d = release_dates.get(a_s).map(String::as_str).unwrap_or("9999-99-99");
-                let b_d = release_dates.get(b_s).map(String::as_str).unwrap_or("9999-99-99");
-                a_d.cmp(b_d).then(a_n.cmp(&b_n))
+                let a_d = release_dates
+                    .get(a_s)
+                    .map(String::as_str)
+                    .unwrap_or("9999-99-99");
+                let b_d = release_dates
+                    .get(b_s)
+                    .map(String::as_str)
+                    .unwrap_or("9999-99-99");
+                a_d.cmp(b_d).then(a_n.cmp(b_n))
             });
             versions.dedup();
             let refs = versions
                 .iter()
-                .map(|(s, n)| VersionRef { set: s.clone(), number: *n })
+                .map(|(s, n)| VersionRef {
+                    set: s.clone(),
+                    number: *n,
+                })
                 .collect();
             (refs, indices)
         })
@@ -604,8 +653,14 @@ fn build_abstract_groups(
     group_list.sort_by(|(a_vers, _), (b_vers, _)| {
         let (a_s, a_n) = (&a_vers[0].set, a_vers[0].number);
         let (b_s, b_n) = (&b_vers[0].set, b_vers[0].number);
-        let a_d = release_dates.get(a_s).map(String::as_str).unwrap_or("9999-99-99");
-        let b_d = release_dates.get(b_s).map(String::as_str).unwrap_or("9999-99-99");
+        let a_d = release_dates
+            .get(a_s)
+            .map(String::as_str)
+            .unwrap_or("9999-99-99");
+        let b_d = release_dates
+            .get(b_s)
+            .map(String::as_str)
+            .unwrap_or("9999-99-99");
         a_d.cmp(b_d).then(a_n.cmp(&b_n))
     });
 
@@ -626,6 +681,7 @@ fn build_abstract_groups(
 
 // ── Helper: card version construction ────────────────────────────────────────
 
+#[allow(clippy::too_many_arguments)]
 fn build_card_version(
     set: &str,
     number: u32,
@@ -695,7 +751,11 @@ fn build_abstract_card(
             flavor: data.flavor.clone(),
             is_ex: if is_pokemon { Some(data.is_ex) } else { None },
             is_mega: if is_pokemon { Some(data.is_mega) } else { None },
-            variants: if is_pokemon { extract_variants(&data.name, pokemon_map) } else { Vec::new() },
+            variants: if is_pokemon {
+                extract_variants(&data.name, pokemon_map)
+            } else {
+                Vec::new()
+            },
             ability: data.ability.clone(),
             attacks: data.attacks.clone(),
             evolves_from: data.evolves_from.clone(),
@@ -856,17 +916,17 @@ fn build_rarity_list(
     // display names and grouping for known codes. Unknown future codes will still
     // appear in output with a warning.
     let metadata: &[(&str, &str, u8, &str)] = &[
-        ("C",   "Diamond", 1, "Common"),
-        ("U",   "Diamond", 2, "Uncommon"),
-        ("R",   "Diamond", 3, "Rare"),
-        ("RR",  "Diamond", 4, "Double Rare"),
-        ("AR",  "Star",    1, "Art Rare"),
-        ("SR",  "Star",    2, "Super Rare"),
-        ("SAR", "Star",    2, "Special Art Rare"),
-        ("IM",  "Star",    3, "Immersive"),
-        ("S",   "Shiny",   1, "Shiny Rare"),
-        ("SSR", "Shiny",   2, "Shiny Super Rare"),
-        ("UR",  "Crown",   1, "Crown Rare"),
+        ("C", "Diamond", 1, "Common"),
+        ("U", "Diamond", 2, "Uncommon"),
+        ("R", "Diamond", 3, "Rare"),
+        ("RR", "Diamond", 4, "Double Rare"),
+        ("AR", "Star", 1, "Art Rare"),
+        ("SR", "Star", 2, "Super Rare"),
+        ("SAR", "Star", 2, "Special Art Rare"),
+        ("IM", "Star", 3, "Immersive"),
+        ("S", "Shiny", 1, "Shiny Rare"),
+        ("SSR", "Shiny", 2, "Shiny Super Rare"),
+        ("UR", "Crown", 1, "Crown Rare"),
     ];
 
     let lookup: std::collections::HashMap<&str, (&str, u8, &str)> = metadata
@@ -882,7 +942,10 @@ fn build_rarity_list(
         .collect();
     for code in codes {
         if !ordered.contains(code) {
-            warn!(code, "unknown rarity code — add to metadata table in build_rarity_list");
+            warn!(
+                code,
+                "unknown rarity code — add to metadata table in build_rarity_list"
+            );
             ordered.push(code.clone());
         }
     }
@@ -890,10 +953,11 @@ fn build_rarity_list(
     ordered
         .iter()
         .map(|code| {
-            let (group, count, name) = lookup
-                .get(code.as_str())
-                .copied()
-                .unwrap_or(("Unknown", 0, code.as_str()));
+            let (group, count, name) =
+                lookup
+                    .get(code.as_str())
+                    .copied()
+                    .unwrap_or(("Unknown", 0, code.as_str()));
             RarityInfo {
                 code: code.clone(),
                 name: name.to_string(),

@@ -14,7 +14,9 @@ pub async fn fetch_all_species(client: &Arc<Client>) -> Result<Vec<BasePokemon>>
     let client = Arc::clone(client);
 
     // Fetch with limit=1 to read the total count, then re-fetch everything.
-    let probe = client.get_text(&format!("{SPECIES_LIST_BASE}?limit=1")).await?;
+    let probe = client
+        .get_text(&format!("{SPECIES_LIST_BASE}?limit=1"))
+        .await?;
     let probe_json: Value = serde_json::from_str(&probe)?;
     let total_count = probe_json["count"]
         .as_u64()
@@ -45,7 +47,10 @@ pub async fn fetch_all_species(client: &Arc<Client>) -> Result<Vec<BasePokemon>>
             let c = Arc::clone(&client);
             async move {
                 match fetch_species_en_name(&c, &url).await {
-                    Ok(name) => Some(BasePokemon { name, natdex_number: id }),
+                    Ok(name) => Some(BasePokemon {
+                        name,
+                        natdex_number: id,
+                    }),
                     Err(e) => {
                         warn!(id, "failed to fetch species: {e}");
                         None
