@@ -8,12 +8,20 @@ use tracing::warn;
 use crate::client::Client;
 use crate::models::BasePokemon;
 
-const SPECIES_LIST_URL: &str = "https://pokeapi.co/api/v2/pokemon-species?limit=2000";
+const SPECIES_LIST_BASE: &str = "https://pokeapi.co/api/v2/pokemon-species";
 
 pub async fn fetch_all_species(client: &Arc<Client>) -> Result<Vec<BasePokemon>> {
     let client = Arc::clone(client);
 
-    let text = client.get_text(SPECIES_LIST_URL).await?;
+    // Fetch with limit=1 to read the total count, then re-fetch everything.
+    let probe = client.get_text(&format!("{SPECIES_LIST_BASE}?limit=1")).await?;
+    let probe_json: Value = serde_json::from_str(&probe)?;
+    let total_count = probe_json["count"]
+        .as_u64()
+        .ok_or_else(|| anyhow::anyhow!("expected 'count' in pokemon-species response"))?;
+
+    let url = format!("{SPECIES_LIST_BASE}?limit={total_count}");
+    let text = client.get_text(&url).await?;
     let list: Value = serde_json::from_str(&text)?;
 
     let results = list["results"]

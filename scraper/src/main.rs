@@ -113,7 +113,8 @@ async fn cmd_global_master(client: &client::Client) -> Result<()> {
     output::write_rarities(&rarities)?;
     info!(count = rarities.len(), "rarities.json written");
 
-    let promo_sources = build_promo_sources();
+    let promo_source_codes = raenonx::parse_promo_source_codes(&raw);
+    let promo_sources = build_promo_sources(&promo_source_codes);
     output::write_promo_sources(&promo_sources)?;
     info!(count = promo_sources.len(), "promo_sources.json written");
 
@@ -472,10 +473,7 @@ async fn cmd_pull_rates(
             Ok(mut rates) => {
                 remap_pull_rate_card_ids(&mut rates, &card_id_to_versions);
                 output::write_pull_rates(&rates)?;
-                let card_count = rates
-                    .variants
-                    .normal
-                    .as_ref()
+                let card_count = rates.variants.get("normal")
                     .map(|v| v.card_rates.len())
                     .unwrap_or(0);
                 info!(pack = pack_id, set = set_code, subtitle, cards = card_count, "written");
@@ -697,7 +695,7 @@ fn build_abstract_card(
             flavor: data.flavor.clone(),
             is_ex: if is_pokemon { Some(data.is_ex) } else { None },
             is_mega: if is_pokemon { Some(data.is_mega) } else { None },
-            variants: data.variants.clone(),
+            variants: if is_pokemon { extract_variants(&data.name, pokemon_map) } else { Vec::new() },
             ability: data.ability.clone(),
             attacks: data.attacks.clone(),
             evolves_from: data.evolves_from.clone(),
@@ -767,6 +765,47 @@ fn find_natdex_number(name: &str, pokemon_map: &HashMap<String, u32>) -> Option<
     None
 }
 
+// ── Helper: variant extraction ───────────────────────────────────────────────
+
+/// Derive variant identifiers (e.g. "Alolan", "Teal Mask") by finding the base
+/// Pokémon name in pokemon_map and treating the remaining words as the variant.
+/// Known non-variant modifiers ("ex", "EX", "Mega") are stripped before returning.
+fn extract_variants(name: &str, pokemon_map: &HashMap<String, u32>) -> Vec<String> {
+    let words: Vec<&str> = name.split_whitespace().collect();
+    let n = words.len();
+
+    // Find the longest contiguous substring that is a known Pokémon name.
+    let mut base_range: Option<(usize, usize)> = None;
+    'outer: for len in (1..=n).rev() {
+        for start in 0..=(n - len) {
+            let candidate = words[start..start + len].join(" ");
+            if pokemon_map.contains_key(candidate.as_str()) {
+                base_range = Some((start, start + len));
+                break 'outer;
+            }
+        }
+    }
+
+    let Some((base_start, base_end)) = base_range else {
+        return Vec::new();
+    };
+
+    // Words before and after the base name, minus non-variant modifiers.
+    const NON_VARIANT: &[&str] = &["ex", "EX", "Mega"];
+    let remaining: Vec<&str> = words[..base_start]
+        .iter()
+        .chain(words[base_end..].iter())
+        .copied()
+        .filter(|w| !NON_VARIANT.contains(w))
+        .collect();
+
+    if remaining.is_empty() {
+        Vec::new()
+    } else {
+        vec![remaining.join(" ")]
+    }
+}
+
 // ── Helper: pack subtitle mapping ────────────────────────────────────────────
 
 fn build_pack_subtitle_map(
@@ -788,14 +827,7 @@ fn remap_pull_rate_card_ids(
 ) {
     let set_code = rates.set.clone();
 
-    for variant in [
-        rates.variants.normal.as_mut(),
-        rates.variants.rare.as_mut(),
-        rates.variants.plus1.as_mut(),
-    ]
-    .into_iter()
-    .flatten()
-    {
+    for variant in rates.variants.values_mut() {
         let remapped: HashMap<String, Vec<Option<f64>>> = variant
             .card_rates
             .iter()
@@ -874,12 +906,23 @@ fn build_rarity_list(
         .collect()
 }
 
-fn build_promo_sources() -> Vec<PromoSource> {
-    vec![
-        PromoSource { code: "Pack".to_string(), description: Some("Obtainable from promo packs".to_string()) },
-        PromoSource { code: "Wonder Pick".to_string(), description: Some("Obtainable via Wonder Pick".to_string()) },
-        PromoSource { code: "Gold Shop".to_string(), description: Some("Purchasable in the Gold Shop".to_string()) },
-        PromoSource { code: "Shop".to_string(), description: Some("Purchasable in the Shop".to_string()) },
-        PromoSource { code: "Mission".to_string(), description: Some("Obtainable via Missions".to_string()) },
-    ]
+fn build_promo_sources(codes: &[String]) -> Vec<PromoSource> {
+    // Display names and descriptions for known promo source codes.
+    // Unknown future codes will still appear in output without a description.
+    let descriptions: &[(&str, &str)] = &[
+        ("Pack", "Obtainable from promo packs"),
+        ("Wonder Pick", "Obtainable via Wonder Pick"),
+        ("Gold Shop", "Purchasable in the Gold Shop"),
+        ("Shop", "Purchasable in the Shop"),
+        ("Mission", "Obtainable via Missions"),
+    ];
+    let desc_lookup: HashMap<&str, &str> = descriptions.iter().copied().collect();
+
+    codes
+        .iter()
+        .map(|code| PromoSource {
+            code: code.clone(),
+            description: desc_lookup.get(code.as_str()).map(|d| d.to_string()),
+        })
+        .collect()
 }

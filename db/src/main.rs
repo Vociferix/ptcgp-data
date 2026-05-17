@@ -2,7 +2,6 @@ use anyhow::{Context, Result};
 use clap::Parser;
 use rusqlite::{Connection, params};
 use serde::Deserialize;
-use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use tracing::info;
 
@@ -47,14 +46,17 @@ struct SetSummary {
 
 #[derive(Debug, Deserialize)]
 struct SetDetail {
+    #[allow(dead_code)]
     code: String,
     packs: Vec<PackInfo>,
 }
 
 #[derive(Debug, Deserialize)]
 struct PackInfo {
+    #[allow(dead_code)]
     raenonx_id: Option<String>,
     subtitle: Option<String>,
+    #[allow(dead_code)]
     display_name: String,
 }
 
@@ -86,6 +88,7 @@ struct Card {
 
 #[derive(Debug, Deserialize)]
 struct PackRef {
+    #[allow(dead_code)]
     raenonx_id: Option<String>,
     display_name: String,
 }
@@ -175,7 +178,7 @@ fn insert_static_data(tx: &rusqlite::Transaction) -> Result<()> {
     }
 
     // Rarity groups
-    let groups = ["Diamond", "Star", "Shiny", "Crown"];
+    let groups = ["Diamond", "Star", "Shiny", "Crown", "Promo"];
     for group in &groups {
         tx.execute(
             "INSERT OR IGNORE INTO rarity_groups (name) VALUES (?1)",
@@ -227,8 +230,9 @@ fn insert_rarities(tx: &rusqlite::Transaction, data: &Path) -> Result<()> {
         )?;
 
         tx.execute(
-            "INSERT OR IGNORE INTO rarities (class_id, code, name) VALUES (?1, ?2, ?3)",
-            params![class_id, r.code, r.name],
+            "INSERT OR IGNORE INTO rarities (class_id, code, name, craft_cost, dupe_dust) \
+             VALUES (?1, ?2, ?3, ?4, ?5)",
+            params![class_id, r.code, r.name, r.craft_cost, r.dupe_dust],
         )?;
     }
 
@@ -391,23 +395,13 @@ fn insert_card(tx: &rusqlite::Transaction, card: &Card) -> Result<()> {
         |row| row.get(0),
     )?;
 
+    // Cards with no rarity text (some promos) fall back to "Promo pack"
+    let rarity_code = if card.rarity.is_empty() { "Promo pack" } else { &card.rarity };
     let rarity_id: i64 = tx.query_row(
         "SELECT id FROM rarities WHERE code = ?1",
-        params![card.rarity],
+        params![rarity_code],
         |row| row.get(0),
-    ).unwrap_or_else(|_| {
-        // Fall back to inserting as-is if the rarity code is novel
-        tx.execute(
-            "INSERT OR IGNORE INTO rarities (class_id, code, name) \
-             SELECT id, ?1, ?1 FROM rarity_classes LIMIT 1",
-            params![card.rarity],
-        ).ok();
-        tx.query_row(
-            "SELECT id FROM rarities WHERE code = ?1",
-            params![card.rarity],
-            |row| row.get(0),
-        ).unwrap_or(1)
-    });
+    )?;
 
     // card_versions
     let illustrator_id = illustrator_id.unwrap_or_else(|| {
@@ -471,9 +465,8 @@ fn insert_card(tx: &rusqlite::Transaction, card: &Card) -> Result<()> {
 fn insert_pokemon_card(tx: &rusqlite::Transaction, card_id: i64, card: &Card) -> Result<()> {
     // base_pokemon — insert by name (natdex_number filled in later from PokeAPI or manual data)
     let base_name = derive_base_name(&card.name);
-    // Use a sentinel natdex_number of 0 as placeholder; update later
     tx.execute(
-        "INSERT OR IGNORE INTO base_pokemon (name, natdex_number) VALUES (?1, 0)",
+        "INSERT OR IGNORE INTO base_pokemon (name, natdex_number) VALUES (?1, NULL)",
         params![base_name],
     )?;
     let base_id: i64 = tx.query_row(

@@ -1,14 +1,24 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use anyhow::{anyhow, bail, Result};
 use regex::Regex;
 use serde::Deserialize;
+use tracing::warn;
 use serde_json::Value;
 
 use crate::client::Client;
 use crate::models::{CardEntry, PackPullRates, PackVariantRates, PackVariants, Rate};
 
 const GLOBAL_MASTER_URL: &str = "https://ptcgp.raenonx.cc/api/data/global-master";
+
+/// Known promo source fields in the RaenonX `source` object, mapped to display names.
+/// The `pack` field is excluded — it maps to pack subtitles via `source_packs`.
+const PROMO_SOURCE_FIELDS: &[(&str, &str)] = &[
+    ("wonderPick", "Wonder Pick"),
+    ("goldShop", "Gold Shop"),
+    ("itemShop", "Shop"),
+    ("mission", "Mission"),
+];
 pub const PACK_PAGE_BASE: &str = "https://ptcgp.raenonx.cc/en/pack";
 
 // ── Public entry points ──────────────────────────────────────────────────────
@@ -253,6 +263,64 @@ pub fn parse_dupe_dust(raw: &Value) -> HashMap<String, u32> {
     parse_rarity_u32_map(raw, "cardDupeShineDustMap")
 }
 
+/// Collect all promo source codes seen across all card entries, in display order.
+/// "Pack" is included first when any card has an AP*** promo pack source.
+pub fn parse_promo_source_codes(raw: &Value) -> Vec<String> {
+    let entry_map = match raw.get("cardEntryMap").and_then(Value::as_object) {
+        Some(m) => m,
+        None => return Vec::new(),
+    };
+
+    let field_to_display: HashMap<&str, &str> = PROMO_SOURCE_FIELDS.iter().copied().collect();
+    let mut seen: HashSet<String> = HashSet::new();
+    let mut has_ap_packs = false;
+
+    for val in entry_map.values() {
+        let source = match val.get("source").and_then(Value::as_object) {
+            Some(s) => s,
+            None => continue,
+        };
+
+        for (field, v) in source {
+            if field == "pack" {
+                if v.as_array().map_or(false, |arr| {
+                    arr.iter().any(|p| p.as_str().map_or(false, |s| s.starts_with("AP")))
+                }) {
+                    has_ap_packs = true;
+                }
+                continue;
+            }
+            if !source_field_has_content(v) {
+                continue;
+            }
+            let code = field_to_display
+                .get(field.as_str())
+                .map(|s| s.to_string())
+                .unwrap_or_else(|| {
+                    warn!(field, "unknown promo source field — add to PROMO_SOURCE_FIELDS in raenonx.rs");
+                    field.clone()
+                });
+            seen.insert(code);
+        }
+    }
+
+    // Preserve known-field order, then append unknowns sorted.
+    let mut result = Vec::new();
+    if has_ap_packs {
+        result.push("Pack".to_string());
+    }
+    for (_, display) in PROMO_SOURCE_FIELDS {
+        let s = display.to_string();
+        if seen.remove(&s) {
+            result.push(s);
+        }
+    }
+    let mut unknowns: Vec<String> = seen.into_iter().collect();
+    unknowns.sort();
+    result.extend(unknowns);
+    result
+}
+
 /// Collect all unique non-empty rarity codes seen in cardEntryMap.
 pub fn parse_rarity_codes(raw: &Value) -> Vec<String> {
     let entry_map = match raw.get("cardEntryMap").and_then(Value::as_object) {
@@ -273,13 +341,17 @@ pub fn parse_rarity_codes(raw: &Value) -> Vec<String> {
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 /// Normalize RaenonX expansion IDs to match Limitless set codes.
-/// "PROMO-A" → "P-A", "PROMO-B" → "P-B", others unchanged.
+/// "PROMO-A" → "P-A", "PROMO-B" → "P-B", plain alphanumeric IDs pass through unchanged.
 pub fn normalize_expansion_id(id: &str) -> String {
     if let Some(suffix) = id.strip_prefix("PROMO-") {
-        format!("P-{suffix}")
-    } else {
-        id.to_string()
+        return format!("P-{suffix}");
     }
+    // Plain set codes (A1, B2a, etc.) pass through as-is.
+    if id.chars().all(|c| c.is_ascii_alphanumeric()) {
+        return id.to_string();
+    }
+    warn!(id, "unrecognized expansion ID pattern — normalization may be wrong");
+    id.to_string()
 }
 
 fn parse_rarity_u32_map(raw: &Value, key: &str) -> HashMap<String, u32> {
@@ -297,35 +369,55 @@ fn parse_rarity_u32_map(raw: &Value, key: &str) -> HashMap<String, u32> {
 }
 
 /// Extract human-readable promo source names from a card's source object.
+/// Iterates over all source fields (excluding `pack`) and maps them to display names.
 fn extract_promo_sources(source: Option<&Value>) -> Vec<String> {
-    let Some(source) = source else { return Vec::new() };
+    let Some(source) = source.and_then(Value::as_object) else {
+        return Vec::new();
+    };
 
-    let mut sources = Vec::new();
+    let field_to_display: HashMap<&str, &str> = PROMO_SOURCE_FIELDS.iter().copied().collect();
 
-    // source.pack is handled separately (maps to pack subtitles, not a promo source)
-    // We only list wonder_pick / shops / missions as promo sources
+    // Collect seen display names, then re-order to match PROMO_SOURCE_FIELDS order.
+    let mut seen: HashSet<String> = HashSet::new();
+    for (field, val) in source {
+        if field == "pack" {
+            continue;
+        }
+        if !source_field_has_content(val) {
+            continue;
+        }
+        let code = field_to_display
+            .get(field.as_str())
+            .map(|s| s.to_string())
+            .unwrap_or_else(|| {
+                warn!(field, "unknown promo source field — add to PROMO_SOURCE_FIELDS in raenonx.rs");
+                field.clone()
+            });
+        seen.insert(code);
+    }
 
-    if let Some(wp) = source.get("wonderPick") {
-        let has_free = wp.get("free").and_then(Value::as_array).map_or(false, |a| !a.is_empty());
-        let has_chansey = wp.get("chansey").and_then(Value::as_array).map_or(false, |a| !a.is_empty());
-        if has_free || has_chansey {
-            sources.push("Wonder Pick".to_string());
+    let mut result = Vec::new();
+    for (_, display) in PROMO_SOURCE_FIELDS {
+        let s = display.to_string();
+        if seen.remove(&s) {
+            result.push(s);
         }
     }
+    let mut unknowns: Vec<String> = seen.into_iter().collect();
+    unknowns.sort();
+    result.extend(unknowns);
+    result
+}
 
-    if source.get("goldShop").and_then(Value::as_array).map_or(false, |a| !a.is_empty()) {
-        sources.push("Gold Shop".to_string());
+fn source_field_has_content(val: &Value) -> bool {
+    match val {
+        Value::Null => false,
+        Value::Bool(b) => *b,
+        Value::Number(n) => n.as_f64().map_or(false, |f| f != 0.0),
+        Value::String(s) => !s.is_empty(),
+        Value::Array(arr) => !arr.is_empty(),
+        Value::Object(obj) => obj.values().any(source_field_has_content),
     }
-
-    if source.get("itemShop").and_then(Value::as_array).map_or(false, |a| !a.is_empty()) {
-        sources.push("Shop".to_string());
-    }
-
-    if source.get("mission").and_then(Value::as_array).map_or(false, |a| !a.is_empty()) {
-        sources.push("Mission".to_string());
-    }
-
-    sources
 }
 
 // ── RSC pull rate parser ─────────────────────────────────────────────────────
@@ -437,16 +529,18 @@ fn build_variants(
     }
 
     let normal_slot_count = normal_rarity.len().max(
-        normal_cards.values().map(Vec::len).max().unwrap_or(5),
+        normal_cards.values().map(Vec::len).max().unwrap_or(0),
     );
     let rare_slot_count = rare_rarity.len().max(
-        rare_cards.values().map(Vec::len).max().unwrap_or(5),
+        rare_cards.values().map(Vec::len).max().unwrap_or(0),
     );
     let plus1_slot_count = plus1_rarity.len().max(
-        plus1_cards.values().map(Vec::len).max().unwrap_or(6),
+        plus1_cards.values().map(Vec::len).max().unwrap_or(0),
     );
 
-    let normal = Some(PackVariantRates {
+    let mut variants = PackVariants::new();
+
+    variants.insert("normal".to_string(), PackVariantRates {
         rate: normal_rate.as_f64(),
         rate_numerator: normal_rate.numerator,
         rate_denominator: normal_rate.denominator,
@@ -455,25 +549,29 @@ fn build_variants(
         card_rates: normal_cards,
     });
 
-    let rare = rare_rate.map(|r| PackVariantRates {
-        rate: r.as_f64(),
-        rate_numerator: r.numerator,
-        rate_denominator: r.denominator,
-        slot_count: rare_slot_count as u32,
-        rarity_rates_by_slot: rare_rarity,
-        card_rates: rare_cards,
-    });
+    if let Some(r) = rare_rate {
+        variants.insert("rare".to_string(), PackVariantRates {
+            rate: r.as_f64(),
+            rate_numerator: r.numerator,
+            rate_denominator: r.denominator,
+            slot_count: rare_slot_count as u32,
+            rarity_rates_by_slot: rare_rarity,
+            card_rates: rare_cards,
+        });
+    }
 
-    let plus1 = plus1_rate.map(|r| PackVariantRates {
-        rate: r.as_f64(),
-        rate_numerator: r.numerator,
-        rate_denominator: r.denominator,
-        slot_count: plus1_slot_count as u32,
-        rarity_rates_by_slot: plus1_rarity,
-        card_rates: plus1_cards,
-    });
+    if let Some(r) = plus1_rate {
+        variants.insert("plus1".to_string(), PackVariantRates {
+            rate: r.as_f64(),
+            rate_numerator: r.numerator,
+            rate_denominator: r.denominator,
+            slot_count: plus1_slot_count as u32,
+            rarity_rates_by_slot: plus1_rarity,
+            card_rates: plus1_cards,
+        });
+    }
 
-    Ok(PackVariants { normal, rare, plus1 })
+    Ok(variants)
 }
 
 fn parse_slot_rates(val: &Value) -> Vec<Option<f64>> {

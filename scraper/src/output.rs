@@ -90,10 +90,10 @@ pub fn write_card_version(version: &CardVersion) -> Result<()> {
     write_json(&cards_dir(&version.set).join(filename), version)
 }
 
-/// Write data/cards/{ID:04}.json — abstract card file.
+/// Write data/cards/{ID:05}.json — abstract card file.
 pub fn write_abstract_card(card: &AbstractCard) -> Result<()> {
     ensure_abstract_cards_dir()?;
-    let filename = format!("{:04}.json", card.id);
+    let filename = format!("{:05}.json", card.id);
     write_json(&abstract_cards_dir().join(filename), card)
 }
 
@@ -133,7 +133,7 @@ pub fn card_version_file_exists(set_code: &str, number: u32) -> bool {
 }
 
 pub fn abstract_card_file_exists(id: u32) -> bool {
-    abstract_cards_dir().join(format!("{id:04}.json")).exists()
+    abstract_cards_dir().join(format!("{id:05}.json")).exists()
 }
 
 pub fn pull_rates_file_exists(set_code: &str, subtitle: &str) -> bool {
@@ -191,7 +191,7 @@ pub fn update_abstract_card_versions(
     id: u32,
     versions: &[crate::models::VersionRef],
 ) -> Result<()> {
-    let path = abstract_cards_dir().join(format!("{id:04}.json"));
+    let path = abstract_cards_dir().join(format!("{id:05}.json"));
     let json = std::fs::read_to_string(&path)?;
     let mut card: AbstractCard = serde_json::from_str(&json)?;
     card.versions = versions.to_vec();

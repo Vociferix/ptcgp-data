@@ -199,7 +199,6 @@ fn parse_card(html: &str, set_code: &str) -> Result<LimitlessCardData> {
 
     let is_ex = name.ends_with(" ex") || name.contains(" ex ");
     let is_mega = name.starts_with("Mega ") || name.contains(" Mega ");
-    let variants = extract_variants(&name);
 
     // Warn if we couldn't parse the name — indicates a selector issue
     if name.is_empty() {
@@ -217,7 +216,6 @@ fn parse_card(html: &str, set_code: &str) -> Result<LimitlessCardData> {
         flavor,
         is_ex,
         is_mega,
-        variants,
         ability,
         attacks,
         evolves_from,
@@ -465,27 +463,6 @@ fn parse_damage(raw: &str) -> (u32, Option<String>) {
         .find(|c| !c.is_ascii_digit() && !c.is_whitespace())
         .map(|c| c.to_string());
     (damage, suffix)
-}
-
-// ── Pokemon name helpers ─────────────────────────────────────────────────────
-
-fn extract_variants(name: &str) -> Vec<String> {
-    const KNOWN_PREFIXES: &[&str] = &["Alolan", "Galarian", "Hisuian", "Paldean"];
-    const KNOWN_SUFFIXES: &[&str] = &[
-        "Teal Mask", "Hearthflame Mask", "Wellspring Mask", "Cornerstone Mask",
-    ];
-    let mut variants = Vec::new();
-    for prefix in KNOWN_PREFIXES {
-        if name.starts_with(prefix) {
-            variants.push(prefix.to_string());
-        }
-    }
-    for suffix in KNOWN_SUFFIXES {
-        if name.ends_with(suffix) {
-            variants.push(suffix.to_string());
-        }
-    }
-    variants
 }
 
 // ── Date parsing ─────────────────────────────────────────────────────────────

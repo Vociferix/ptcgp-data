@@ -31,7 +31,7 @@ pub struct SetDetail {
 
 // ── Abstract cards and card versions ─────────────────────────────────────────
 
-/// Abstract card file — data/cards/{ID:04}.json
+/// Abstract card file — data/cards/{ID:05}.json
 ///
 /// An abstract card represents the game content shared by all art/rarity
 /// variants of the same card (same name and mechanics). Version-specific
@@ -135,7 +135,6 @@ pub struct LimitlessCardData {
     pub flavor: Option<String>,
     pub is_ex: bool,
     pub is_mega: bool,
-    pub variants: Vec<String>,
     pub ability: Option<Ability>,
     pub attacks: Vec<Attack>,
     pub evolves_from: Option<String>,
@@ -242,14 +241,9 @@ pub struct PackPullRates {
     pub variants: PackVariants,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct PackVariants {
-    pub normal: Option<PackVariantRates>,
-    /// Rare pack ("god pack") — 0.05% base rate, all 5 slots are rare
-    pub rare: Option<PackVariantRates>,
-    /// Plus-1 pack — 6 cards, last slot shiny-only
-    pub plus1: Option<PackVariantRates>,
-}
+/// Maps variant name (e.g. "normal", "rare", "plus1") to its rates.
+/// Only variants that exist for this pack appear as keys.
+pub type PackVariants = HashMap<String, PackVariantRates>;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PackVariantRates {
