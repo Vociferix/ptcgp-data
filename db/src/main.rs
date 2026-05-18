@@ -31,6 +31,12 @@ struct Cli {
 // ── JSON models ───────────────────────────────────────────────────────────────
 
 #[derive(Deserialize)]
+struct ElementInfo {
+    symbol: Option<String>,
+    name: String,
+}
+
+#[derive(Deserialize)]
 struct RarityInfo {
     code: String,
     name: String,
@@ -154,7 +160,7 @@ fn main() -> Result<()> {
 
     let tx = conn.transaction()?;
 
-    insert_static_data(&tx)?;
+    insert_static_data(&tx, &cli.data)?;
     insert_promo_sources(&tx, &cli.data)?;
     insert_rarities(&tx, &cli.data)?;
     let set_map = insert_sets(&tx, &cli.data)?;
@@ -169,23 +175,18 @@ fn main() -> Result<()> {
 
 // ── Static reference data ─────────────────────────────────────────────────────
 
-fn insert_static_data(tx: &rusqlite::Transaction) -> Result<()> {
-    for el in &[
-        "Grass",
-        "Fire",
-        "Water",
-        "Lightning",
-        "Fighting",
-        "Psychic",
-        "Darkness",
-        "Metal",
-        "Dragon",
-        "Colorless",
-    ] {
-        tx.execute(
-            "INSERT OR IGNORE INTO elements (name) VALUES (?1)",
-            params![el],
-        )?;
+fn insert_static_data(tx: &rusqlite::Transaction, data: &Path) -> Result<()> {
+    let elements_path = data.join("elements.json");
+    if elements_path.exists() {
+        let elements: Vec<ElementInfo> = load_json(&elements_path)?;
+        for el in &elements {
+            tx.execute(
+                "INSERT OR IGNORE INTO elements (symbol, name) VALUES (?1, ?2)",
+                params![el.symbol, el.name],
+            )?;
+        }
+    } else {
+        warn!("elements.json not found — run `global-master` first");
     }
     for stage in &["Basic", "Stage 1", "Stage 2"] {
         tx.execute(

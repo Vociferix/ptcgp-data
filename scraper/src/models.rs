@@ -174,6 +174,16 @@ pub struct BasePokemon {
     pub natdex_number: u32,
 }
 
+/// One entry in data/elements.json
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ElementInfo {
+    /// Single-letter energy symbol (e.g. "G" for Grass, "R" for Fire).
+    /// Null for Dragon, which has no dedicated energy type in PTCGP.
+    #[serde(skip_serializing_if = "Option::is_none", default)]
+    pub symbol: Option<String>,
+    pub name: String,
+}
+
 /// data/rarities.json
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RarityInfo {

@@ -5,8 +5,8 @@ use anyhow::Result;
 use serde::Serialize;
 
 use crate::models::{
-    AbstractCard, BasePokemon, CardVersion, PackPullRates, PromoSource, RarityInfo, SetDetail,
-    SetSummary,
+    AbstractCard, BasePokemon, CardVersion, ElementInfo, PackPullRates, PromoSource, RarityInfo,
+    SetDetail, SetSummary,
 };
 
 // ── Path helpers ─────────────────────────────────────────────────────────────
@@ -69,6 +69,11 @@ fn write_json<T: Serialize + ?Sized>(path: &Path, value: &T) -> Result<()> {
 pub fn write_sets(sets: &[SetSummary]) -> Result<()> {
     std::fs::create_dir_all(data_dir())?;
     write_json(&data_dir().join("sets.json"), sets)
+}
+
+pub fn write_elements(elements: &[ElementInfo]) -> Result<()> {
+    std::fs::create_dir_all(data_dir())?;
+    write_json(&data_dir().join("elements.json"), elements)
 }
 
 pub fn write_rarities(rarities: &[RarityInfo]) -> Result<()> {

@@ -12,10 +12,26 @@ use anyhow::Result;
 use clap::{Parser, Subcommand};
 use futures::stream::{self, StreamExt};
 use models::{
-    AbstractCard, CardEntry, CardVersion, LimitlessCardData, PromoSource, RarityInfo, SetDetail,
-    SetSummary, VersionRef,
+    Ability, AbstractCard, CardEntry, CardVersion, ElementInfo, LimitlessCardData, PromoSource,
+    RarityInfo, SetDetail, SetSummary, VersionRef,
 };
 use tracing::{error, info, warn};
+
+// ── Element symbol map ────────────────────────────────────────────────────────
+
+/// Maps element full name to single-letter energy symbol.
+/// Dragon has no energy type in PTCGP, so it is absent here.
+const ELEMENT_SYMBOLS: &[(&str, &str)] = &[
+    ("Grass", "G"),
+    ("Fire", "R"),
+    ("Water", "W"),
+    ("Lightning", "L"),
+    ("Fighting", "F"),
+    ("Psychic", "P"),
+    ("Darkness", "D"),
+    ("Metal", "M"),
+    ("Colorless", "C"),
+];
 
 // ── CLI definition ────────────────────────────────────────────────────────────
 
@@ -110,6 +126,10 @@ async fn cmd_global_master(client: &client::Client) -> Result<()> {
     let craft_costs = raenonx::parse_craft_costs(&raw);
     let dupe_dust = raenonx::parse_dupe_dust(&raw);
     let rarity_codes = raenonx::parse_rarity_codes(&raw);
+
+    let elements = build_elements();
+    output::write_elements(&elements)?;
+    info!(count = elements.len(), "elements.json written");
 
     let rarities = build_rarity_list(&rarity_codes, &craft_costs, &dupe_dust);
     output::write_rarities(&rarities)?;
@@ -756,11 +776,17 @@ fn build_abstract_card(
             } else {
                 Vec::new()
             },
-            ability: data.ability.clone(),
+            ability: data.ability.as_ref().map(|a| Ability {
+                name: a.name.clone(),
+                effect: normalize_element_placeholders(&a.effect),
+            }),
             attacks: data.attacks.clone(),
             evolves_from: data.evolves_from.clone(),
             trainer_kind: data.trainer_kind.clone(),
-            trainer_effect: data.trainer_effect.clone(),
+            trainer_effect: data
+                .trainer_effect
+                .as_deref()
+                .map(normalize_element_placeholders),
             versions: group.versions.clone(),
         }
     } else {
@@ -968,6 +994,36 @@ fn build_rarity_list(
             }
         })
         .collect()
+}
+
+fn build_elements() -> Vec<ElementInfo> {
+    let known: &[(&str, Option<&str>)] = &[
+        ("Grass", Some("G")),
+        ("Fire", Some("R")),
+        ("Water", Some("W")),
+        ("Lightning", Some("L")),
+        ("Fighting", Some("F")),
+        ("Psychic", Some("P")),
+        ("Darkness", Some("D")),
+        ("Metal", Some("M")),
+        ("Colorless", Some("C")),
+        ("Dragon", None),
+    ];
+    known
+        .iter()
+        .map(|&(name, symbol)| ElementInfo {
+            symbol: symbol.map(str::to_string),
+            name: name.to_string(),
+        })
+        .collect()
+}
+
+fn normalize_element_placeholders(text: &str) -> String {
+    let mut result = text.to_string();
+    for &(name, symbol) in ELEMENT_SYMBOLS {
+        result = result.replace(&format!("[{name}]"), &format!("[{symbol}]"));
+    }
+    result
 }
 
 fn build_promo_sources(codes: &[String]) -> Vec<PromoSource> {

@@ -384,6 +384,10 @@ CREATE TABLE elements (
     -- Primary key
     id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
 
+    -- Single-letter energy symbol (e.g. "G" for Grass, "R" for Fire).
+    -- Null for Dragon, which has no dedicated energy type in PTCGP.
+    symbol TEXT UNIQUE,
+
     -- The name of the element, such as "Grass" or "Fire"
     name TEXT UNIQUE NOT NULL
 );
