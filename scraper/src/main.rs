@@ -15,6 +15,7 @@ use models::{
     Ability, AbstractCard, CardEntry, CardVersion, ElementInfo, LimitlessCardData, PromoSource,
     RarityInfo, SetDetail, SetSummary, VersionRef,
 };
+use serde_json::Value;
 use tracing::{error, info, warn};
 
 // ── Element symbol map ────────────────────────────────────────────────────────
@@ -99,11 +100,14 @@ async fn main() -> Result<()> {
             cmd_pull_rates(&client, pack.as_deref(), force).await?
         }
         Command::All { force } => {
-            cmd_global_master(&client).await?;
-            cmd_sets(&client).await?;
+            let raw = raenonx::fetch_global_master(&client).await?;
+            write_reference_data(&raw)?;
+            let pack_names = fetch_pack_names(&client, &raw).await;
+            let expansion_packs = raenonx::parse_expansion_packs(&raw);
+            run_sets(&client, &expansion_packs, &pack_names).await?;
             cmd_base_pokemon(&client).await?;
-            cmd_cards(&client, None, force).await?;
-            cmd_pull_rates(&client, None, force).await?;
+            run_cards(&client, &raw, &pack_names, None, force).await?;
+            run_pull_rates(&client, &raw, &pack_names, None, force).await?;
         }
     }
 
@@ -113,83 +117,69 @@ async fn main() -> Result<()> {
 // ── Command implementations ───────────────────────────────────────────────────
 
 async fn cmd_global_master(client: &client::Client) -> Result<()> {
-    let raw = if output::global_master_exists() {
-        info!("global-master already cached; loading from disk");
-        output::load_global_master()?
-    } else {
-        info!("fetching global-master from RaenonX");
-        let raw = raenonx::fetch_global_master(client).await?;
-        output::write_global_master(&raw)?;
-        raw
-    };
+    info!("fetching global-master from RaenonX");
+    let raw = raenonx::fetch_global_master(client).await?;
+    write_reference_data(&raw)
+}
 
-    let craft_costs = raenonx::parse_craft_costs(&raw);
-    let dupe_dust = raenonx::parse_dupe_dust(&raw);
-    let rarity_codes = raenonx::parse_rarity_codes(&raw);
-
+fn write_reference_data(raw: &Value) -> Result<()> {
     let elements = build_elements();
     output::write_elements(&elements)?;
     info!(count = elements.len(), "elements.json written");
 
+    let craft_costs = raenonx::parse_craft_costs(raw);
+    let dupe_dust = raenonx::parse_dupe_dust(raw);
+    let rarity_codes = raenonx::parse_rarity_codes(raw);
     let rarities = build_rarity_list(&rarity_codes, &craft_costs, &dupe_dust);
     output::write_rarities(&rarities)?;
     info!(count = rarities.len(), "rarities.json written");
 
-    let promo_source_codes = raenonx::parse_promo_source_codes(&raw);
+    let promo_source_codes = raenonx::parse_promo_source_codes(raw);
     let promo_sources = build_promo_sources(&promo_source_codes);
     output::write_promo_sources(&promo_sources)?;
     info!(count = promo_sources.len(), "promo_sources.json written");
 
-    if !output::pack_names_exist() {
-        info!("fetching pack names from RaenonX pack pages");
-        let named_packs = raenonx::parse_named_pack_ids(&raw);
-        let mut pack_names: HashMap<String, String> = HashMap::new();
-        for pack_id in &named_packs {
-            let url = format!("{}/{}", raenonx::PACK_PAGE_BASE, pack_id);
-            match client.get_text(&url).await {
-                Ok(html) => {
-                    if let Some(name) = raenonx::parse_pack_name_from_title(&html) {
-                        info!(pack = pack_id, name, "resolved pack name");
-                        pack_names.insert(pack_id.clone(), name);
-                    } else {
-                        warn!(pack = pack_id, "could not parse pack name from title");
-                    }
-                }
-                Err(e) => warn!(pack = pack_id, "failed to fetch pack page: {e}"),
-            }
-        }
-        output::write_pack_names(&pack_names)?;
-        info!(count = pack_names.len(), "pack_names.json written");
-    } else {
-        info!("pack_names.json already cached");
-    }
-
     Ok(())
 }
 
+async fn fetch_pack_names(client: &client::Client, raw: &Value) -> HashMap<String, String> {
+    let named_packs = raenonx::parse_named_pack_ids(raw);
+    let mut pack_names = HashMap::new();
+    for pack_id in &named_packs {
+        let url = format!("{}/{}", raenonx::PACK_PAGE_BASE, pack_id);
+        match client.get_text(&url).await {
+            Ok(html) => {
+                if let Some(name) = raenonx::parse_pack_name_from_title(&html) {
+                    pack_names.insert(pack_id.clone(), name);
+                } else {
+                    warn!(pack = pack_id, "could not parse pack name from title");
+                }
+            }
+            Err(e) => warn!(pack = pack_id, "failed to fetch pack page: {e}"),
+        }
+    }
+    info!(count = pack_names.len(), "pack names resolved");
+    pack_names
+}
+
 async fn cmd_sets(client: &client::Client) -> Result<()> {
+    let raw = raenonx::fetch_global_master(client).await?;
+    let pack_names = fetch_pack_names(client, &raw).await;
+    let expansion_packs = raenonx::parse_expansion_packs(&raw);
+    run_sets(client, &expansion_packs, &pack_names).await
+}
+
+async fn run_sets(
+    client: &client::Client,
+    expansion_packs: &HashMap<String, Vec<String>>,
+    pack_names: &HashMap<String, String>,
+) -> Result<()> {
     info!("scraping set index from Limitless TCG");
     let sets = limitless::scrape_sets(client).await?;
     output::write_sets(&sets)?;
     info!(count = sets.len(), "sets.json written");
 
-    // Load pack names (built by cmd_global_master) and expansion pack ordering
-    let pack_names = if output::pack_names_exist() {
-        output::load_pack_names()?
-    } else {
-        warn!("pack_names.json not found — run `global-master` first for accurate pack names");
-        HashMap::new()
-    };
-
-    let expansion_packs = if output::global_master_exists() {
-        let raw = output::load_global_master()?;
-        raenonx::parse_expansion_packs(&raw)
-    } else {
-        HashMap::new()
-    };
-
     for set in &sets {
-        // Promo sets don't have openable packs; source info is on card versions
         let subtitles: Vec<String> = if set.is_promo {
             vec![]
         } else if let Some(pack_ids) = expansion_packs.get(&set.code) {
@@ -234,11 +224,20 @@ async fn cmd_cards(
     filter_set: Option<&str>,
     force: bool,
 ) -> Result<()> {
-    // Load dependencies
-    let raw = output::load_global_master()?;
-    let card_entries = raenonx::parse_card_entries(&raw)?;
-    let promo_subtitles = raenonx::parse_promo_pack_subtitles(&raw);
-    let pack_names = output::load_pack_names().unwrap_or_default();
+    let raw = raenonx::fetch_global_master(client).await?;
+    let pack_names = fetch_pack_names(client, &raw).await;
+    run_cards(client, &raw, &pack_names, filter_set, force).await
+}
+
+async fn run_cards(
+    client: &Arc<client::Client>,
+    raw: &Value,
+    pack_names: &HashMap<String, String>,
+    filter_set: Option<&str>,
+    force: bool,
+) -> Result<()> {
+    let card_entries = raenonx::parse_card_entries(raw)?;
+    let promo_subtitles = raenonx::parse_promo_pack_subtitles(raw);
 
     let pokemon_map: HashMap<String, u32> = if output::base_pokemon_exists() {
         output::load_base_pokemon()
@@ -271,7 +270,7 @@ async fn cmd_cards(
         .collect();
 
     // Build pack_id → subtitle mapping (used to resolve source.pack IDs on card entries)
-    let pack_subtitle_map = build_pack_subtitle_map(&promo_subtitles, &pack_names);
+    let pack_subtitle_map = build_pack_subtitle_map(&promo_subtitles, pack_names);
 
     // Build abstract card groups (regardless of set filter, since abstracts span sets)
     let groups = build_abstract_groups(&card_entries, &release_dates);
@@ -463,16 +462,26 @@ async fn cmd_pull_rates(
     filter_pack: Option<&str>,
     force: bool,
 ) -> Result<()> {
-    let raw = output::load_global_master()?;
-    let regular_packs = raenonx::parse_regular_packs(&raw);
-    let pack_expansion = raenonx::parse_pack_expansion(&raw);
-    let promo_subtitles = raenonx::parse_promo_pack_subtitles(&raw);
-    let pack_names = output::load_pack_names().unwrap_or_default();
+    let raw = raenonx::fetch_global_master(client).await?;
+    let pack_names = fetch_pack_names(client, &raw).await;
+    run_pull_rates(client, &raw, &pack_names, filter_pack, force).await
+}
 
-    let pack_subtitle_map = build_pack_subtitle_map(&promo_subtitles, &pack_names);
+async fn run_pull_rates(
+    client: &Arc<client::Client>,
+    raw: &Value,
+    pack_names: &HashMap<String, String>,
+    filter_pack: Option<&str>,
+    force: bool,
+) -> Result<()> {
+    let regular_packs = raenonx::parse_regular_packs(raw);
+    let pack_expansion = raenonx::parse_pack_expansion(raw);
+    let promo_subtitles = raenonx::parse_promo_pack_subtitles(raw);
+
+    let pack_subtitle_map = build_pack_subtitle_map(&promo_subtitles, pack_names);
 
     // Build card entry lookup for remapping pull rate card IDs
-    let card_entries = raenonx::parse_card_entries(&raw)?;
+    let card_entries = raenonx::parse_card_entries(raw)?;
     let mut card_id_to_versions: HashMap<String, Vec<(String, u32)>> = HashMap::new();
     for entry in &card_entries {
         card_id_to_versions.insert(entry.card_id.clone(), entry.collection_nums.clone());

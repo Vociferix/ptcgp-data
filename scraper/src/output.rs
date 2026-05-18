@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 use anyhow::Result;
@@ -13,10 +12,6 @@ use crate::models::{
 
 pub fn data_dir() -> PathBuf {
     PathBuf::from("data")
-}
-
-fn cache_dir() -> PathBuf {
-    PathBuf::from("cache")
 }
 
 fn set_dir(set_code: &str) -> PathBuf {
@@ -112,12 +107,6 @@ pub fn write_pull_rates(rates: &PackPullRates) -> Result<()> {
     write_json(&pull_rates_dir(&rates.set).join(filename), rates)
 }
 
-/// Write the raw global-master JSON to cache/global_master.json.
-pub fn write_global_master(raw: &serde_json::Value) -> Result<()> {
-    std::fs::create_dir_all(cache_dir())?;
-    write_json(&cache_dir().join("global_master.json"), raw)
-}
-
 pub fn load_card_versions(set_code: &str) -> Result<Vec<CardVersion>> {
     let dir = cards_dir(set_code);
     if !dir.exists() {
@@ -152,15 +141,6 @@ pub fn pull_rates_file_exists(set_code: &str, subtitle: &str) -> bool {
         .exists()
 }
 
-pub fn global_master_exists() -> bool {
-    cache_dir().join("global_master.json").exists()
-        || data_dir().join("global_master.json").exists()
-        || data_dir()
-            .join("raenonx")
-            .join("global_master.json")
-            .exists()
-}
-
 // ── Base Pokémon ──────────────────────────────────────────────────────────────
 
 fn base_pokemon_path() -> PathBuf {
@@ -181,26 +161,6 @@ pub fn load_base_pokemon() -> Result<Vec<BasePokemon>> {
     Ok(serde_json::from_str(&json)?)
 }
 
-// ── Pack names ────────────────────────────────────────────────────────────────
-
-fn pack_names_path() -> PathBuf {
-    cache_dir().join("pack_names.json")
-}
-
-pub fn pack_names_exist() -> bool {
-    pack_names_path().exists()
-}
-
-pub fn write_pack_names(names: &HashMap<String, String>) -> Result<()> {
-    std::fs::create_dir_all(cache_dir())?;
-    write_json(&pack_names_path(), names)
-}
-
-pub fn load_pack_names() -> Result<HashMap<String, String>> {
-    let json = std::fs::read_to_string(pack_names_path())?;
-    Ok(serde_json::from_str(&json)?)
-}
-
 /// Load an existing abstract card, update its versions list, and write it back.
 pub fn update_abstract_card_versions(
     id: u32,
@@ -211,24 +171,4 @@ pub fn update_abstract_card_versions(
     let mut card: AbstractCard = serde_json::from_str(&json)?;
     card.versions = versions.to_vec();
     write_json(&path, &card)
-}
-
-/// Load global-master from disk (tries cache/, then legacy data/ paths).
-pub fn load_global_master() -> Result<serde_json::Value> {
-    let cache_path = cache_dir().join("global_master.json");
-    let legacy_data_path = data_dir().join("global_master.json");
-    let legacy_raenonx_path = data_dir().join("raenonx").join("global_master.json");
-
-    let path = if cache_path.exists() {
-        cache_path
-    } else if legacy_data_path.exists() {
-        legacy_data_path
-    } else if legacy_raenonx_path.exists() {
-        legacy_raenonx_path
-    } else {
-        anyhow::bail!("global_master.json not found — run `global-master` command first");
-    };
-
-    let json = std::fs::read_to_string(&path)?;
-    Ok(serde_json::from_str(&json)?)
 }
