@@ -63,11 +63,11 @@ pub struct AbstractCard {
     pub is_ex: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub is_mega: Option<bool>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
+    #[serde(skip_serializing_if = "Vec::is_empty", default)]
     pub variants: Vec<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ability: Option<Ability>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
+    #[serde(skip_serializing_if = "Vec::is_empty", default)]
     pub attacks: Vec<Attack>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub evolves_from: Option<String>,
