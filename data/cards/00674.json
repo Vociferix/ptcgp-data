@@ -1,0 +1,38 @@
+{
+  "id": 674,
+  "name": "Comfey",
+  "card_type": "pokemon",
+  "natdex_number": 764,
+  "element": "Psychic",
+  "stage": "Basic",
+  "hp": 70,
+  "retreat_cost": 1,
+  "weakness": "Metal",
+  "flavor": "Comfey picks flowers with its vine and decorates itself with them. For some reason, flowers won’t wither once they’re attached to a Comfey.",
+  "is_ex": false,
+  "is_mega": false,
+  "ability": {
+    "name": "Flower Shield",
+    "effect": "Each of your Pokémon that has any [P] Energy attached recovers from all Special Conditions and can't be affected by any Special Conditions."
+  },
+  "attacks": [
+    {
+      "name": "Spinning Attack",
+      "cost": [
+        "Psychic",
+        "Colorless"
+      ],
+      "damage": 30
+    }
+  ],
+  "versions": [
+    {
+      "set": "A3",
+      "number": 80
+    },
+    {
+      "set": "A3",
+      "number": 168
+    }
+  ]
+}

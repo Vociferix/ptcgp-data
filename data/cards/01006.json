@@ -1,0 +1,41 @@
+{
+  "id": 1006,
+  "name": "Tyranitar",
+  "card_type": "pokemon",
+  "natdex_number": 248,
+  "element": "Darkness",
+  "stage": "Stage 2",
+  "hp": 160,
+  "retreat_cost": 4,
+  "weakness": "Grass",
+  "flavor": "Extremely strong, it can change the landscape. It is so insolent that it doesn’t care about others.",
+  "is_ex": false,
+  "is_mega": false,
+  "ability": {
+    "name": "Energy Plunder",
+    "effect": "Once during your turn, you may move all [D] Energy from each of your Pokémon to this Pokémon."
+  },
+  "attacks": [
+    {
+      "name": "Buster Tail",
+      "cost": [
+        "Darkness",
+        "Darkness",
+        "Darkness",
+        "Colorless"
+      ],
+      "damage": 130
+    }
+  ],
+  "evolves_from": "Pupitar",
+  "versions": [
+    {
+      "set": "A4",
+      "number": 119
+    },
+    {
+      "set": "A4",
+      "number": 179
+    }
+  ]
+}

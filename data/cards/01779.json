@@ -1,0 +1,39 @@
+{
+  "id": 1779,
+  "name": "Rapid Strike Urshifu",
+  "card_type": "pokemon",
+  "natdex_number": 892,
+  "element": "Water",
+  "stage": "Stage 1",
+  "hp": 120,
+  "retreat_cost": 3,
+  "weakness": "Lightning",
+  "flavor": "This form of Urshifu is a strong believer in defeating foes by raining many blows down on them. Its strikes are nonstop, flowing like a river.",
+  "is_ex": false,
+  "is_mega": false,
+  "variants": [
+    "Rapid Strike"
+  ],
+  "ability": {
+    "name": "Double Type",
+    "effect": "As long as this Pokémon is in play, it is [W] and [F] type."
+  },
+  "attacks": [
+    {
+      "name": "Tornado Shot",
+      "cost": [
+        "Water",
+        "Colorless"
+      ],
+      "damage": 40,
+      "effect": "Discard a [W] Energy from this Pokémon, and this attack also does 40 damage to 1 of your opponent's Benched Pokémon."
+    }
+  ],
+  "evolves_from": "Kubfu",
+  "versions": [
+    {
+      "set": "B3",
+      "number": 51
+    }
+  ]
+}

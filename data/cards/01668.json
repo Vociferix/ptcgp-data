@@ -1,0 +1,44 @@
+{
+  "id": 1668,
+  "name": "Mega Charizard X ex",
+  "card_type": "pokemon",
+  "natdex_number": 6,
+  "element": "Fire",
+  "stage": "Stage 2",
+  "hp": 220,
+  "retreat_cost": 2,
+  "weakness": "Water",
+  "is_ex": true,
+  "is_mega": true,
+  "variants": [
+    "X"
+  ],
+  "attacks": [
+    {
+      "name": "Raging Blaze",
+      "cost": [
+        "Fire",
+        "Fire",
+        "Fire"
+      ],
+      "damage": 100,
+      "damage_suffix": "+",
+      "effect": "If this Pokémon's remaining HP is 110 or less, this attack does 80 more damage."
+    }
+  ],
+  "evolves_from": "Charmeleon",
+  "versions": [
+    {
+      "set": "B2b",
+      "number": 9
+    },
+    {
+      "set": "B2b",
+      "number": 76
+    },
+    {
+      "set": "B2b",
+      "number": 111
+    }
+  ]
+}

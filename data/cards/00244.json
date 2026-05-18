@@ -1,0 +1,48 @@
+{
+  "id": 244,
+  "name": "Vaporeon",
+  "card_type": "pokemon",
+  "natdex_number": 134,
+  "element": "Water",
+  "stage": "Stage 1",
+  "hp": 120,
+  "retreat_cost": 2,
+  "weakness": "Lightning",
+  "flavor": "It lives close to water. Its long tail is ridged with a fin, which is often mistaken for a mermaid’s.",
+  "is_ex": false,
+  "is_mega": false,
+  "ability": {
+    "name": "Wash Out",
+    "effect": "As often as you like during your turn, you may move a [W] Energy from 1 of your Benched [W] Pokémon to your Active [W] Pokémon."
+  },
+  "attacks": [
+    {
+      "name": "Wave Splash",
+      "cost": [
+        "Water",
+        "Colorless",
+        "Colorless"
+      ],
+      "damage": 60
+    }
+  ],
+  "evolves_from": "Eevee",
+  "versions": [
+    {
+      "set": "A1a",
+      "number": 19
+    },
+    {
+      "set": "A1a",
+      "number": 72
+    },
+    {
+      "set": "A4b",
+      "number": 99
+    },
+    {
+      "set": "A4b",
+      "number": 100
+    }
+  ]
+}

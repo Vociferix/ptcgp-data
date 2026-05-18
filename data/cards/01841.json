@@ -1,0 +1,40 @@
+{
+  "id": 1841,
+  "name": "Single Strike Urshifu",
+  "card_type": "pokemon",
+  "natdex_number": 892,
+  "element": "Darkness",
+  "stage": "Stage 1",
+  "hp": 120,
+  "retreat_cost": 3,
+  "weakness": "Grass",
+  "flavor": "This form of Urshifu is a strong believer in the one-hit KO. Its strategy is to leap in close to foes and land a devastating blow with a hardened fist.",
+  "is_ex": false,
+  "is_mega": false,
+  "variants": [
+    "Single Strike"
+  ],
+  "ability": {
+    "name": "Double Type",
+    "effect": "As long as this Pokémon is in play, it is [F] and [D] type."
+  },
+  "attacks": [
+    {
+      "name": "Power Blast",
+      "cost": [
+        "Darkness",
+        "Darkness",
+        "Colorless"
+      ],
+      "damage": 110,
+      "effect": "Discard a [D] Energy from this Pokémon."
+    }
+  ],
+  "evolves_from": "Kubfu",
+  "versions": [
+    {
+      "set": "B3",
+      "number": 113
+    }
+  ]
+}

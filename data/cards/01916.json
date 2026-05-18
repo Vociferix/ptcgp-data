@@ -1,0 +1,36 @@
+{
+  "id": 1916,
+  "name": "Zygarde ex",
+  "card_type": "pokemon",
+  "natdex_number": 718,
+  "element": "Fighting",
+  "stage": "Basic",
+  "hp": 170,
+  "retreat_cost": 4,
+  "weakness": "Grass",
+  "is_ex": true,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Land Laser",
+      "cost": [
+        "Fighting",
+        "Fighting",
+        "Fighting"
+      ],
+      "damage": 100,
+      "damage_suffix": "x",
+      "effect": "Flip 2 coins. This attack does 100 damage for each heads."
+    }
+  ],
+  "versions": [
+    {
+      "set": "P-B",
+      "number": 53
+    },
+    {
+      "set": "P-B",
+      "number": 55
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "id": 321,
+  "name": "Heat Rotom",
+  "card_type": "pokemon",
+  "natdex_number": 479,
+  "element": "Fire",
+  "stage": "Basic",
+  "hp": 80,
+  "retreat_cost": 1,
+  "weakness": "Water",
+  "flavor": "If the convection microwave oven is not working properly, then the Rotom inhabiting it will become lethargic.",
+  "is_ex": false,
+  "is_mega": false,
+  "variants": [
+    "Heat"
+  ],
+  "attacks": [
+    {
+      "name": "Heat Breath",
+      "cost": [
+        "Fire",
+        "Colorless"
+      ],
+      "damage": 30,
+      "damage_suffix": "+",
+      "effect": "Flip a coin. If heads, this attack does 30 more damage."
+    }
+  ],
+  "versions": [
+    {
+      "set": "A2",
+      "number": 30
+    }
+  ]
+}
