@@ -1,4 +1,5 @@
 mod client;
+mod images;
 mod limitless;
 mod models;
 mod output;
@@ -70,6 +71,12 @@ enum Command {
     /// Fetch all Pokémon species names and national dex numbers from PokéAPI
     BasePokemon,
 
+    /// Download card images and set logos to the images repository (../ptcgp-images)
+    Images {
+        #[arg(long)]
+        force: bool,
+    },
+
     /// Run the complete pipeline: global-master → sets → base-pokemon → cards → pull-rates
     All {
         #[arg(long)]
@@ -98,6 +105,9 @@ async fn main() -> Result<()> {
         Command::Cards { set, force } => cmd_cards(&client, set.as_deref(), force).await?,
         Command::PullRates { pack, force } => {
             cmd_pull_rates(&client, pack.as_deref(), force).await?
+        }
+        Command::Images { force } => {
+            images::run_images(&client, force).await?;
         }
         Command::All { force } => {
             let raw = raenonx::fetch_global_master(&client).await?;

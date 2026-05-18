@@ -52,4 +52,19 @@ impl Client {
         let text = self.get_text(url).await?;
         Ok(serde_json::from_str(&text)?)
     }
+
+    pub async fn get_bytes(&self, url: &str) -> Result<Vec<u8>> {
+        let _permit = self.semaphore.acquire().await?;
+        sleep(Duration::from_millis(MIN_DELAY_MS)).await;
+        debug!("GET {url}");
+        let bytes = self
+            .inner
+            .get(url)
+            .send()
+            .await?
+            .error_for_status()?
+            .bytes()
+            .await?;
+        Ok(bytes.to_vec())
+    }
 }
