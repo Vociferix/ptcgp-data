@@ -177,6 +177,24 @@ struct Attack {
     effect: Option<String>,
 }
 
+// ── Pull rate models ──────────────────────────────────────────────────────────
+
+#[derive(Deserialize)]
+struct PackPullRates {
+    set: String,
+    subtitle: String,
+    variants: HashMap<String, Option<PackVariantRates>>,
+}
+
+#[derive(Deserialize)]
+struct PackVariantRates {
+    rate_numerator: f64,
+    rate_denominator: f64,
+    slot_count: u32,
+    rarity_rates_by_slot: Vec<HashMap<String, f64>>,
+    card_rates: HashMap<String, Vec<Option<f64>>>,
+}
+
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 fn main() -> Result<()> {
@@ -214,6 +232,7 @@ fn main() -> Result<()> {
     insert_base_pokemon(&tx, &cli.data)?;
     let card_id_map = insert_abstract_cards(&tx, &cli.data, &mut v)?;
     insert_card_versions(&tx, &cli.data, &card_id_map, &set_map, &mut v)?;
+    insert_pull_rates(&tx, &cli.data, &mut v)?;
 
     v.finish()?;
     tx.commit()?;
@@ -967,4 +986,206 @@ fn get_or_insert_base_pokemon(
 fn load_json<T: for<'de> Deserialize<'de>>(path: &Path) -> Result<T> {
     let text = std::fs::read_to_string(path)?;
     serde_json::from_str(&text).with_context(|| format!("parsing {:?}", path))
+}
+
+// ── Pull rates ────────────────────────────────────────────────────────────────
+
+/// Fixed denominator for per-slot rarity and card pull rates.
+///
+/// Source data stores these as floats; we scale by this constant so they fit
+/// the integer-fraction schema. 10^6 gives microsecond-level precision, which
+/// is more than enough for any realistic pull rate.
+const SLOT_RATE_DENOMINATOR: i64 = 1_000_000;
+
+fn insert_pull_rates(
+    tx: &rusqlite::Transaction,
+    data_dir: &Path,
+    v: &mut Violations,
+) -> Result<()> {
+    let pull_rates_dir = data_dir.join("pull_rates");
+    if !pull_rates_dir.exists() {
+        return Ok(());
+    }
+
+    // Build lookup tables from the DB.
+    let mut stmt = tx.prepare("SELECT code, id FROM sets")?;
+    let set_ids: HashMap<String, i64> = stmt
+        .query_map([], |row| Ok((row.get::<_, String>(0)?, row.get::<_, i64>(1)?)))?
+        .collect::<rusqlite::Result<_>>()?;
+    drop(stmt);
+
+    let mut stmt = tx.prepare("SELECT code, id FROM rarities")?;
+    let rarity_ids: HashMap<String, i64> = stmt
+        .query_map([], |row| Ok((row.get::<_, String>(0)?, row.get::<_, i64>(1)?)))?
+        .collect::<rusqlite::Result<_>>()?;
+    drop(stmt);
+
+    let mut set_dirs: Vec<_> = std::fs::read_dir(&pull_rates_dir)?
+        .filter_map(|e| e.ok())
+        .filter(|e| e.path().is_dir())
+        .collect();
+    set_dirs.sort_by_key(|e| e.path());
+
+    let mut total = 0usize;
+
+    for set_dir_entry in set_dirs {
+        let set_code = set_dir_entry.file_name().to_string_lossy().into_owned();
+        let Some(&set_id) = set_ids.get(&set_code) else {
+            v.add(format!("pull_rates/{set_code}: set not found in DB"));
+            continue;
+        };
+
+        let mut rate_files: Vec<_> = std::fs::read_dir(set_dir_entry.path())?
+            .filter_map(|e| e.ok())
+            .filter(|e| e.path().extension().is_some_and(|x| x == "json"))
+            .collect();
+        rate_files.sort_by_key(|e| e.path());
+
+        for rate_file in rate_files {
+            let rates: PackPullRates = match load_json(&rate_file.path()) {
+                Ok(r) => r,
+                Err(e) => {
+                    v.add(format!("{}: {e:?}", rate_file.path().display()));
+                    continue;
+                }
+            };
+
+            if rates.set != set_code {
+                v.add(format!(
+                    "pull_rates/{set_code}/{}: set field '{}' does not match directory",
+                    rates.subtitle, rates.set
+                ));
+            }
+
+            let pack_id: i64 = match tx.query_row(
+                "SELECT p.id FROM packs p \
+                 JOIN pack_subtitles ps ON p.id = ps.pack_id \
+                 WHERE p.set_id = ?1 AND ps.subtitle = ?2",
+                params![set_id, rates.subtitle],
+                |row| row.get(0),
+            ) {
+                Ok(id) => id,
+                Err(_) => {
+                    v.add(format!(
+                        "pull_rates/{set_code}/{}: pack '{}' not found",
+                        rates.subtitle, rates.subtitle
+                    ));
+                    continue;
+                }
+            };
+
+            // Pack variant rate denominator — shared across all variants in this pack.
+            if let Some(first) = rates.variants.values().flatten().next() {
+                let denom = first.rate_denominator.round() as i64;
+                tx.execute(
+                    "INSERT OR IGNORE INTO pack_variant_rate_denominators \
+                     (pack_id, rate_denominator) VALUES (?1, ?2)",
+                    params![pack_id, denom],
+                )?;
+            }
+
+            for (variant_name, variant) in
+                rates.variants.iter().filter_map(|(k, v)| v.as_ref().map(|v| (k, v)))
+            {
+                tx.execute(
+                    "INSERT OR IGNORE INTO pack_variant_names (name) VALUES (?1)",
+                    params![variant_name],
+                )?;
+                let name_id: i64 = tx.query_row(
+                    "SELECT id FROM pack_variant_names WHERE name = ?1",
+                    params![variant_name],
+                    |row| row.get(0),
+                )?;
+
+                let rate_num = variant.rate_numerator.round() as i64;
+                tx.execute(
+                    "INSERT OR IGNORE INTO pack_variants \
+                     (name_id, pack_id, rate_numerator) VALUES (?1, ?2, ?3)",
+                    params![name_id, pack_id, rate_num],
+                )?;
+                let variant_id: i64 = tx.query_row(
+                    "SELECT id FROM pack_variants WHERE name_id = ?1 AND pack_id = ?2",
+                    params![name_id, pack_id],
+                    |row| row.get(0),
+                )?;
+
+                for slot_idx in 0..variant.slot_count {
+                    tx.execute(
+                        "INSERT OR IGNORE INTO pack_slots \
+                         (pack_variant_id, pull_number, rate_denominator) VALUES (?1, ?2, ?3)",
+                        params![variant_id, slot_idx, SLOT_RATE_DENOMINATOR],
+                    )?;
+                    let slot_id: i64 = tx.query_row(
+                        "SELECT id FROM pack_slots \
+                         WHERE pack_variant_id = ?1 AND pull_number = ?2",
+                        params![variant_id, slot_idx],
+                        |row| row.get(0),
+                    )?;
+
+                    if let Some(rarity_rates) =
+                        variant.rarity_rates_by_slot.get(slot_idx as usize)
+                    {
+                        for (rarity_code, &rate) in rarity_rates {
+                            match rarity_ids.get(rarity_code.as_str()) {
+                                Some(&rarity_id) => {
+                                    let num =
+                                        (rate * SLOT_RATE_DENOMINATOR as f64).round() as i64;
+                                    tx.execute(
+                                        "INSERT OR IGNORE INTO rarity_pull_rates \
+                                         (slot_id, rarity_id, rate_numerator) VALUES (?1, ?2, ?3)",
+                                        params![slot_id, rarity_id, num],
+                                    )?;
+                                }
+                                None => v.add(format!(
+                                    "pull_rates/{set_code}/{}: unknown rarity '{rarity_code}'",
+                                    rates.subtitle
+                                )),
+                            }
+                        }
+                    }
+
+                    for (card_key, slot_rates) in &variant.card_rates {
+                        let Some(Some(rate)) = slot_rates.get(slot_idx as usize) else {
+                            continue;
+                        };
+                        let card_num: u32 = match card_key.parse() {
+                            Ok(n) => n,
+                            Err(_) => {
+                                v.add(format!(
+                                    "pull_rates/{set_code}/{}: invalid card key '{card_key}'",
+                                    rates.subtitle
+                                ));
+                                continue;
+                            }
+                        };
+                        let card_version_id: i64 = match tx.query_row(
+                            "SELECT id FROM card_versions WHERE set_id = ?1 AND number = ?2",
+                            params![set_id, card_num],
+                            |row| row.get(0),
+                        ) {
+                            Ok(id) => id,
+                            Err(_) => {
+                                v.add(format!(
+                                    "pull_rates/{set_code}/{}: card {card_num:03} not found",
+                                    rates.subtitle
+                                ));
+                                continue;
+                            }
+                        };
+                        let num = (rate * SLOT_RATE_DENOMINATOR as f64).round() as i64;
+                        tx.execute(
+                            "INSERT OR IGNORE INTO card_pull_rates \
+                             (card_version_id, slot_id, rate_numerator) VALUES (?1, ?2, ?3)",
+                            params![card_version_id, slot_id, num],
+                        )?;
+                    }
+                }
+            }
+
+            total += 1;
+        }
+    }
+
+    info!(count = total, "pull rates inserted");
+    Ok(())
 }
