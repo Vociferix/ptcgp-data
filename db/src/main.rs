@@ -410,10 +410,25 @@ fn insert_base_pokemon(tx: &rusqlite::Transaction, data: &Path) -> Result<()> {
         return Ok(());
     }
     let pokemon: Vec<BasePokemon> = load_json(&path)?;
-    for p in &pokemon {
+
+    // Seed base_pokemon_names alphabetically.
+    let names: BTreeSet<&str> = pokemon.iter().map(|p| p.name.as_str()).collect();
+    for name in &names {
         tx.execute(
-            "INSERT OR IGNORE INTO base_pokemon (name, natdex_number) VALUES (?1, ?2)",
-            params![p.name, p.natdex_number],
+            "INSERT OR IGNORE INTO base_pokemon_names (name) VALUES (?1)",
+            params![name],
+        )?;
+    }
+
+    for p in &pokemon {
+        let name_id: i64 = tx.query_row(
+            "SELECT id FROM base_pokemon_names WHERE name = ?1",
+            params![p.name],
+            |row| row.get(0),
+        )?;
+        tx.execute(
+            "INSERT OR IGNORE INTO base_pokemon (natdex_number, name_id) VALUES (?1, ?2)",
+            params![p.natdex_number, name_id],
         )?;
     }
     info!(count = pokemon.len(), "base Pokémon inserted");
@@ -557,28 +572,25 @@ fn insert_pokemon_data(
     card: &AbstractCard,
     v: &mut Violations,
 ) -> Result<()> {
-    let base_id = if let Some(natdex) = card.natdex_number {
-        match tx.query_row::<i64, _, _>(
-            "SELECT id FROM base_pokemon WHERE natdex_number = ?1",
+    let Some(natdex) = card.natdex_number else {
+        v.add(format!("pokemon {}: no natdex_number — skipping", card.name));
+        return Ok(());
+    };
+    let natdex = natdex as i64;
+    if tx
+        .query_row::<i64, _, _>(
+            "SELECT natdex_number FROM base_pokemon WHERE natdex_number = ?1",
             params![natdex],
             |row| row.get(0),
-        ) {
-            Ok(id) => id,
-            Err(_) => {
-                v.add(format!(
-                    "pokemon {}: natdex {natdex} not in base_pokemon — inserting by name",
-                    card.name
-                ));
-                get_or_insert_base_pokemon(tx, &card.name, Some(natdex))?
-            }
-        }
-    } else {
+        )
+        .is_err()
+    {
         v.add(format!(
-            "pokemon {}: no natdex_number — inserting by name",
+            "pokemon {}: natdex {natdex} not in base_pokemon — inserting",
             card.name
         ));
-        get_or_insert_base_pokemon(tx, &card.name, None)?
-    };
+        get_or_insert_base_pokemon(tx, &card.name, natdex)?;
+    }
 
     let Some(el) = &card.element else {
         return Ok(());
@@ -604,11 +616,11 @@ fn insert_pokemon_data(
 
     tx.execute(
         "INSERT OR IGNORE INTO pokemon_cards \
-         (card_id, base_id, element_id, stage_id, retreat_cost, hp) \
+         (card_id, natdex_number, element_id, stage_id, retreat_cost, hp) \
          VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
         params![
             card_id,
-            base_id,
+            natdex,
             element_id,
             stage_id,
             card.retreat_cost,
@@ -1056,17 +1068,22 @@ fn insert_version_duplicates(
 fn get_or_insert_base_pokemon(
     tx: &rusqlite::Transaction,
     name: &str,
-    natdex: Option<u32>,
-) -> Result<i64> {
+    natdex: i64,
+) -> Result<()> {
     tx.execute(
-        "INSERT OR IGNORE INTO base_pokemon (name, natdex_number) VALUES (?1, ?2)",
-        params![name, natdex],
+        "INSERT OR IGNORE INTO base_pokemon_names (name) VALUES (?1)",
+        params![name],
     )?;
-    Ok(tx.query_row(
-        "SELECT id FROM base_pokemon WHERE name = ?1",
+    let name_id: i64 = tx.query_row(
+        "SELECT id FROM base_pokemon_names WHERE name = ?1",
         params![name],
         |row| row.get(0),
-    )?)
+    )?;
+    tx.execute(
+        "INSERT OR IGNORE INTO base_pokemon (natdex_number, name_id) VALUES (?1, ?2)",
+        params![natdex, name_id],
+    )?;
+    Ok(())
 }
 
 fn load_json<T: for<'de> Deserialize<'de>>(path: &Path) -> Result<T> {

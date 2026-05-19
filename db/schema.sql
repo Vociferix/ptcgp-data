@@ -520,20 +520,27 @@ CREATE TABLE attack_cost (
     UNIQUE (attack_id, idx) ON CONFLICT FAIL
 );
 
+-- Base Pokemon Names
+CREATE TABLE base_pokemon_names (
+    -- Primary key
+    id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
+
+    -- The base pokemon name
+    name TEXT UNIQUE NOT NULL
+);
+
 -- Base Pokemon
 --
 -- This table contains the names and national pokedex numbers of all
 -- pokemon from main series video games.
 CREATE TABLE base_pokemon (
-    -- Primary key
-    id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
+    -- Primary key and the national pokedex number
+    natdex_number INTEGER PRIMARY KEY UNIQUE NOT NULL,
 
-    -- The name of the pokemon
-    name TEXT UNIQUE NOT NULL,
+    -- base_pokemon_names.id - The name of the base pokemon
+    name_id INTEGER UNIQUE NOT NULL,
 
-    -- The national pokedex number of the pokemon.
-    -- Null when not yet populated (requires PokeAPI or manual data).
-    natdex_number INTEGER UNIQUE
+    FOREIGN KEY (name_id) REFERENCES base_pokemon_names (id)
 );
 
 -- Pokemon Stages
@@ -558,8 +565,8 @@ CREATE TABLE pokemon_cards (
     -- cards.id - The pokemon card described
     card_id INTEGER UNIQUE NOT NULL,
 
-    -- base_pokemon.id - The base pokemon of the card
-    base_id INTEGER NOT NULL,
+    -- base_pokemon.natdex_number - The base pokemon of the card
+    natdex_number INTEGER NOT NULL,
 
     -- elements.id - The element (type) of the pokemon
     element_id INTEGER NOT NULL,
@@ -575,7 +582,7 @@ CREATE TABLE pokemon_cards (
     -- Null when not available for this card.
     hp INTEGER,
 
-    FOREIGN KEY (base_id) REFERENCES base_pokemon (id),
+    FOREIGN KEY (natdex_number) REFERENCES base_pokemon (natdex_number),
     FOREIGN KEY (card_id) REFERENCES cards (id),
     FOREIGN KEY (element_id) REFERENCES elements (id),
     FOREIGN KEY (stage_id) REFERENCES stages (id)
@@ -907,7 +914,7 @@ CREATE VIEW pokemon AS
     SELECT
         c.id                AS card_id,
         cn.name             AS name,
-        bp.name             AS base_name,
+        bpn.name            AS base_name,
         bp.natdex_number,
         e.name              AS element,
         st.name             AS stage,
@@ -923,7 +930,8 @@ CREATE VIEW pokemon AS
     FROM cards                c
     JOIN card_names           cn  ON cn.id  = c.name_id
     JOIN pokemon_cards        pc  ON pc.card_id = c.id
-    JOIN base_pokemon         bp  ON bp.id  = pc.base_id
+    JOIN base_pokemon         bp  ON bp.natdex_number = pc.natdex_number
+    JOIN base_pokemon_names   bpn ON bpn.id = bp.name_id
     JOIN elements             e   ON e.id   = pc.element_id
     JOIN stages               st  ON st.id  = pc.stage_id
     LEFT JOIN weaknesses          w   ON w.card_id  = c.id
