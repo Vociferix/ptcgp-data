@@ -516,7 +516,7 @@ fn build_variants(
             denominator: Decimal::ONE,
         });
 
-    let rare_rate = type_rates
+    let mut rare_rate = type_rates
         .and_then(|m| m.get("rare"))
         .and_then(parse_rate_obj);
 
@@ -558,14 +558,22 @@ fn build_variants(
         }
     }
 
-    // For the rare variant: extra byRarity slots where every entry has exactly one
-    // rarity with rate = 1 are RaenonX artifacts (conditional probabilities, not
-    // absolute). Truncate rarity to the actual slot count and drop those card entries.
+    // For the rare variant: check whether the extra byRarity slots (beyond the card
+    // array length) are all single-rarity 1/1 slots. If so, this is a "themed rare"
+    // pack embedded in the "rare" byRarity data (e.g. B2b Mega Shine). In that case:
+    //   - byPackType "rare" rate → "themed" variant rate
+    //   - actual "rare" rate = 1 − (normal + themed + plus1) [the remaining probability]
+    //   - byRarity.rare[0..N] → "rare" rarity; byRarity.rare[N..] → "themed" rarity
+    //   - rare_cards (SSR cards with N-element arrays) → "themed" card rates (no alignment)
+    //   - "rare" card rates → empty (no per-card data for regular rare pack)
     // For plus1: compact single-element card arrays represent the bonus slot; align them.
+    let mut themed_rate: Option<Rate> = None;
+    let mut themed_rarity: Vec<HashMap<String, RaritySlotRates>> = Vec::new();
+    let mut themed_cards: HashMap<String, Vec<Option<Rate>>> = HashMap::new();
     {
         let max_rare_card_len = rare_cards.values().map(Vec::len).max().unwrap_or(0);
         if rare_rarity.len() > max_rare_card_len && max_rare_card_len > 0 {
-            let extra_are_artifacts = rare_rarity[max_rare_card_len..].iter().all(|slot| {
+            let extra_are_themed = rare_rarity[max_rare_card_len..].iter().all(|slot| {
                 slot.len() == 1
                     && slot.values().all(|r| {
                         r.normal
@@ -573,14 +581,42 @@ fn build_variants(
                             .is_some_and(|rate| rate.numerator == rate.denominator)
                     })
             });
-            if extra_are_artifacts {
+            if extra_are_themed {
                 warn!(
                     pack_id,
-                    extra_slots = rare_rarity.len() - max_rare_card_len,
-                    "truncating artifact slots from rare byRarity; discarding artifact card entries"
+                    rare_slots = max_rare_card_len,
+                    themed_slots = rare_rarity.len() - max_rare_card_len,
+                    "splitting embedded themed variant from rare byRarity"
                 );
-                rare_rarity.truncate(max_rare_card_len);
-                rare_cards.clear();
+                // Split byRarity slots: [0..N] stay with "rare", [N..] go to "themed".
+                themed_rarity = rare_rarity.split_off(max_rare_card_len);
+                // rare_cards are the themed pack's cards; rare gets no per-card rates.
+                // Drop all-null entries (cards that cannot appear in the themed pack).
+                themed_cards = std::mem::take(&mut rare_cards);
+                themed_cards.retain(|_, slots| slots.iter().any(Option::is_some));
+                // byPackType "rare" rate → themed; derive actual rare rate as remainder.
+                if let Some(rr) = rare_rate.take() {
+                    let mut sum = normal_rate.numerator / normal_rate.denominator;
+                    sum += rr.numerator / rr.denominator;
+                    if let Some(ref pr) = plus1_rate {
+                        sum += pr.numerator / pr.denominator;
+                    }
+                    let remainder = Decimal::ONE - sum;
+                    let scale = remainder.scale();
+                    let factor = Decimal::from(10u64.pow(scale));
+                    let rn: i64 = (remainder * factor)
+                        .try_into()
+                        .expect("remainder rate numerator overflows i64");
+                    let rd: i64 = factor
+                        .try_into()
+                        .expect("remainder rate denominator overflows i64");
+                    let g = rate_gcd(rn.abs(), rd.abs());
+                    rare_rate = Some(Rate {
+                        numerator: Decimal::from(rn / g),
+                        denominator: Decimal::from(rd / g),
+                    });
+                    themed_rate = Some(rr);
+                }
             } else {
                 align_card_slots_to_rarity(&mut rare_cards, rare_rarity.len());
             }
@@ -594,6 +630,9 @@ fn build_variants(
     let rare_slot_count = rare_rarity
         .len()
         .max(rare_cards.values().map(Vec::len).max().unwrap_or(0));
+    let themed_slot_count = themed_rarity
+        .len()
+        .max(themed_cards.values().map(Vec::len).max().unwrap_or(0));
     let plus1_slot_count = plus1_rarity
         .len()
         .max(plus1_cards.values().map(Vec::len).max().unwrap_or(0));
@@ -620,6 +659,19 @@ fn build_variants(
                 slot_count: rare_slot_count as u32,
                 rarity_rates_by_slot: rare_rarity,
                 card_rates: rare_cards,
+            },
+        );
+    }
+
+    if let Some(r) = themed_rate {
+        variants.insert(
+            "themed".to_string(),
+            PackVariantRates {
+                rate_numerator: r.numerator,
+                rate_denominator: r.denominator,
+                slot_count: themed_slot_count as u32,
+                rarity_rates_by_slot: themed_rarity,
+                card_rates: themed_cards,
             },
         );
     }
