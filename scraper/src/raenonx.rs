@@ -696,15 +696,19 @@ fn cf_rational(x: f64, max_denom: i64) -> Option<(i64, i64)> {
 
 /// Derive card pull rates from rarity rates, replacing the API-provided float values.
 ///
-/// Per-card rates are not stored directly in the PTCGP APK; RaenonX computes them
-/// as `rarity_total_rate / n_cards_of_that_rarity_in_slot`. This function performs
-/// the same computation to obtain exact integer fractions.
+/// Per-card rates are not stored in the PTCGP APK; RaenonX computes them from rarity
+/// rates. For normal packs: per-card rate = rarity_rate / n_cards_of_that_rarity.
 ///
-/// For verification, the API-provided value is compared against the derived rate;
-/// mismatches beyond floating-point rounding are logged as warnings.
+/// For packs with foil (mirror) cards (currently only A4b): foil cards across all
+/// rarities share a single uniform "mirror rate" per slot. Non-foil rates for mixed
+/// rarities are derived as the residual after subtracting the foil contribution.
+///
+/// The API-provided values are compared against derived rates; significant mismatches
+/// are logged as warnings.
 pub fn fix_card_rates_from_rarity(
     rates: &mut crate::models::PackPullRates,
     card_id_to_rarity: &HashMap<String, String>,
+    card_id_to_is_foil: &HashMap<String, bool>,
 ) {
     use rust_decimal::prelude::ToPrimitive;
 
@@ -713,38 +717,109 @@ pub fn fix_card_rates_from_rarity(
             .max(variant.card_rates.values().map(|v| v.len()).max().unwrap_or(0));
 
         for slot_idx in 0..slot_count {
-            // Count how many cards of each rarity appear in this slot.
-            let mut rarity_counts: HashMap<&str, usize> = HashMap::new();
+            // Count foil and non-foil cards per rarity in this slot.
+            let mut foil_counts: HashMap<&str, usize> = HashMap::new();
+            let mut nonfoil_counts: HashMap<&str, usize> = HashMap::new();
             for (card_id, slot_rates) in variant.card_rates.iter() {
                 if slot_rates.get(slot_idx).map_or(false, |r| r.is_some()) {
                     let rarity = card_id_to_rarity.get(card_id).map(String::as_str).unwrap_or("");
-                    *rarity_counts.entry(rarity).or_insert(0) += 1;
+                    if card_id_to_is_foil.get(card_id).copied().unwrap_or(false) {
+                        *foil_counts.entry(rarity).or_insert(0) += 1;
+                    } else {
+                        *nonfoil_counts.entry(rarity).or_insert(0) += 1;
+                    }
                 }
             }
 
             let rarity_map = variant.rarity_rates_by_slot.get(slot_idx);
 
+            // Determine the uniform mirror rate from any rarity where ALL cards are foil.
+            // In A4b, C and U are all-foil, giving mirror_rate = rarity_rate / foil_count.
+            let mut mirror_rate: Option<(i64, i64)> = None;
+            for (rarity, &fc) in &foil_counts {
+                if nonfoil_counts.get(rarity).copied().unwrap_or(0) == 0 {
+                    if let Some(rr) = rarity_map.and_then(|m| m.get(*rarity)) {
+                        let Ok(rn): Result<i64, _> = rr.numerator.try_into() else { continue };
+                        let Ok(rd): Result<i64, _> = rr.denominator.try_into() else { continue };
+                        let den = rd * fc as i64;
+                        let g = rate_gcd(rn.abs(), den.abs());
+                        let candidate = (rn / g, den / g);
+                        if let Some(existing) = mirror_rate {
+                            if existing != candidate {
+                                warn!(
+                                    slot = slot_idx,
+                                    rarity,
+                                    "inconsistent mirror rate candidates: {existing:?} vs {candidate:?}"
+                                );
+                            }
+                        }
+                        mirror_rate = Some(candidate);
+                    }
+                }
+            }
+
             for (card_id, slot_rates) in variant.card_rates.iter_mut() {
                 let Some(Some(api_rate)) = slot_rates.get(slot_idx) else { continue };
                 let rarity = card_id_to_rarity.get(card_id).map(String::as_str).unwrap_or("");
-                let Some(rarity_rate) = rarity_map.and_then(|m| m.get(rarity)) else {
-                    warn!(
-                        card_id,
-                        slot = slot_idx,
-                        rarity,
-                        "card rarity not found in slot rarity rates; keeping API value"
-                    );
-                    continue;
-                };
-                let n = *rarity_counts.get(rarity).unwrap_or(&1) as i64;
-                let Ok(rn): Result<i64, _> = rarity_rate.numerator.try_into() else { continue };
-                let Ok(rd): Result<i64, _> = rarity_rate.denominator.try_into() else { continue };
-                let den = rd * n;
-                let g = rate_gcd(rn.abs(), den.abs());
-                let derived_num = rn / g;
-                let derived_den = den / g;
+                let is_foil = card_id_to_is_foil.get(card_id).copied().unwrap_or(false);
 
-                // Verify: the API float should match the derived exact fraction.
+                let derived = if is_foil {
+                    // All foil cards in a slot share the same mirror rate.
+                    if let Some((mn, md)) = mirror_rate {
+                        Some((mn, md))
+                    } else {
+                        warn!(
+                            card_id,
+                            slot = slot_idx,
+                            "foil card but no mirror rate determined; keeping API value"
+                        );
+                        None
+                    }
+                } else {
+                    let Some(rarity_rate) = rarity_map.and_then(|m| m.get(rarity)) else {
+                        warn!(
+                            card_id,
+                            slot = slot_idx,
+                            rarity,
+                            "card rarity not found in slot rarity rates; keeping API value"
+                        );
+                        continue;
+                    };
+                    let Ok(rn): Result<i64, _> = rarity_rate.numerator.try_into() else { continue };
+                    let Ok(rd): Result<i64, _> = rarity_rate.denominator.try_into() else { continue };
+                    let nf_count = nonfoil_counts.get(rarity).copied().unwrap_or(0) as i64;
+                    let f_count = foil_counts.get(rarity).copied().unwrap_or(0) as i64;
+
+                    if f_count > 0 {
+                        // Mixed rarity: subtract foil contribution before dividing.
+                        // non_foil_total = rn/rd - f_count * mn/md
+                        //               = (rn*md - rd*f_count*mn) / (rd*md)
+                        // per_non_foil  = non_foil_total / nf_count
+                        //               = (rn*md - rd*f_count*mn) / (rd*md*nf_count)
+                        let Some((mn, md)) = mirror_rate else {
+                            warn!(
+                                card_id,
+                                slot = slot_idx,
+                                rarity,
+                                "mixed rarity but no mirror rate; keeping API value"
+                            );
+                            continue;
+                        };
+                        let num = rn * md - rd * f_count * mn;
+                        let den = rd * md * nf_count;
+                        let g = rate_gcd(num.abs(), den.abs());
+                        Some((num / g, den / g))
+                    } else {
+                        // All non-foil: standard derivation.
+                        let den = rd * nf_count;
+                        let g = rate_gcd(rn.abs(), den.abs());
+                        Some((rn / g, den / g))
+                    }
+                };
+
+                let Some((derived_num, derived_den)) = derived else { continue };
+
+                // Verify the API float matches the derived exact fraction.
                 let api_f64 = api_rate.numerator.to_f64().unwrap_or(f64::NAN)
                     / api_rate.denominator.to_f64().unwrap_or(1.0);
                 let derived_f64 = derived_num as f64 / derived_den as f64;
@@ -753,9 +828,10 @@ pub fn fix_card_rates_from_rarity(
                         card_id,
                         slot = slot_idx,
                         rarity,
+                        is_foil,
                         api_rate = api_f64,
                         derived_rate = derived_f64,
-                        "card rate mismatch: API value does not match rarity/{n}"
+                        "card rate mismatch: API value does not match derived rate"
                     );
                 }
 

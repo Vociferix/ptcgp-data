@@ -615,9 +615,11 @@ async fn run_pull_rates(
     let card_entries = raenonx::parse_card_entries(raw)?;
     let mut card_id_to_versions: HashMap<String, Vec<(String, u32)>> = HashMap::new();
     let mut card_id_to_rarity: HashMap<String, String> = HashMap::new();
+    let mut card_id_to_is_foil: HashMap<String, bool> = HashMap::new();
     for entry in &card_entries {
         card_id_to_versions.insert(entry.card_id.clone(), entry.collection_nums.clone());
         card_id_to_rarity.insert(entry.card_id.clone(), entry.rarity.clone());
+        card_id_to_is_foil.insert(entry.card_id.clone(), entry.is_foil);
     }
 
     let packs: Vec<&String> = regular_packs
@@ -648,7 +650,7 @@ async fn run_pull_rates(
 
         match raenonx::fetch_pack_pull_rates(client, pack_id, set_code, &subtitle).await {
             Ok(mut rates) => {
-                raenonx::fix_card_rates_from_rarity(&mut rates, &card_id_to_rarity);
+                raenonx::fix_card_rates_from_rarity(&mut rates, &card_id_to_rarity, &card_id_to_is_foil);
                 remap_pull_rate_card_ids(&mut rates, &card_id_to_versions);
                 output::write_pull_rates(&rates)?;
                 let card_count = rates

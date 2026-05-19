@@ -26,6 +26,26 @@
           }
         },
         {
+          "IM": {
+            "numerator": 111,
+            "denominator": 50000
+          },
+          "SR": {
+            "numerator": 1,
+            "denominator": 250
+          },
+          "SAR": {
+            "numerator": 1,
+            "denominator": 1000
+          },
+          "R": {
+            "numerator": 1,
+            "denominator": 20
+          },
+          "UR": {
+            "numerator": 1,
+            "denominator": 2500
+          },
           "AR": {
             "numerator": 643,
             "denominator": 25000
@@ -37,64 +57,367 @@
           "U": {
             "numerator": 9,
             "denominator": 10
-          },
-          "SR": {
-            "numerator": 1,
-            "denominator": 250
-          },
-          "R": {
-            "numerator": 1,
-            "denominator": 20
-          },
-          "UR": {
-            "numerator": 1,
-            "denominator": 2500
-          },
-          "IM": {
-            "numerator": 111,
-            "denominator": 50000
-          },
-          "SAR": {
-            "numerator": 1,
-            "denominator": 1000
           }
         },
         {
-          "R": {
-            "numerator": 1,
+          "U": {
+            "numerator": 3,
             "denominator": 5
-          },
-          "RR": {
-            "numerator": 833,
-            "denominator": 12500
           },
           "SR": {
             "numerator": 2,
             "denominator": 125
           },
-          "IM": {
-            "numerator": 111,
+          "AR": {
+            "numerator": 643,
+            "denominator": 6250
+          },
+          "RR": {
+            "numerator": 833,
             "denominator": 12500
+          },
+          "R": {
+            "numerator": 1,
+            "denominator": 5
           },
           "UR": {
             "numerator": 1,
             "denominator": 625
           },
-          "U": {
-            "numerator": 3,
-            "denominator": 5
-          },
           "SAR": {
             "numerator": 1,
             "denominator": 250
           },
-          "AR": {
-            "numerator": 643,
-            "denominator": 6250
+          "IM": {
+            "numerator": 111,
+            "denominator": 12500
           }
         }
       ],
       "card_rates": {
+        "015": [
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          null,
+          null
+        ],
+        "062": [
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          null,
+          null
+        ],
+        "010": [
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          null,
+          null
+        ],
+        "014": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 1,
+            "denominator": 160
+          },
+          {
+            "numerator": 1,
+            "denominator": 40
+          }
+        ],
+        "041": [
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          null,
+          null
+        ],
+        "036": [
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          null,
+          null
+        ],
+        "050": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 9,
+            "denominator": 230
+          },
+          {
+            "numerator": 3,
+            "denominator": 115
+          }
+        ],
+        "070": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 643,
+            "denominator": 150000
+          },
+          {
+            "numerator": 643,
+            "denominator": 37500
+          }
+        ],
+        "084": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 1,
+            "denominator": 2000
+          },
+          {
+            "numerator": 1,
+            "denominator": 500
+          }
+        ],
+        "080": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 1,
+            "denominator": 2000
+          },
+          {
+            "numerator": 1,
+            "denominator": 500
+          }
+        ],
+        "056": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 9,
+            "denominator": 230
+          },
+          {
+            "numerator": 3,
+            "denominator": 115
+          }
+        ],
+        "019": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 1,
+            "denominator": 160
+          },
+          {
+            "numerator": 1,
+            "denominator": 40
+          }
+        ],
+        "016": [
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          null,
+          null
+        ],
+        "071": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 643,
+            "denominator": 150000
+          },
+          {
+            "numerator": 643,
+            "denominator": 37500
+          }
+        ],
+        "011": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 9,
+            "denominator": 230
+          },
+          {
+            "numerator": 3,
+            "denominator": 115
+          }
+        ],
+        "006": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 1,
+            "denominator": 160
+          },
+          {
+            "numerator": 1,
+            "denominator": 40
+          }
+        ],
+        "024": [
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          null,
+          null
+        ],
+        "021": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 9,
+            "denominator": 230
+          },
+          {
+            "numerator": 3,
+            "denominator": 115
+          }
+        ],
+        "055": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 9,
+            "denominator": 230
+          },
+          {
+            "numerator": 3,
+            "denominator": 115
+          }
+        ],
+        "077": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 1,
+            "denominator": 2000
+          },
+          {
+            "numerator": 1,
+            "denominator": 500
+          }
+        ],
+        "082": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 1,
+            "denominator": 2000
+          },
+          {
+            "numerator": 1,
+            "denominator": 500
+          }
+        ],
+        "067": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 9,
+            "denominator": 230
+          },
+          {
+            "numerator": 3,
+            "denominator": 115
+          }
+        ],
+        "054": [
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          null,
+          null
+        ],
         "052": [
           {
             "numerator": 1,
@@ -111,7 +434,262 @@
           null,
           null
         ],
-        "061": [
+        "051": [
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          null,
+          null
+        ],
+        "047": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 1,
+            "denominator": 160
+          },
+          {
+            "numerator": 1,
+            "denominator": 40
+          }
+        ],
+        "022": [
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          null,
+          null
+        ],
+        "076": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 1,
+            "denominator": 2000
+          },
+          {
+            "numerator": 1,
+            "denominator": 500
+          }
+        ],
+        "081": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 1,
+            "denominator": 2000
+          },
+          {
+            "numerator": 1,
+            "denominator": 500
+          }
+        ],
+        "020": [
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          null,
+          null
+        ],
+        "059": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 833,
+            "denominator": 250000
+          },
+          {
+            "numerator": 833,
+            "denominator": 62500
+          }
+        ],
+        "033": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 9,
+            "denominator": 230
+          },
+          {
+            "numerator": 3,
+            "denominator": 115
+          }
+        ],
+        "023": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 9,
+            "denominator": 230
+          },
+          {
+            "numerator": 3,
+            "denominator": 115
+          }
+        ],
+        "085": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 111,
+            "denominator": 50000
+          },
+          {
+            "numerator": 111,
+            "denominator": 12500
+          }
+        ],
+        "048": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 9,
+            "denominator": 230
+          },
+          {
+            "numerator": 3,
+            "denominator": 115
+          }
+        ],
+        "027": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 9,
+            "denominator": 230
+          },
+          {
+            "numerator": 3,
+            "denominator": 115
+          }
+        ],
+        "007": [
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          null,
+          null
+        ],
+        "066": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 9,
+            "denominator": 230
+          },
+          {
+            "numerator": 3,
+            "denominator": 115
+          }
+        ],
+        "025": [
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          null,
+          null
+        ],
+        "057": [
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          null,
+          null
+        ],
+        "065": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 9,
+            "denominator": 230
+          },
+          {
+            "numerator": 3,
+            "denominator": 115
+          }
+        ],
+        "053": [
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          null,
+          null
+        ],
+        "017": [
           {
             "numerator": 1,
             "denominator": 32
@@ -143,986 +721,7 @@
           null,
           null
         ],
-        "009": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 9,
-            "denominator": 230
-          },
-          {
-            "numerator": 3,
-            "denominator": 115
-          }
-        ],
-        "057": [
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          null,
-          null
-        ],
-        "058": [
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          null,
-          null
-        ],
-        "028": [
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          null,
-          null
-        ],
-        "038": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 9,
-            "denominator": 230
-          },
-          {
-            "numerator": 3,
-            "denominator": 115
-          }
-        ],
-        "066": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 9,
-            "denominator": 230
-          },
-          {
-            "numerator": 3,
-            "denominator": 115
-          }
-        ],
-        "051": [
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          null,
-          null
-        ],
-        "083": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 1,
-            "denominator": 2000
-          },
-          {
-            "numerator": 1,
-            "denominator": 500
-          }
-        ],
-        "060": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 1,
-            "denominator": 160
-          },
-          {
-            "numerator": 1,
-            "denominator": 40
-          }
-        ],
-        "004": [
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          null,
-          null
-        ],
-        "071": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 643,
-            "denominator": 150000
-          },
-          {
-            "numerator": 643,
-            "denominator": 37500
-          }
-        ],
-        "069": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 643,
-            "denominator": 150000
-          },
-          {
-            "numerator": 643,
-            "denominator": 37500
-          }
-        ],
-        "023": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 9,
-            "denominator": 230
-          },
-          {
-            "numerator": 3,
-            "denominator": 115
-          }
-        ],
-        "078": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 1,
-            "denominator": 2000
-          },
-          {
-            "numerator": 1,
-            "denominator": 500
-          }
-        ],
-        "037": [
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          null,
-          null
-        ],
-        "018": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 833,
-            "denominator": 250000
-          },
-          {
-            "numerator": 833,
-            "denominator": 62500
-          }
-        ],
-        "055": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 9,
-            "denominator": 230
-          },
-          {
-            "numerator": 3,
-            "denominator": 115
-          }
-        ],
-        "079": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 1,
-            "denominator": 2000
-          },
-          {
-            "numerator": 1,
-            "denominator": 500
-          }
-        ],
-        "022": [
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          null,
-          null
-        ],
-        "020": [
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          null,
-          null
-        ],
-        "033": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 9,
-            "denominator": 230
-          },
-          {
-            "numerator": 3,
-            "denominator": 115
-          }
-        ],
-        "064": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 9,
-            "denominator": 230
-          },
-          {
-            "numerator": 3,
-            "denominator": 115
-          }
-        ],
-        "086": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 1,
-            "denominator": 2500
-          },
-          {
-            "numerator": 1,
-            "denominator": 625
-          }
-        ],
-        "013": [
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          null,
-          null
-        ],
-        "026": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 1,
-            "denominator": 160
-          },
-          {
-            "numerator": 1,
-            "denominator": 40
-          }
-        ],
-        "080": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 1,
-            "denominator": 2000
-          },
-          {
-            "numerator": 1,
-            "denominator": 500
-          }
-        ],
-        "003": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 833,
-            "denominator": 250000
-          },
-          {
-            "numerator": 833,
-            "denominator": 62500
-          }
-        ],
-        "056": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 9,
-            "denominator": 230
-          },
-          {
-            "numerator": 3,
-            "denominator": 115
-          }
-        ],
-        "010": [
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          null,
-          null
-        ],
-        "025": [
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          null,
-          null
-        ],
-        "005": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 9,
-            "denominator": 230
-          },
-          {
-            "numerator": 3,
-            "denominator": 115
-          }
-        ],
-        "017": [
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          null,
-          null
-        ],
-        "006": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 1,
-            "denominator": 160
-          },
-          {
-            "numerator": 1,
-            "denominator": 40
-          }
-        ],
-        "059": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 833,
-            "denominator": 250000
-          },
-          {
-            "numerator": 833,
-            "denominator": 62500
-          }
-        ],
-        "002": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 9,
-            "denominator": 230
-          },
-          {
-            "numerator": 3,
-            "denominator": 115
-          }
-        ],
-        "067": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 9,
-            "denominator": 230
-          },
-          {
-            "numerator": 3,
-            "denominator": 115
-          }
-        ],
-        "077": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 1,
-            "denominator": 2000
-          },
-          {
-            "numerator": 1,
-            "denominator": 500
-          }
-        ],
-        "075": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 1,
-            "denominator": 2000
-          },
-          {
-            "numerator": 1,
-            "denominator": 500
-          }
-        ],
-        "014": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 1,
-            "denominator": 160
-          },
-          {
-            "numerator": 1,
-            "denominator": 40
-          }
-        ],
-        "032": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 833,
-            "denominator": 250000
-          },
-          {
-            "numerator": 833,
-            "denominator": 62500
-          }
-        ],
-        "082": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 1,
-            "denominator": 2000
-          },
-          {
-            "numerator": 1,
-            "denominator": 500
-          }
-        ],
-        "027": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 9,
-            "denominator": 230
-          },
-          {
-            "numerator": 3,
-            "denominator": 115
-          }
-        ],
-        "035": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 9,
-            "denominator": 230
-          },
-          {
-            "numerator": 3,
-            "denominator": 115
-          }
-        ],
-        "007": [
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          null,
-          null
-        ],
-        "044": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 9,
-            "denominator": 230
-          },
-          {
-            "numerator": 3,
-            "denominator": 115
-          }
-        ],
-        "072": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 643,
-            "denominator": 150000
-          },
-          {
-            "numerator": 643,
-            "denominator": 37500
-          }
-        ],
-        "042": [
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          null,
-          null
-        ],
-        "049": [
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          null,
-          null
-        ],
-        "043": [
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          null,
-          null
-        ],
-        "011": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 9,
-            "denominator": 230
-          },
-          {
-            "numerator": 3,
-            "denominator": 115
-          }
-        ],
-        "019": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 1,
-            "denominator": 160
-          },
-          {
-            "numerator": 1,
-            "denominator": 40
-          }
-        ],
-        "054": [
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          null,
-          null
-        ],
         "063": [
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          null,
-          null
-        ],
-        "046": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 833,
-            "denominator": 250000
-          },
-          {
-            "numerator": 833,
-            "denominator": 62500
-          }
-        ],
-        "024": [
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          null,
-          null
-        ],
-        "041": [
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          null,
-          null
-        ],
-        "050": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 9,
-            "denominator": 230
-          },
-          {
-            "numerator": 3,
-            "denominator": 115
-          }
-        ],
-        "045": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 1,
-            "denominator": 160
-          },
-          {
-            "numerator": 1,
-            "denominator": 40
-          }
-        ],
-        "076": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 1,
-            "denominator": 2000
-          },
-          {
-            "numerator": 1,
-            "denominator": 500
-          }
-        ],
-        "001": [
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          null,
-          null
-        ],
-        "047": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 1,
-            "denominator": 160
-          },
-          {
-            "numerator": 1,
-            "denominator": 40
-          }
-        ],
-        "021": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 9,
-            "denominator": 230
-          },
-          {
-            "numerator": 3,
-            "denominator": 115
-          }
-        ],
-        "084": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 1,
-            "denominator": 2000
-          },
-          {
-            "numerator": 1,
-            "denominator": 500
-          }
-        ],
-        "015": [
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          null,
-          null
-        ],
-        "048": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 9,
-            "denominator": 230
-          },
-          {
-            "numerator": 3,
-            "denominator": 115
-          }
-        ],
-        "031": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 1,
-            "denominator": 160
-          },
-          {
-            "numerator": 1,
-            "denominator": 40
-          }
-        ],
-        "073": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 643,
-            "denominator": 150000
-          },
-          {
-            "numerator": 643,
-            "denominator": 37500
-          }
-        ],
-        "074": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 643,
-            "denominator": 150000
-          },
-          {
-            "numerator": 643,
-            "denominator": 37500
-          }
-        ],
-        "070": [
-          null,
-          null,
-          null,
-          {
-            "numerator": 643,
-            "denominator": 150000
-          },
-          {
-            "numerator": 643,
-            "denominator": 37500
-          }
-        ],
-        "039": [
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          null,
-          null
-        ],
-        "016": [
           {
             "numerator": 1,
             "denominator": 32
@@ -1151,7 +750,33 @@
             "denominator": 115
           }
         ],
-        "062": [
+        "018": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 833,
+            "denominator": 250000
+          },
+          {
+            "numerator": 833,
+            "denominator": 62500
+          }
+        ],
+        "026": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 1,
+            "denominator": 160
+          },
+          {
+            "numerator": 1,
+            "denominator": 40
+          }
+        ],
+        "004": [
           {
             "numerator": 1,
             "denominator": 32
@@ -1167,7 +792,7 @@
           null,
           null
         ],
-        "068": [
+        "064": [
           null,
           null,
           null,
@@ -1180,7 +805,33 @@
             "denominator": 115
           }
         ],
-        "034": [
+        "069": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 643,
+            "denominator": 150000
+          },
+          {
+            "numerator": 643,
+            "denominator": 37500
+          }
+        ],
+        "002": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 9,
+            "denominator": 230
+          },
+          {
+            "numerator": 3,
+            "denominator": 115
+          }
+        ],
+        "037": [
           {
             "numerator": 1,
             "denominator": 32
@@ -1209,7 +860,49 @@
             "denominator": 115
           }
         ],
-        "081": [
+        "072": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 643,
+            "denominator": 150000
+          },
+          {
+            "numerator": 643,
+            "denominator": 37500
+          }
+        ],
+        "031": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 1,
+            "denominator": 160
+          },
+          {
+            "numerator": 1,
+            "denominator": 40
+          }
+        ],
+        "001": [
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          null,
+          null
+        ],
+        "079": [
           null,
           null,
           null,
@@ -1222,23 +915,7 @@
             "denominator": 500
           }
         ],
-        "036": [
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          {
-            "numerator": 1,
-            "denominator": 32
-          },
-          null,
-          null
-        ],
-        "065": [
+        "068": [
           null,
           null,
           null,
@@ -1251,7 +928,20 @@
             "denominator": 115
           }
         ],
-        "030": [
+        "003": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 833,
+            "denominator": 250000
+          },
+          {
+            "numerator": 833,
+            "denominator": 62500
+          }
+        ],
+        "058": [
           {
             "numerator": 1,
             "denominator": 32
@@ -1267,7 +957,107 @@
           null,
           null
         ],
-        "053": [
+        "046": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 833,
+            "denominator": 250000
+          },
+          {
+            "numerator": 833,
+            "denominator": 62500
+          }
+        ],
+        "028": [
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          null,
+          null
+        ],
+        "045": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 1,
+            "denominator": 160
+          },
+          {
+            "numerator": 1,
+            "denominator": 40
+          }
+        ],
+        "086": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 1,
+            "denominator": 2500
+          },
+          {
+            "numerator": 1,
+            "denominator": 625
+          }
+        ],
+        "075": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 1,
+            "denominator": 2000
+          },
+          {
+            "numerator": 1,
+            "denominator": 500
+          }
+        ],
+        "013": [
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          null,
+          null
+        ],
+        "034": [
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          null,
+          null
+        ],
+        "030": [
           {
             "numerator": 1,
             "denominator": 32
@@ -1296,18 +1086,228 @@
             "denominator": 115
           }
         ],
-        "085": [
-          null,
-          null,
-          null,
+        "042": [
           {
-            "numerator": 111,
-            "denominator": 50000
+            "numerator": 1,
+            "denominator": 32
           },
           {
-            "numerator": 111,
-            "denominator": 12500
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          null,
+          null
+        ],
+        "060": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 1,
+            "denominator": 160
+          },
+          {
+            "numerator": 1,
+            "denominator": 40
           }
+        ],
+        "073": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 643,
+            "denominator": 150000
+          },
+          {
+            "numerator": 643,
+            "denominator": 37500
+          }
+        ],
+        "044": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 9,
+            "denominator": 230
+          },
+          {
+            "numerator": 3,
+            "denominator": 115
+          }
+        ],
+        "035": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 9,
+            "denominator": 230
+          },
+          {
+            "numerator": 3,
+            "denominator": 115
+          }
+        ],
+        "043": [
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          null,
+          null
+        ],
+        "038": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 9,
+            "denominator": 230
+          },
+          {
+            "numerator": 3,
+            "denominator": 115
+          }
+        ],
+        "074": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 643,
+            "denominator": 150000
+          },
+          {
+            "numerator": 643,
+            "denominator": 37500
+          }
+        ],
+        "039": [
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          null,
+          null
+        ],
+        "078": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 1,
+            "denominator": 2000
+          },
+          {
+            "numerator": 1,
+            "denominator": 500
+          }
+        ],
+        "049": [
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          null,
+          null
+        ],
+        "005": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 9,
+            "denominator": 230
+          },
+          {
+            "numerator": 3,
+            "denominator": 115
+          }
+        ],
+        "032": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 833,
+            "denominator": 250000
+          },
+          {
+            "numerator": 833,
+            "denominator": 62500
+          }
+        ],
+        "009": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 9,
+            "denominator": 230
+          },
+          {
+            "numerator": 3,
+            "denominator": 115
+          }
+        ],
+        "083": [
+          null,
+          null,
+          null,
+          {
+            "numerator": 1,
+            "denominator": 2000
+          },
+          {
+            "numerator": 1,
+            "denominator": 500
+          }
+        ],
+        "061": [
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          {
+            "numerator": 1,
+            "denominator": 32
+          },
+          null,
+          null
         ]
       }
     },
@@ -1317,6 +1317,28 @@
       "slot_count": 5,
       "rarity_rates_by_slot": [
         {
+          "UR": {
+            "numerator": 13889,
+            "denominator": 250000
+          },
+          "IM": {
+            "numerator": 13889,
+            "denominator": 250000
+          },
+          "SAR": {
+            "numerator": 111111,
+            "denominator": 1000000
+          },
+          "AR": {
+            "numerator": 333333,
+            "denominator": 1000000
+          },
+          "SR": {
+            "numerator": 111111,
+            "denominator": 250000
+          }
+        },
+        {
           "SR": {
             "numerator": 111111,
             "denominator": 250000
@@ -1339,18 +1361,6 @@
           }
         },
         {
-          "IM": {
-            "numerator": 13889,
-            "denominator": 250000
-          },
-          "UR": {
-            "numerator": 13889,
-            "denominator": 250000
-          },
-          "SR": {
-            "numerator": 111111,
-            "denominator": 250000
-          },
           "SAR": {
             "numerator": 111111,
             "denominator": 1000000
@@ -1358,46 +1368,14 @@
           "AR": {
             "numerator": 333333,
             "denominator": 1000000
-          }
-        },
-        {
-          "SAR": {
-            "numerator": 111111,
-            "denominator": 1000000
           },
           "SR": {
             "numerator": 111111,
             "denominator": 250000
           },
-          "AR": {
-            "numerator": 333333,
-            "denominator": 1000000
-          },
           "IM": {
             "numerator": 13889,
             "denominator": 250000
-          },
-          "UR": {
-            "numerator": 13889,
-            "denominator": 250000
-          }
-        },
-        {
-          "SR": {
-            "numerator": 111111,
-            "denominator": 250000
-          },
-          "AR": {
-            "numerator": 333333,
-            "denominator": 1000000
-          },
-          "IM": {
-            "numerator": 13889,
-            "denominator": 250000
-          },
-          "SAR": {
-            "numerator": 111111,
-            "denominator": 1000000
           },
           "UR": {
             "numerator": 13889,
@@ -1420,6 +1398,28 @@
           "AR": {
             "numerator": 333333,
             "denominator": 1000000
+          },
+          "SAR": {
+            "numerator": 111111,
+            "denominator": 1000000
+          }
+        },
+        {
+          "IM": {
+            "numerator": 13889,
+            "denominator": 250000
+          },
+          "UR": {
+            "numerator": 13889,
+            "denominator": 250000
+          },
+          "AR": {
+            "numerator": 333333,
+            "denominator": 1000000
+          },
+          "SR": {
+            "numerator": 111111,
+            "denominator": 250000
           },
           "SAR": {
             "numerator": 111111,
@@ -1428,28 +1428,86 @@
         }
       ],
       "card_rates": {
-        "021": [
+        "003": [
           null,
           null,
           null,
           null,
           null
         ],
-        "062": [
+        "082": [
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          },
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          },
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          },
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          },
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          }
+        ],
+        "072": [
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          },
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          },
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          },
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          },
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          }
+        ],
+        "013": [
           null,
           null,
           null,
           null,
           null
         ],
-        "039": [
+        "032": [
           null,
           null,
           null,
           null,
           null
         ],
-        "018": [
+        "036": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "017": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "028": [
           null,
           null,
           null,
@@ -1463,85 +1521,21 @@
           null,
           null
         ],
-        "055": [
+        "037": [
           null,
           null,
           null,
           null,
           null
         ],
-        "056": [
+        "027": [
           null,
           null,
           null,
           null,
           null
         ],
-        "002": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "016": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "049": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "084": [
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          },
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          },
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          },
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          },
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          }
-        ],
-        "038": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "058": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "008": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "047": [
+        "012": [
           null,
           null,
           null,
@@ -1570,14 +1564,21 @@
             "denominator": 2000000
           }
         ],
-        "068": [
+        "031": [
           null,
           null,
           null,
           null,
           null
         ],
-        "070": [
+        "034": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "069": [
           {
             "numerator": 111111,
             "denominator": 2000000
@@ -1599,41 +1600,34 @@
             "denominator": 2000000
           }
         ],
-        "027": [
+        "011": [
           null,
           null,
           null,
           null,
           null
         ],
-        "079": [
+        "086": [
           {
-            "numerator": 111111,
-            "denominator": 2000000
+            "numerator": 13889,
+            "denominator": 250000
           },
           {
-            "numerator": 111111,
-            "denominator": 2000000
+            "numerator": 13889,
+            "denominator": 250000
           },
           {
-            "numerator": 111111,
-            "denominator": 2000000
+            "numerator": 13889,
+            "denominator": 250000
           },
           {
-            "numerator": 111111,
-            "denominator": 2000000
+            "numerator": 13889,
+            "denominator": 250000
           },
           {
-            "numerator": 111111,
-            "denominator": 2000000
+            "numerator": 13889,
+            "denominator": 250000
           }
-        ],
-        "045": [
-          null,
-          null,
-          null,
-          null,
-          null
         ],
         "077": [
           {
@@ -1657,99 +1651,7 @@
             "denominator": 2000000
           }
         ],
-        "066": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "063": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "005": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "050": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "037": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "072": [
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          },
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          },
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          },
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          },
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          }
-        ],
-        "025": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "043": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "017": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "059": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "053": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "030": [
+        "056": [
           null,
           null,
           null,
@@ -1763,120 +1665,21 @@
           null,
           null
         ],
-        "028": [
+        "049": [
           null,
           null,
           null,
           null,
           null
         ],
-        "014": [
+        "001": [
           null,
           null,
           null,
           null,
           null
         ],
-        "026": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "004": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "040": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "041": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "032": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "019": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "024": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "010": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "052": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "009": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "085": [
-          {
-            "numerator": 13889,
-            "denominator": 250000
-          },
-          {
-            "numerator": 13889,
-            "denominator": 250000
-          },
-          {
-            "numerator": 13889,
-            "denominator": 250000
-          },
-          {
-            "numerator": 13889,
-            "denominator": 250000
-          },
-          {
-            "numerator": 13889,
-            "denominator": 250000
-          }
-        ],
-        "048": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "023": [
+        "022": [
           null,
           null,
           null,
@@ -1927,14 +1730,101 @@
             "denominator": 2000000
           }
         ],
-        "001": [
+        "038": [
           null,
           null,
           null,
           null,
           null
         ],
-        "034": [
+        "068": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "063": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "075": [
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          },
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          },
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          },
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          },
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          }
+        ],
+        "085": [
+          {
+            "numerator": 13889,
+            "denominator": 250000
+          },
+          {
+            "numerator": 13889,
+            "denominator": 250000
+          },
+          {
+            "numerator": 13889,
+            "denominator": 250000
+          },
+          {
+            "numerator": 13889,
+            "denominator": 250000
+          },
+          {
+            "numerator": 13889,
+            "denominator": 250000
+          }
+        ],
+        "062": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "083": [
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          },
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          },
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          },
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          },
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          }
+        ],
+        "043": [
           null,
           null,
           null,
@@ -1963,287 +1853,7 @@
             "denominator": 2000000
           }
         ],
-        "057": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "074": [
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          },
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          },
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          },
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          },
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          }
-        ],
-        "075": [
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          },
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          },
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          },
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          },
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          }
-        ],
-        "083": [
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          },
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          },
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          },
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          },
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          }
-        ],
-        "007": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "044": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "006": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "031": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "076": [
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          },
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          },
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          },
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          },
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          }
-        ],
-        "042": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "011": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "060": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "022": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "046": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "051": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "012": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "086": [
-          {
-            "numerator": 13889,
-            "denominator": 250000
-          },
-          {
-            "numerator": 13889,
-            "denominator": 250000
-          },
-          {
-            "numerator": 13889,
-            "denominator": 250000
-          },
-          {
-            "numerator": 13889,
-            "denominator": 250000
-          },
-          {
-            "numerator": 13889,
-            "denominator": 250000
-          }
-        ],
-        "035": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "003": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "069": [
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          },
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          },
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          },
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          },
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          }
-        ],
-        "078": [
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          },
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          },
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          },
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          },
-          {
-            "numerator": 111111,
-            "denominator": 2000000
-          }
-        ],
-        "020": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "054": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "061": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "067": [
-          null,
-          null,
-          null,
-          null,
-          null
-        ],
-        "082": [
+        "070": [
           {
             "numerator": 111111,
             "denominator": 2000000
@@ -2272,7 +1882,50 @@
           null,
           null
         ],
-        "033": [
+        "007": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "047": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "025": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "079": [
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          },
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          },
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          },
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          },
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          }
+        ],
+        "066": [
           null,
           null,
           null,
@@ -2286,14 +1939,361 @@
           null,
           null
         ],
-        "013": [
+        "035": [
           null,
           null,
           null,
           null,
           null
         ],
-        "036": [
+        "023": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "030": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "054": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "055": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "005": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "060": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "061": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "059": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "006": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "074": [
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          },
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          },
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          },
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          },
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          }
+        ],
+        "040": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "024": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "050": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "051": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "018": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "033": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "057": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "010": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "046": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "045": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "052": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "020": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "016": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "053": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "042": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "041": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "067": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "084": [
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          },
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          },
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          },
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          },
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          }
+        ],
+        "048": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "002": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "044": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "004": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "008": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "019": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "009": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "014": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "078": [
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          },
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          },
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          },
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          },
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          }
+        ],
+        "021": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "026": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "058": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "076": [
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          },
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          },
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          },
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          },
+          {
+            "numerator": 111111,
+            "denominator": 2000000
+          }
+        ],
+        "039": [
           null,
           null,
           null,
