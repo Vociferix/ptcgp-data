@@ -18,6 +18,39 @@ use models::{
 use serde_json::Value;
 use tracing::{error, info, warn};
 
+// ── Violations ────────────────────────────────────────────────────────────────
+
+struct Violations {
+    items: Vec<String>,
+    lenient: bool,
+}
+
+impl Violations {
+    fn new(lenient: bool) -> Self {
+        Self { items: Vec::new(), lenient }
+    }
+
+    fn add(&mut self, msg: impl std::fmt::Display) {
+        let s = msg.to_string();
+        if self.lenient {
+            warn!("{s}");
+        } else {
+            error!("{s}");
+            self.items.push(s);
+        }
+    }
+
+    fn finish(self) -> Result<()> {
+        if !self.items.is_empty() {
+            anyhow::bail!(
+                "{} constraint violation(s) — re-run with --lenient to proceed anyway",
+                self.items.len()
+            );
+        }
+        Ok(())
+    }
+}
+
 // ── Element symbol map ────────────────────────────────────────────────────────
 
 /// Maps element full name to single-letter energy symbol.
@@ -57,6 +90,9 @@ enum Command {
         set: Option<String>,
         #[arg(long)]
         force: bool,
+        /// Log constraint violations as warnings instead of failing
+        #[arg(long)]
+        lenient: bool,
     },
 
     /// Fetch pull rate data from RaenonX for each regular pack
@@ -74,6 +110,9 @@ enum Command {
     All {
         #[arg(long)]
         force: bool,
+        /// Log constraint violations as warnings instead of failing
+        #[arg(long)]
+        lenient: bool,
     },
 }
 
@@ -95,18 +134,20 @@ async fn main() -> Result<()> {
         Command::GlobalMaster => cmd_global_master(&client).await?,
         Command::Sets => cmd_sets(&client).await?,
         Command::BasePokemon => cmd_base_pokemon(&client).await?,
-        Command::Cards { set, force } => cmd_cards(&client, set.as_deref(), force).await?,
+        Command::Cards { set, force, lenient } => {
+            cmd_cards(&client, set.as_deref(), force, lenient).await?
+        }
         Command::PullRates { pack, force } => {
             cmd_pull_rates(&client, pack.as_deref(), force).await?
         }
-        Command::All { force } => {
+        Command::All { force, lenient } => {
             let raw = raenonx::fetch_global_master(&client).await?;
             write_reference_data(&raw)?;
             let pack_names = fetch_pack_names(&client, &raw).await;
             let expansion_packs = raenonx::parse_expansion_packs(&raw);
             run_sets(&client, &expansion_packs, &pack_names).await?;
             cmd_base_pokemon(&client).await?;
-            run_cards(&client, &raw, &pack_names, None, force).await?;
+            run_cards(&client, &raw, &pack_names, None, force, lenient).await?;
             run_pull_rates(&client, &raw, &pack_names, None, force).await?;
         }
     }
@@ -223,10 +264,11 @@ async fn cmd_cards(
     client: &Arc<client::Client>,
     filter_set: Option<&str>,
     force: bool,
+    lenient: bool,
 ) -> Result<()> {
     let raw = raenonx::fetch_global_master(client).await?;
     let pack_names = fetch_pack_names(client, &raw).await;
-    run_cards(client, &raw, &pack_names, filter_set, force).await
+    run_cards(client, &raw, &pack_names, filter_set, force, lenient).await
 }
 
 async fn run_cards(
@@ -235,7 +277,9 @@ async fn run_cards(
     pack_names: &HashMap<String, String>,
     filter_set: Option<&str>,
     force: bool,
+    lenient: bool,
 ) -> Result<()> {
+    let mut violations = Violations::new(lenient);
     let card_entries = raenonx::parse_card_entries(raw)?;
     let promo_subtitles = raenonx::parse_promo_pack_subtitles(raw);
 
@@ -375,18 +419,14 @@ async fn run_cards(
         let abstract_id = match version_to_abstract.get(&(set.clone(), *num)) {
             Some(id) => *id,
             None => {
-                warn!(
-                    set,
-                    number = num,
-                    "no abstract mapping found, skipping version"
-                );
+                violations.add(format!("{set}/{num:03}: no abstract card mapping — version skipped"));
                 continue;
             }
         };
         let entry_idx = match version_to_entry_idx.get(&(set.clone(), *num)) {
             Some(idx) => *idx,
             None => {
-                warn!(set, number = num, "no card entry found, skipping version");
+                violations.add(format!("{set}/{num:03}: no card entry found — version skipped"));
                 continue;
             }
         };
@@ -429,6 +469,12 @@ async fn run_cards(
             let (canonical_set, canonical_num) = &group.canonical;
             let card_data = all_card_data.get(&(canonical_set.clone(), *canonical_num));
 
+            if card_data.is_none() {
+                violations.add(format!(
+                    "{canonical_set}/{canonical_num:03}: no Limitless data — minimal card built"
+                ));
+            }
+
             let abstract_card = build_abstract_card(
                 group.abstract_id,
                 group,
@@ -454,6 +500,55 @@ async fn run_cards(
 
     compute_and_write_duplicates(&all_sets, &release_dates)?;
 
+    // ── Data integrity validation pass ────────────────────────────────────────
+
+    let known_elements = load_known_set::<ElementInfo, _>(
+        &output::data_dir().join("elements.json"),
+        |e| e.name,
+    );
+    let known_rarities = load_known_set::<RarityInfo, _>(
+        &output::data_dir().join("rarities.json"),
+        |r| r.code,
+    );
+    let known_card_names = collect_card_names()?;
+    let base_pokemon_loaded = output::base_pokemon_exists();
+
+    let abstract_dir = output::data_dir().join("cards");
+    if abstract_dir.exists() {
+        let mut entries: Vec<_> = std::fs::read_dir(&abstract_dir)?
+            .filter_map(|e| e.ok())
+            .filter(|e| e.path().extension().is_some_and(|x| x == "json"))
+            .collect();
+        entries.sort_by_key(|e| e.path());
+        for entry in entries {
+            match serde_json::from_str::<AbstractCard>(&std::fs::read_to_string(entry.path())?) {
+                Ok(card) => validate_abstract_card(
+                    &mut violations,
+                    &card,
+                    &known_elements,
+                    &known_card_names,
+                    base_pokemon_loaded,
+                ),
+                Err(e) => violations.add(format!(
+                    "{}: parse error: {e}",
+                    entry.path().display()
+                )),
+            }
+        }
+    }
+
+    for set in all_sets.iter().filter(|s| filter_set.is_none_or(|f| s.code == f)) {
+        match output::load_card_versions(&set.code) {
+            Ok(versions) => {
+                for version in &versions {
+                    validate_card_version(&mut violations, version, &known_rarities, &set_is_promo);
+                }
+            }
+            Err(e) => violations.add(format!("{}: failed to load card versions: {e}", set.code)),
+        }
+    }
+
+    violations.finish()?;
     Ok(())
 }
 
@@ -805,12 +900,6 @@ fn build_abstract_card(
             .first()
             .map(|&i| card_entries[i].card_type.clone())
             .unwrap_or_else(|| "unknown".to_string());
-        warn!(
-            id,
-            set,
-            number = num,
-            "no Limitless data for canonical version — minimal abstract card"
-        );
         AbstractCard {
             id,
             name: format!("{set}-{num:03}"),
@@ -1033,6 +1122,178 @@ fn normalize_element_placeholders(text: &str) -> String {
         result = result.replace(&format!("[{name}]"), &format!("[{symbol}]"));
     }
     result
+}
+
+// ── Validation helpers ────────────────────────────────────────────────────────
+
+fn load_known_set<T, F>(path: &std::path::Path, key: F) -> HashSet<String>
+where
+    T: for<'de> serde::Deserialize<'de>,
+    F: Fn(T) -> String,
+{
+    (|| -> Option<HashSet<String>> {
+        let text = std::fs::read_to_string(path).ok()?;
+        let items: Vec<T> = serde_json::from_str(&text).ok()?;
+        Some(items.into_iter().map(key).collect())
+    })()
+    .unwrap_or_default()
+}
+
+fn collect_card_names() -> Result<HashSet<String>> {
+    let dir = output::data_dir().join("cards");
+    if !dir.exists() {
+        return Ok(HashSet::new());
+    }
+    let mut names = HashSet::new();
+    for entry in std::fs::read_dir(&dir)? {
+        let path = entry?.path();
+        if path.extension().is_some_and(|e| e == "json") {
+            if let Ok(text) = std::fs::read_to_string(&path) {
+                if let Ok(card) = serde_json::from_str::<AbstractCard>(&text) {
+                    names.insert(card.name);
+                }
+            }
+        }
+    }
+    Ok(names)
+}
+
+fn validate_abstract_card(
+    v: &mut Violations,
+    card: &AbstractCard,
+    known_elements: &HashSet<String>,
+    known_card_names: &HashSet<String>,
+    base_pokemon_loaded: bool,
+) {
+    if card.name.is_empty() {
+        v.add(format!("card {:05}: empty name", card.id));
+    }
+    if card.versions.is_empty() {
+        v.add(format!("card {:05} ({}): no versions", card.id, card.name));
+    }
+    match card.card_type.as_str() {
+        "pokemon" => validate_pokemon_card(v, card, known_elements, known_card_names, base_pokemon_loaded),
+        "trainer" => validate_trainer_card(v, card),
+        other => v.add(format!(
+            "card {:05} ({}): unknown card_type '{other}'",
+            card.id, card.name
+        )),
+    }
+}
+
+fn validate_pokemon_card(
+    v: &mut Violations,
+    card: &AbstractCard,
+    known_elements: &HashSet<String>,
+    known_card_names: &HashSet<String>,
+    base_pokemon_loaded: bool,
+) {
+    let name = &card.name;
+    if card.element.is_none() {
+        v.add(format!("pokemon {name}: missing element"));
+    } else if let Some(el) = &card.element {
+        if !known_elements.is_empty() && !known_elements.contains(el) {
+            v.add(format!("pokemon {name}: unknown element '{el}'"));
+        }
+    }
+    if card.stage.is_none() {
+        v.add(format!("pokemon {name}: missing stage"));
+    }
+    match card.hp {
+        None => v.add(format!("pokemon {name}: missing hp")),
+        Some(0) => v.add(format!("pokemon {name}: hp is 0")),
+        _ => {}
+    }
+    if card.retreat_cost.is_none() {
+        v.add(format!("pokemon {name}: missing retreat_cost"));
+    }
+    if card.is_ex.is_none() {
+        v.add(format!("pokemon {name}: missing is_ex"));
+    }
+    if card.is_mega.is_none() {
+        v.add(format!("pokemon {name}: missing is_mega"));
+    }
+    if base_pokemon_loaded && card.natdex_number.is_none() {
+        v.add(format!("pokemon {name}: missing natdex_number"));
+    }
+    if let Some(weakness) = &card.weakness {
+        if !known_elements.is_empty() && !known_elements.contains(weakness) {
+            v.add(format!("pokemon {name}: unknown weakness element '{weakness}'"));
+        }
+    }
+    if let Some(from) = &card.evolves_from {
+        if !known_card_names.is_empty() && !known_card_names.contains(from) {
+            v.add(format!(
+                "pokemon {name}: evolves_from '{from}' is not a known card name"
+            ));
+        }
+    }
+    for attack in &card.attacks {
+        if attack.name.is_empty() {
+            v.add(format!("pokemon {name}: attack with empty name"));
+        }
+        for cost_el in &attack.cost {
+            if !known_elements.is_empty() && !known_elements.contains(cost_el) {
+                v.add(format!(
+                    "pokemon {name} attack '{}': unknown cost element '{cost_el}'",
+                    attack.name
+                ));
+            }
+        }
+    }
+    if card.trainer_kind.is_some() {
+        v.add(format!("pokemon {name}: unexpected trainer_kind"));
+    }
+    if card.trainer_effect.is_some() {
+        v.add(format!("pokemon {name}: unexpected trainer_effect"));
+    }
+}
+
+fn validate_trainer_card(v: &mut Violations, card: &AbstractCard) {
+    let name = &card.name;
+    if card.trainer_kind.is_none() {
+        v.add(format!("trainer {name}: missing trainer_kind"));
+    }
+    if card.trainer_effect.is_none() {
+        v.add(format!("trainer {name}: missing trainer_effect"));
+    }
+    if card.element.is_some() {
+        v.add(format!("trainer {name}: unexpected element"));
+    }
+    if card.stage.is_some() {
+        v.add(format!("trainer {name}: unexpected stage"));
+    }
+    if card.hp.is_some() {
+        v.add(format!("trainer {name}: unexpected hp"));
+    }
+    if card.retreat_cost.is_some() {
+        v.add(format!("trainer {name}: unexpected retreat_cost"));
+    }
+    if !card.attacks.is_empty() {
+        v.add(format!("trainer {name}: unexpected attacks"));
+    }
+    if card.evolves_from.is_some() {
+        v.add(format!("trainer {name}: unexpected evolves_from"));
+    }
+}
+
+fn validate_card_version(
+    v: &mut Violations,
+    version: &CardVersion,
+    known_rarities: &HashSet<String>,
+    set_is_promo: &HashMap<String, bool>,
+) {
+    let loc = format!("{}/{:03}", version.set, version.number);
+    if !known_rarities.is_empty() && !known_rarities.contains(&version.rarity) {
+        v.add(format!("{loc}: unknown rarity '{}'", version.rarity));
+    }
+    let is_promo = set_is_promo.get(&version.set).copied().unwrap_or(version.is_promo);
+    if !is_promo && version.packs.is_empty() {
+        v.add(format!("{loc}: non-promo card has no packs"));
+    }
+    if is_promo && version.promo_sources.is_empty() {
+        v.add(format!("{loc}: promo card has no promo_sources"));
+    }
 }
 
 fn build_promo_sources(codes: &[String]) -> Vec<PromoSource> {

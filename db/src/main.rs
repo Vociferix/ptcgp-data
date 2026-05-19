@@ -5,7 +5,40 @@ use anyhow::{Context, Result};
 use clap::Parser;
 use rusqlite::{params, Connection};
 use serde::Deserialize;
-use tracing::{info, warn};
+use tracing::{error, info, warn};
+
+// ── Violations ────────────────────────────────────────────────────────────────
+
+struct Violations {
+    items: Vec<String>,
+    lenient: bool,
+}
+
+impl Violations {
+    fn new(lenient: bool) -> Self {
+        Self { items: Vec::new(), lenient }
+    }
+
+    fn add(&mut self, msg: impl std::fmt::Display) {
+        let s = msg.to_string();
+        if self.lenient {
+            warn!("{s}");
+        } else {
+            error!("{s}");
+            self.items.push(s);
+        }
+    }
+
+    fn finish(self) -> Result<()> {
+        if !self.items.is_empty() {
+            anyhow::bail!(
+                "{} constraint violation(s) — re-run with --lenient to proceed anyway",
+                self.items.len()
+            );
+        }
+        Ok(())
+    }
+}
 
 // ── CLI ───────────────────────────────────────────────────────────────────────
 
@@ -26,6 +59,10 @@ struct Cli {
     /// Path to schema.sql (default assumes working directory is workspace root)
     #[arg(long, default_value = "db/schema.sql")]
     schema: PathBuf,
+
+    /// Log constraint violations as warnings instead of failing
+    #[arg(long)]
+    lenient: bool,
 }
 
 // ── JSON models ───────────────────────────────────────────────────────────────
@@ -158,16 +195,19 @@ fn main() -> Result<()> {
     conn.execute_batch(&schema)?;
     info!("schema applied");
 
+    let mut v = Violations::new(cli.lenient);
+
     let tx = conn.transaction()?;
 
-    insert_static_data(&tx, &cli.data)?;
+    insert_static_data(&tx, &cli.data, &mut v)?;
     insert_promo_sources(&tx, &cli.data)?;
     insert_rarities(&tx, &cli.data)?;
     let set_map = insert_sets(&tx, &cli.data)?;
     insert_base_pokemon(&tx, &cli.data)?;
-    let card_id_map = insert_abstract_cards(&tx, &cli.data)?;
-    insert_card_versions(&tx, &cli.data, &card_id_map, &set_map)?;
+    let card_id_map = insert_abstract_cards(&tx, &cli.data, &mut v)?;
+    insert_card_versions(&tx, &cli.data, &card_id_map, &set_map, &mut v)?;
 
+    v.finish()?;
     tx.commit()?;
     info!("database written to {:?}", cli.output);
     Ok(())
@@ -175,7 +215,7 @@ fn main() -> Result<()> {
 
 // ── Static reference data ─────────────────────────────────────────────────────
 
-fn insert_static_data(tx: &rusqlite::Transaction, data: &Path) -> Result<()> {
+fn insert_static_data(tx: &rusqlite::Transaction, data: &Path, v: &mut Violations) -> Result<()> {
     let elements_path = data.join("elements.json");
     if elements_path.exists() {
         let elements: Vec<ElementInfo> = load_json(&elements_path)?;
@@ -186,19 +226,7 @@ fn insert_static_data(tx: &rusqlite::Transaction, data: &Path) -> Result<()> {
             )?;
         }
     } else {
-        warn!("elements.json not found — run `global-master` first");
-    }
-    for stage in &["Basic", "Stage 1", "Stage 2"] {
-        tx.execute(
-            "INSERT OR IGNORE INTO stages (name) VALUES (?1)",
-            params![stage],
-        )?;
-    }
-    for kind in &["Item", "Stadium", "Supporter", "Tool"] {
-        tx.execute(
-            "INSERT OR IGNORE INTO trainer_kinds (name) VALUES (?1)",
-            params![kind],
-        )?;
+        v.add("elements.json not found — run `global-master` first");
     }
     info!("static data inserted");
     Ok(())
@@ -350,10 +378,14 @@ fn insert_base_pokemon(tx: &rusqlite::Transaction, data: &Path) -> Result<()> {
 // ── Abstract cards ────────────────────────────────────────────────────────────
 
 /// Returns json abstract_id → db cards.id map.
-fn insert_abstract_cards(tx: &rusqlite::Transaction, data: &Path) -> Result<HashMap<u32, i64>> {
+fn insert_abstract_cards(
+    tx: &rusqlite::Transaction,
+    data: &Path,
+    v: &mut Violations,
+) -> Result<HashMap<u32, i64>> {
     let dir = data.join("cards");
     if !dir.exists() {
-        warn!("data/cards/ not found, skipping abstract cards");
+        v.add("data/cards/ not found — run `cards` command first");
         return Ok(HashMap::new());
     }
 
@@ -368,24 +400,28 @@ fn insert_abstract_cards(tx: &rusqlite::Transaction, data: &Path) -> Result<Hash
         let card: AbstractCard = match load_json(&entry.path()) {
             Ok(c) => c,
             Err(e) => {
-                warn!(path = ?entry.path(), "failed to parse abstract card: {e}");
+                v.add(format!("{}: failed to parse: {e}", entry.path().display()));
                 continue;
             }
         };
         let json_id = card.id;
         let name = card.name.clone();
-        match insert_abstract_card(tx, &card) {
+        match insert_abstract_card(tx, &card, v) {
             Ok(db_id) => {
                 card_id_map.insert(json_id, db_id);
             }
-            Err(e) => warn!(id = json_id, name, "abstract card insert failed: {e}"),
+            Err(e) => v.add(format!("card {:05} ({name}): insert failed: {e}", json_id)),
         }
     }
     info!(count = card_id_map.len(), "abstract cards inserted");
     Ok(card_id_map)
 }
 
-fn insert_abstract_card(tx: &rusqlite::Transaction, card: &AbstractCard) -> Result<i64> {
+fn insert_abstract_card(
+    tx: &rusqlite::Transaction,
+    card: &AbstractCard,
+    v: &mut Violations,
+) -> Result<i64> {
     tx.execute(
         "INSERT OR IGNORE INTO card_names (name) VALUES (?1)",
         params![card.name],
@@ -400,9 +436,9 @@ fn insert_abstract_card(tx: &rusqlite::Transaction, card: &AbstractCard) -> Resu
     let card_id = tx.last_insert_rowid();
 
     match card.card_type.as_str() {
-        "pokemon" => insert_pokemon_data(tx, card_id, card)?,
-        "trainer" => insert_trainer_data(tx, card_id, card)?,
-        other => warn!(card_type = other, card = card.name, "unknown card type"),
+        "pokemon" => insert_pokemon_data(tx, card_id, card, v)?,
+        "trainer" => insert_trainer_data(tx, card_id, card, v)?,
+        other => v.add(format!("card {} ({}): unknown card_type '{other}'", card.id, card.name)),
     }
 
     Ok(card_id)
@@ -412,6 +448,7 @@ fn insert_pokemon_data(
     tx: &rusqlite::Transaction,
     card_id: i64,
     card: &AbstractCard,
+    v: &mut Violations,
 ) -> Result<()> {
     let base_id = if let Some(natdex) = card.natdex_number {
         match tx.query_row::<i64, _, _>(
@@ -420,10 +457,14 @@ fn insert_pokemon_data(
             |row| row.get(0),
         ) {
             Ok(id) => id,
-            Err(_) => get_or_insert_base_pokemon(tx, &derive_base_name(&card.name), Some(natdex))?,
+            Err(_) => {
+                v.add(format!("pokemon {}: natdex {natdex} not in base_pokemon — inserting by name", card.name));
+                get_or_insert_base_pokemon(tx, &card.name, Some(natdex))?
+            }
         }
     } else {
-        get_or_insert_base_pokemon(tx, &derive_base_name(&card.name), None)?
+        v.add(format!("pokemon {}: no natdex_number — inserting by name", card.name));
+        get_or_insert_base_pokemon(tx, &card.name, None)?
     };
 
     let Some(el) = &card.element else {
@@ -438,6 +479,10 @@ fn insert_pokemon_data(
     let Some(st) = &card.stage else {
         return Ok(());
     };
+    tx.execute(
+        "INSERT OR IGNORE INTO stages (name) VALUES (?1)",
+        params![st],
+    )?;
     let stage_id: i64 = tx.query_row(
         "SELECT id FROM stages WHERE name = ?1",
         params![st],
@@ -453,8 +498,8 @@ fn insert_pokemon_data(
             base_id,
             element_id,
             stage_id,
-            card.retreat_cost.unwrap_or(0),
-            card.hp.unwrap_or(0),
+            card.retreat_cost,
+            card.hp,
         ],
     )?;
 
@@ -574,8 +619,16 @@ fn insert_trainer_data(
     tx: &rusqlite::Transaction,
     card_id: i64,
     card: &AbstractCard,
+    v: &mut Violations,
 ) -> Result<()> {
-    let kind = card.trainer_kind.as_deref().unwrap_or("Item");
+    let Some(kind) = card.trainer_kind.as_deref() else {
+        v.add(format!("trainer {}: missing trainer_kind — skipped", card.name));
+        return Ok(());
+    };
+    tx.execute(
+        "INSERT OR IGNORE INTO trainer_kinds (name) VALUES (?1)",
+        params![kind],
+    )?;
     let kind_id: i64 = tx.query_row(
         "SELECT id FROM trainer_kinds WHERE name = ?1",
         params![kind],
@@ -669,6 +722,7 @@ fn insert_card_versions(
     data: &Path,
     card_id_map: &HashMap<u32, i64>,
     set_map: &HashMap<String, i64>,
+    v: &mut Violations,
 ) -> Result<()> {
     let sets_path = data.join("sets.json");
     if !sets_path.exists() {
@@ -685,10 +739,7 @@ fn insert_card_versions(
             continue;
         }
         let Some(&set_id) = set_map.get(&set.code) else {
-            warn!(
-                code = set.code,
-                "set missing from DB map, skipping versions"
-            );
+            v.add(format!("{}: set missing from DB map — versions skipped", set.code));
             continue;
         };
 
@@ -700,20 +751,18 @@ fn insert_card_versions(
 
         for entry in entries {
             let version: CardVersion = match load_json(&entry.path()) {
-                Ok(v) => v,
+                Ok(cv) => cv,
                 Err(e) => {
-                    warn!(path = ?entry.path(), "failed to parse card version: {e}");
+                    v.add(format!("{}: failed to parse: {e}", entry.path().display()));
                     continue;
                 }
             };
 
             let Some(&card_db_id) = card_id_map.get(&version.card_id) else {
-                warn!(
-                    card_id = version.card_id,
-                    set = version.set,
-                    number = version.number,
-                    "abstract card not found"
-                );
+                v.add(format!(
+                    "{}/{:03}: abstract card {:05} not found",
+                    version.set, version.number, version.card_id
+                ));
                 continue;
             };
 
@@ -724,12 +773,10 @@ fn insert_card_versions(
             ) {
                 Ok(id) => id,
                 Err(_) => {
-                    warn!(
-                        rarity = version.rarity,
-                        set = version.set,
-                        number = version.number,
-                        "unknown rarity, skipping version"
-                    );
+                    v.add(format!(
+                        "{}/{:03}: unknown rarity '{}'",
+                        version.set, version.number, version.rarity
+                    ));
                     continue;
                 }
             };
@@ -781,12 +828,10 @@ fn insert_card_versions(
                             params![version_db_id, pid],
                         )?;
                     }
-                    None => warn!(
-                        set = version.set,
-                        number = version.number,
-                        subtitle,
-                        "pack not found"
-                    ),
+                    None => v.add(format!(
+                        "{}/{:03}: pack '{subtitle}' not found",
+                        version.set, version.number
+                    )),
                 }
             }
 
@@ -881,14 +926,6 @@ fn get_or_insert_base_pokemon(
         params![name],
         |row| row.get(0),
     )?)
-}
-
-/// Strip common card name modifiers to get a best-guess base Pokémon name.
-/// Used only as a fallback when natdex_number is absent.
-fn derive_base_name(name: &str) -> String {
-    name.trim_end_matches(" ex")
-        .trim_start_matches("Mega ")
-        .to_string()
 }
 
 fn load_json<T: for<'de> Deserialize<'de>>(path: &Path) -> Result<T> {

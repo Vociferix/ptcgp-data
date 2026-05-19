@@ -568,11 +568,13 @@ CREATE TABLE pokemon_cards (
     -- stages.id - The stage of the pokemon card
     stage_id INTEGER NOT NULL,
 
-    -- The energy cost for the card to retreat
-    retreat_cost INTEGER NOT NULL,
+    -- The energy cost for the card to retreat.
+    -- Null when not available for this card.
+    retreat_cost INTEGER,
 
-    -- The HP of the pokemon card
-    hp INTEGER NOT NULL,
+    -- The HP of the pokemon card.
+    -- Null when not available for this card.
+    hp INTEGER,
 
     FOREIGN KEY (base_id) REFERENCES base_pokemon (id),
     FOREIGN KEY (card_id) REFERENCES cards (id),
