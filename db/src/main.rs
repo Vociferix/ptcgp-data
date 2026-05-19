@@ -372,11 +372,18 @@ fn insert_sets(tx: &rusqlite::Transaction, data: &Path) -> Result<HashMap<String
         }
         let detail: SetDetail = load_json(&detail_path)?;
         for subtitle in &detail.packs {
-            tx.execute("INSERT INTO packs (set_id) VALUES (?1)", params![set_id])?;
-            let pack_id = tx.last_insert_rowid();
             tx.execute(
-                "INSERT OR IGNORE INTO pack_subtitles (pack_id, subtitle) VALUES (?1, ?2)",
-                params![pack_id, subtitle],
+                "INSERT OR IGNORE INTO pack_subtitles (subtitle) VALUES (?1)",
+                params![subtitle],
+            )?;
+            let subtitle_id: i64 = tx.query_row(
+                "SELECT id FROM pack_subtitles WHERE subtitle = ?1",
+                params![subtitle],
+                |row| row.get(0),
+            )?;
+            tx.execute(
+                "INSERT INTO packs (set_id, subtitle_id) VALUES (?1, ?2)",
+                params![set_id, subtitle_id],
             )?;
         }
     }
@@ -906,7 +913,7 @@ fn lookup_pack(tx: &rusqlite::Transaction, set_id: i64, subtitle: &str) -> Optio
     // cards can be obtained from packs defined in other sets).
     tx.query_row::<i64, _, _>(
         "SELECT p.id FROM packs p \
-         JOIN pack_subtitles ps ON p.id = ps.pack_id \
+         JOIN pack_subtitles ps ON ps.id = p.subtitle_id \
          WHERE p.set_id = ?1 AND ps.subtitle = ?2",
         params![set_id, subtitle],
         |row| row.get(0),
@@ -915,7 +922,7 @@ fn lookup_pack(tx: &rusqlite::Transaction, set_id: i64, subtitle: &str) -> Optio
     .or_else(|| {
         tx.query_row::<i64, _, _>(
             "SELECT p.id FROM packs p \
-             JOIN pack_subtitles ps ON p.id = ps.pack_id \
+             JOIN pack_subtitles ps ON ps.id = p.subtitle_id \
              WHERE ps.subtitle = ?1",
             params![subtitle],
             |row| row.get(0),
@@ -1059,7 +1066,7 @@ fn insert_pull_rates(
 
             let pack_id: i64 = match tx.query_row(
                 "SELECT p.id FROM packs p \
-                 JOIN pack_subtitles ps ON p.id = ps.pack_id \
+                 JOIN pack_subtitles ps ON ps.id = p.subtitle_id \
                  WHERE p.set_id = ?1 AND ps.subtitle = ?2",
                 params![set_id, rates.subtitle],
                 |row| row.get(0),

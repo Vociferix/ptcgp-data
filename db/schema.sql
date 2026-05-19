@@ -130,6 +130,15 @@ CREATE TABLE set_card_counts (
     FOREIGN KEY (set_id) REFERENCES sets (id)
 );
 
+-- Pack Subtitles
+CREATE TABLE pack_subtitles (
+    -- Primary key
+    id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
+
+    -- The pack subtitle, such as "Charizard" or "Mega Blaziken".
+    subtitle TEXT UNIQUE NOT NULL
+);
+
 -- Card Packs
 --
 -- Individual packs part of a set
@@ -140,20 +149,10 @@ CREATE TABLE packs (
     -- sets.id - The set this pack is part of
     set_id INTEGER NOT NULL,
 
-    FOREIGN KEY (set_id) REFERENCES sets (id)
-);
+    subtitle_id INTEGER NOT NULL,
 
--- Pack Subtitles
---
--- When a set has multiple packs, each pack has a subtitle to identify it.
-CREATE TABLE pack_subtitles (
-    -- packs.id - The pack that has the this row's subtitle
-    pack_id INTEGER UNIQUE NOT NULL,
-
-    -- The subtitle for this pack, such as "Charizard" or "Mega Blaziken".
-    subtitle TEXT NOT NULL,
-
-    FOREIGN KEY (pack_id) REFERENCES packs (id)
+    FOREIGN KEY (set_id) REFERENCES sets (id),
+    FOREIGN KEY (subtitle_id) REFERENCES pack_subtitles (id)
 );
 
 -- Names of Cards
@@ -998,7 +997,7 @@ CREATE VIEW pack_art AS
         printf('packs/art/%s/%s.png', s.code, lower(replace(ps.subtitle, ' ', '_'))) AS path
     FROM packs p
     JOIN sets s ON s.id = p.set_id
-    JOIN pack_subtitles ps ON ps.pack_id = p.id;
+    JOIN pack_subtitles ps ON ps.id = p.subtitle_id;
 
 CREATE VIEW pack_logos AS
     SELECT
@@ -1006,7 +1005,7 @@ CREATE VIEW pack_logos AS
         printf('packs/logos/%s/%s.png', s.code, lower(replace(ps.subtitle, ' ', '_'))) AS path
     FROM packs p
     JOIN sets s ON s.id = p.set_id
-    JOIN pack_subtitles ps ON ps.pack_id = p.id;
+    JOIN pack_subtitles ps ON ps.id = p.subtitle_id;
 
 CREATE VIEW promo_source_icons AS
     SELECT
