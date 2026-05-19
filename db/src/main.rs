@@ -3,6 +3,7 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
 use clap::Parser;
+use rust_decimal::Decimal;
 use rusqlite::{params, Connection};
 use serde::Deserialize;
 use tracing::{error, info, warn};
@@ -90,6 +91,12 @@ struct RarityInfo {
 struct PromoSourceInfo {
     code: String,
     description: Option<String>,
+}
+
+#[derive(Deserialize)]
+struct PackVariantKind {
+    code: String,
+    name: String,
 }
 
 #[derive(Deserialize)]
@@ -187,12 +194,18 @@ struct PackPullRates {
 }
 
 #[derive(Deserialize)]
+struct Rate {
+    numerator: Decimal,
+    denominator: Decimal,
+}
+
+#[derive(Deserialize)]
 struct PackVariantRates {
-    rate_numerator: f64,
-    rate_denominator: f64,
+    rate_numerator: Decimal,
+    rate_denominator: Decimal,
     slot_count: u32,
-    rarity_rates_by_slot: Vec<HashMap<String, f64>>,
-    card_rates: HashMap<String, Vec<Option<f64>>>,
+    rarity_rates_by_slot: Vec<HashMap<String, Rate>>,
+    card_rates: HashMap<String, Vec<Option<Rate>>>,
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
@@ -228,6 +241,7 @@ fn main() -> Result<()> {
     insert_static_data(&tx, &cli.data, &mut v)?;
     insert_promo_sources(&tx, &cli.data)?;
     insert_rarities(&tx, &cli.data)?;
+    insert_pack_variant_kinds(&tx, &cli.data)?;
     let set_map = insert_sets(&tx, &cli.data)?;
     insert_base_pokemon(&tx, &cli.data)?;
     let card_id_map = insert_abstract_cards(&tx, &cli.data, &mut v)?;
@@ -345,6 +359,53 @@ fn insert_rarities(tx: &rusqlite::Transaction, data: &Path) -> Result<()> {
         )?;
     }
     info!(count = rarities.len(), "rarities inserted");
+    Ok(())
+}
+
+fn insert_pack_variant_kinds(tx: &rusqlite::Transaction, data: &Path) -> Result<()> {
+    let path = data.join("pack_variant_names.json");
+    if !path.exists() {
+        warn!("pack_variant_names.json not found, skipping");
+        return Ok(());
+    }
+    let kinds: Vec<PackVariantKind> = load_json(&path)?;
+
+    // Seed pack_variant_codes alphabetically.
+    let codes: BTreeSet<&str> = kinds.iter().map(|k| k.code.as_str()).collect();
+    for code in &codes {
+        tx.execute(
+            "INSERT OR IGNORE INTO pack_variant_codes (code) VALUES (?1)",
+            params![code],
+        )?;
+    }
+
+    // Seed pack_variant_names alphabetically.
+    let names: BTreeSet<&str> = kinds.iter().map(|k| k.name.as_str()).collect();
+    for name in &names {
+        tx.execute(
+            "INSERT OR IGNORE INTO pack_variant_names (name) VALUES (?1)",
+            params![name],
+        )?;
+    }
+
+    // Insert pack_variant_kinds linking codes to names.
+    for k in &kinds {
+        let code_id: i64 = tx.query_row(
+            "SELECT id FROM pack_variant_codes WHERE code = ?1",
+            params![k.code],
+            |row| row.get(0),
+        )?;
+        let name_id: i64 = tx.query_row(
+            "SELECT id FROM pack_variant_names WHERE name = ?1",
+            params![k.name],
+            |row| row.get(0),
+        )?;
+        tx.execute(
+            "INSERT OR IGNORE INTO pack_variant_kinds (code_id, name_id) VALUES (?1, ?2)",
+            params![code_id, name_id],
+        )?;
+    }
+    info!(count = kinds.len(), "pack variant kinds inserted");
     Ok(())
 }
 
@@ -1146,19 +1207,38 @@ fn get_or_insert_base_pokemon(
     Ok(())
 }
 
+fn gcd(a: i64, b: i64) -> i64 {
+    if b == 0 { a } else { gcd(b, a % b) }
+}
+
+fn lcm(a: i64, b: i64) -> i64 {
+    a / gcd(a, b) * b
+}
+
+/// Convert a `Rate` to an `(numerator, denominator)` integer pair.
+///
+/// The source API sometimes gives fractional numerators (e.g. `0.125 / 1`).
+/// We clear those by scaling both values up by `10^scale` (the Decimal scale),
+/// then reduce by GCD — all without introducing any floating-point arithmetic.
+fn rate_to_integers(rate: &Rate) -> (i64, i64) {
+    let scale = rate.numerator.scale().max(rate.denominator.scale());
+    let factor = Decimal::from(10u64.pow(scale));
+    let n = (rate.numerator * factor)
+        .try_into()
+        .expect("rate numerator overflows i64");
+    let d = (rate.denominator * factor)
+        .try_into()
+        .expect("rate denominator overflows i64");
+    let g = gcd(n, d);
+    (n / g, d / g)
+}
+
 fn load_json<T: for<'de> Deserialize<'de>>(path: &Path) -> Result<T> {
     let text = std::fs::read_to_string(path)?;
     serde_json::from_str(&text).with_context(|| format!("parsing {:?}", path))
 }
 
 // ── Pull rates ────────────────────────────────────────────────────────────────
-
-/// Fixed denominator for per-slot rarity and card pull rates.
-///
-/// Source data stores these as floats; we scale by this constant so they fit
-/// the integer-fraction schema. 10^6 gives microsecond-level precision, which
-/// is more than enough for any realistic pull rate.
-const SLOT_RATE_DENOMINATOR: i64 = 1_000_000;
 
 fn insert_pull_rates(
     tx: &rusqlite::Transaction,
@@ -1182,28 +1262,6 @@ fn insert_pull_rates(
         .query_map([], |row| Ok((row.get::<_, String>(0)?, row.get::<_, i64>(1)?)))?
         .collect::<rusqlite::Result<_>>()?;
     drop(stmt);
-
-    // Seed pack_variant_names alphabetically before inserting pull rates.
-    let mut all_variant_names: BTreeSet<String> = BTreeSet::new();
-    for entry in std::fs::read_dir(&pull_rates_dir)?.filter_map(|e| e.ok()) {
-        if !entry.path().is_dir() { continue; }
-        for file in std::fs::read_dir(entry.path())?.filter_map(|e| e.ok()) {
-            if !file.path().extension().is_some_and(|x| x == "json") { continue; }
-            if let Ok(rates) = load_json::<PackPullRates>(&file.path()) {
-                for (name, variant) in &rates.variants {
-                    if variant.is_some() {
-                        all_variant_names.insert(name.clone());
-                    }
-                }
-            }
-        }
-    }
-    for name in &all_variant_names {
-        tx.execute(
-            "INSERT OR IGNORE INTO pack_variant_names (name) VALUES (?1)",
-            params![name],
-        )?;
-    }
 
     let mut set_dirs: Vec<_> = std::fs::read_dir(&pull_rates_dir)?
         .filter_map(|e| e.ok())
@@ -1259,42 +1317,79 @@ fn insert_pull_rates(
                 }
             };
 
-            // Pack variant rate denominator — shared across all variants in this pack.
-            if let Some(first) = rates.variants.values().flatten().next() {
-                let denom = first.rate_denominator.round() as i64;
-                tx.execute(
-                    "INSERT OR IGNORE INTO pack_variant_rate_denominators \
-                     (pack_id, rate_denominator) VALUES (?1, ?2)",
-                    params![pack_id, denom],
-                )?;
-            }
+            // Compute LCM of all non-null variant rate denominators for this pack.
+            let pack_denom: i64 = rates
+                .variants
+                .values()
+                .flatten()
+                .map(|v| rate_to_integers(&Rate { numerator: v.rate_numerator, denominator: v.rate_denominator }).1)
+                .fold(1i64, lcm);
+            tx.execute(
+                "INSERT OR IGNORE INTO pack_variant_rate_denominators \
+                 (pack_id, rate_denominator) VALUES (?1, ?2)",
+                params![pack_id, pack_denom],
+            )?;
 
-            for (variant_name, variant) in
+            for (variant_code, variant) in
                 rates.variants.iter().filter_map(|(k, v)| v.as_ref().map(|v| (k, v)))
             {
-                let name_id: i64 = tx.query_row(
-                    "SELECT id FROM pack_variant_names WHERE name = ?1",
-                    params![variant_name],
+                let kind_id: i64 = match tx.query_row::<i64, _, _>(
+                    "SELECT pvk.id FROM pack_variant_kinds pvk \
+                     JOIN pack_variant_codes pvc ON pvc.id = pvk.code_id \
+                     WHERE pvc.code = ?1",
+                    params![variant_code],
                     |row| row.get(0),
-                )?;
+                ) {
+                    Ok(id) => id,
+                    Err(_) => {
+                        v.add(format!(
+                            "pull_rates/{set_code}/{}: unknown variant code '{variant_code}'",
+                            rates.subtitle
+                        ));
+                        continue;
+                    }
+                };
 
-                let rate_num = variant.rate_numerator.round() as i64;
+                // Scale variant numerator to the pack's LCM denominator.
+                let variant_rate = Rate {
+                    numerator: variant.rate_numerator,
+                    denominator: variant.rate_denominator,
+                };
+                let (vn, vd) = rate_to_integers(&variant_rate);
+                let rate_num = vn * (pack_denom / vd);
                 tx.execute(
                     "INSERT OR IGNORE INTO pack_variants \
-                     (name_id, pack_id, rate_numerator) VALUES (?1, ?2, ?3)",
-                    params![name_id, pack_id, rate_num],
+                     (kind_id, pack_id, rate_numerator) VALUES (?1, ?2, ?3)",
+                    params![kind_id, pack_id, rate_num],
                 )?;
                 let variant_id: i64 = tx.query_row(
-                    "SELECT id FROM pack_variants WHERE name_id = ?1 AND pack_id = ?2",
-                    params![name_id, pack_id],
+                    "SELECT id FROM pack_variants WHERE kind_id = ?1 AND pack_id = ?2",
+                    params![kind_id, pack_id],
                     |row| row.get(0),
                 )?;
 
                 for slot_idx in 0..variant.slot_count {
+                    // Compute LCM of all rate denominators in this slot.
+                    let mut slot_denom = 1i64;
+                    if let Some(rarity_rates) =
+                        variant.rarity_rates_by_slot.get(slot_idx as usize)
+                    {
+                        for rate in rarity_rates.values() {
+                            let (_, d) = rate_to_integers(rate);
+                            slot_denom = lcm(slot_denom, d);
+                        }
+                    }
+                    for slot_rates in variant.card_rates.values() {
+                        if let Some(Some(rate)) = slot_rates.get(slot_idx as usize) {
+                            let (_, d) = rate_to_integers(rate);
+                            slot_denom = lcm(slot_denom, d);
+                        }
+                    }
+
                     tx.execute(
                         "INSERT OR IGNORE INTO pack_slots \
                          (pack_variant_id, pull_number, rate_denominator) VALUES (?1, ?2, ?3)",
-                        params![variant_id, slot_idx, SLOT_RATE_DENOMINATOR],
+                        params![variant_id, slot_idx, slot_denom],
                     )?;
                     let slot_id: i64 = tx.query_row(
                         "SELECT id FROM pack_slots \
@@ -1306,15 +1401,15 @@ fn insert_pull_rates(
                     if let Some(rarity_rates) =
                         variant.rarity_rates_by_slot.get(slot_idx as usize)
                     {
-                        for (rarity_code, &rate) in rarity_rates {
+                        for (rarity_code, rate) in rarity_rates {
+                            let (rn, rd) = rate_to_integers(rate);
+                            let scaled_num = rn * (slot_denom / rd);
                             match rarity_ids.get(rarity_code.as_str()) {
                                 Some(&rarity_id) => {
-                                    let num =
-                                        (rate * SLOT_RATE_DENOMINATOR as f64).round() as i64;
                                     tx.execute(
                                         "INSERT OR IGNORE INTO rarity_pull_rates \
                                          (slot_id, rarity_id, rate_numerator) VALUES (?1, ?2, ?3)",
-                                        params![slot_id, rarity_id, num],
+                                        params![slot_id, rarity_id, scaled_num],
                                     )?;
                                 }
                                 None => v.add(format!(
@@ -1353,11 +1448,12 @@ fn insert_pull_rates(
                                 continue;
                             }
                         };
-                        let num = (rate * SLOT_RATE_DENOMINATOR as f64).round() as i64;
+                        let (cn, cd) = rate_to_integers(rate);
+                        let scaled_num = cn * (slot_denom / cd);
                         tx.execute(
                             "INSERT OR IGNORE INTO card_pull_rates \
                              (card_version_id, slot_id, rate_numerator) VALUES (?1, ?2, ?3)",
-                            params![card_version_id, slot_id, num],
+                            params![card_version_id, slot_id, scaled_num],
                         )?;
                     }
                 }

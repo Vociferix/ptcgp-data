@@ -3,36 +3,57 @@
   "subtitle": "Vol 6",
   "variants": {
     "normal": {
-      "rate": 1.0,
-      "rate_numerator": 1.0,
-      "rate_denominator": 1.0,
+      "rate_numerator": 1,
+      "rate_denominator": 1,
       "slot_count": 1,
       "rarity_rates_by_slot": [
         {
-          "R": 0.1582,
-          "C": 0.7152,
-          "AR": 0.1266
+          "AR": {
+            "numerator": 633,
+            "denominator": 5000
+          },
+          "R": {
+            "numerator": 791,
+            "denominator": 5000
+          },
+          "C": {
+            "numerator": 447,
+            "denominator": 625
+          }
         }
       ],
       "card_rates": {
-        "057": [
-          0.2384
+        "053": [
+          {
+            "numerator": 149,
+            "denominator": 625
+          }
         ],
         "054": [
-          0.1266
-        ],
-        "056": [
-          0.2384
-        ],
-        "053": [
-          0.2384
+          {
+            "numerator": 633,
+            "denominator": 5000
+          }
         ],
         "055": [
-          0.1582
+          {
+            "numerator": 791,
+            "denominator": 5000
+          }
+        ],
+        "056": [
+          {
+            "numerator": 149,
+            "denominator": 625
+          }
+        ],
+        "057": [
+          {
+            "numerator": 149,
+            "denominator": 625
+          }
         ]
       }
-    },
-    "rare": null,
-    "plus1": null
+    }
   }
 }

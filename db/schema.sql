@@ -787,16 +787,43 @@ CREATE TABLE pokemon_variant_tags (
     FOREIGN KEY (variant_id) REFERENCES pokemon_variants (id)
 );
 
--- Names of Pack Variants
+-- Pack Variant Codes
 --
--- Pack variants generally share names across packs, so the
--- strings are stored out-of-line.
+-- Short codes used in pull rate data for each kind of pack variant.
+CREATE TABLE pack_variant_codes (
+    -- Primary key
+    id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
+
+    -- Short code, such as "normal" or "plus1"
+    code TEXT UNIQUE NOT NULL
+);
+
+-- Pack Variant Names
+--
+-- Display names for each kind of pack variant.
 CREATE TABLE pack_variant_names (
     -- Primary key
     id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
 
-    -- The pack variant name
-    name TEXT NOT NULL
+    -- Display name, such as "Regular Pack" or "Rare Pack"
+    name TEXT UNIQUE NOT NULL
+);
+
+-- Pack Variant Kinds
+--
+-- The three kinds of pack variant: normal, rare, and plus1.
+CREATE TABLE pack_variant_kinds (
+    -- Primary key
+    id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
+
+    -- pack_variant_codes.id - Short code for this variant kind
+    code_id INTEGER UNIQUE NOT NULL,
+
+    -- pack_variant_names.id - Display name for this variant kind
+    name_id INTEGER UNIQUE NOT NULL,
+
+    FOREIGN KEY (code_id) REFERENCES pack_variant_codes (id),
+    FOREIGN KEY (name_id) REFERENCES pack_variant_names (id)
 );
 
 -- Pack Variants
@@ -808,35 +835,37 @@ CREATE TABLE pack_variants (
     -- Primary key
     id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
 
-    -- pack_variant_names.id - The name of the pack variant
-    name_id INTEGER NOT NULL,
+    -- pack_variant_kinds.id - The kind of this pack variant
+    kind_id INTEGER NOT NULL,
 
     -- packs.id - The pack this variant belongs to
     pack_id INTEGER NOT NULL,
 
     -- The numerator of the pull rate for this pack variant.
     --
-    -- The denominator of the pull rate is specified in the
-    -- pack_variant_rate_denominators table. Together the
-    -- numerator and denominator define a probability ratio
-    -- between 0 and 1.
+    -- The numerator of the pull rate for this pack variant.
+    --
+    -- The denominator is the LCM of all variant denominators for this pack,
+    -- stored in pack_variant_rate_denominators. Dividing by that denominator
+    -- gives the probability as a value between 0 and 1.
     rate_numerator INTEGER NOT NULL,
 
-    FOREIGN KEY (name_id) REFERENCES pack_variant_names (id),
+    FOREIGN KEY (kind_id) REFERENCES pack_variant_kinds (id),
     FOREIGN KEY (pack_id) REFERENCES packs (id),
-    UNIQUE (name_id, pack_id) ON CONFLICT FAIL
+    UNIQUE (kind_id, pack_id) ON CONFLICT FAIL
 );
 
 -- Pack Variant Rate Denominators
 --
--- This table provides the denominator of pack variant pull
--- rates. The numerator is specified in the pack_variants
--- table.
+-- This table provides the common denominator for all variant pull rates
+-- within a pack. Because different variants can have different denominators
+-- in the source data, this value is the LCM of all per-variant denominators,
+-- and each variant's rate_numerator is scaled accordingly.
 CREATE TABLE pack_variant_rate_denominators (
     -- packs.id - The pack the pull rate denominator applies to
     pack_id INTEGER UNIQUE NOT NULL,
 
-    -- The pull rate denominator
+    -- The LCM of all variant rate denominators for this pack
     rate_denominator INTEGER NOT NULL,
 
     FOREIGN KEY (pack_id) REFERENCES packs (id)

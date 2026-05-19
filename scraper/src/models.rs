@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
 // ── Set metadata ──────────────────────────────────────────────────────────────
@@ -229,18 +230,10 @@ pub struct CardEntry {
 /// Pull rate as a fraction, preserving the source representation.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Rate {
-    pub numerator: f64,
-    pub denominator: f64,
-}
-
-impl Rate {
-    pub fn as_f64(&self) -> f64 {
-        if self.denominator == 0.0 {
-            0.0
-        } else {
-            self.numerator / self.denominator
-        }
-    }
+    #[serde(with = "rust_decimal::serde::arbitrary_precision")]
+    pub numerator: Decimal,
+    #[serde(with = "rust_decimal::serde::arbitrary_precision")]
+    pub denominator: Decimal,
 }
 
 /// data/pull_rates/{SET}/{SUBTITLE}.json
@@ -257,13 +250,13 @@ pub type PackVariants = HashMap<String, PackVariantRates>;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PackVariantRates {
-    /// Probability of getting this pack type (0..1)
-    pub rate: f64,
-    pub rate_numerator: f64,
-    pub rate_denominator: f64,
+    #[serde(with = "rust_decimal::serde::arbitrary_precision")]
+    pub rate_numerator: Decimal,
+    #[serde(with = "rust_decimal::serde::arbitrary_precision")]
+    pub rate_denominator: Decimal,
     pub slot_count: u32,
-    /// Per-slot rarity breakdown: each element maps rarity code -> probability
-    pub rarity_rates_by_slot: Vec<HashMap<String, f64>>,
-    /// Per-card pull rates: "{SET}-{NUM:03}" -> one f64 per slot (null = cannot appear)
-    pub card_rates: HashMap<String, Vec<Option<f64>>>,
+    /// Per-slot rarity breakdown: each element maps rarity code -> exact fraction
+    pub rarity_rates_by_slot: Vec<HashMap<String, Rate>>,
+    /// Per-card pull rates: card key -> one Rate per slot (null = cannot appear)
+    pub card_rates: HashMap<String, Vec<Option<Rate>>>,
 }

@@ -3,36 +3,57 @@
   "subtitle": "Vol 10",
   "variants": {
     "normal": {
-      "rate": 1.0,
-      "rate_numerator": 2.0,
-      "rate_denominator": 2.0,
+      "rate_numerator": 1,
+      "rate_denominator": 1,
       "slot_count": 1,
       "rarity_rates_by_slot": [
         {
-          "R": 0.1582,
-          "AR": 0.1266,
-          "C": 0.7152
+          "R": {
+            "numerator": 791,
+            "denominator": 5000
+          },
+          "C": {
+            "numerator": 447,
+            "denominator": 625
+          },
+          "AR": {
+            "numerator": 633,
+            "denominator": 5000
+          }
         }
       ],
       "card_rates": {
-        "086": [
-          0.1582
-        ],
-        "089": [
-          0.2384
+        "088": [
+          {
+            "numerator": 149,
+            "denominator": 625
+          }
         ],
         "085": [
-          0.2384
+          {
+            "numerator": 149,
+            "denominator": 625
+          }
+        ],
+        "086": [
+          {
+            "numerator": 791,
+            "denominator": 5000
+          }
         ],
         "087": [
-          0.1266
+          {
+            "numerator": 633,
+            "denominator": 5000
+          }
         ],
-        "088": [
-          0.2384
+        "089": [
+          {
+            "numerator": 149,
+            "denominator": 625
+          }
         ]
       }
-    },
-    "rare": null,
-    "plus1": null
+    }
   }
 }

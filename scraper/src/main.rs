@@ -614,8 +614,10 @@ async fn run_pull_rates(
     // Build card entry lookup for remapping pull rate card IDs
     let card_entries = raenonx::parse_card_entries(raw)?;
     let mut card_id_to_versions: HashMap<String, Vec<(String, u32)>> = HashMap::new();
+    let mut card_id_to_rarity: HashMap<String, String> = HashMap::new();
     for entry in &card_entries {
         card_id_to_versions.insert(entry.card_id.clone(), entry.collection_nums.clone());
+        card_id_to_rarity.insert(entry.card_id.clone(), entry.rarity.clone());
     }
 
     let packs: Vec<&String> = regular_packs
@@ -646,6 +648,7 @@ async fn run_pull_rates(
 
         match raenonx::fetch_pack_pull_rates(client, pack_id, set_code, &subtitle).await {
             Ok(mut rates) => {
+                raenonx::fix_card_rates_from_rarity(&mut rates, &card_id_to_rarity);
                 remap_pull_rate_card_ids(&mut rates, &card_id_to_versions);
                 output::write_pull_rates(&rates)?;
                 let card_count = rates
@@ -1033,8 +1036,8 @@ fn build_pack_subtitle_map(
     pack_names: &HashMap<String, String>,
 ) -> HashMap<String, String> {
     let mut map = pack_names.clone();
-    for pack_id in promo_subtitles.keys() {
-        map.insert(pack_id.clone(), promo_vol_label(pack_id));
+    for (pack_id, desc_id) in promo_subtitles {
+        map.insert(pack_id.clone(), promo_vol_label(desc_id));
     }
     map
 }
@@ -1058,7 +1061,7 @@ fn remap_pull_rate_card_ids(
     let set_code = rates.set.clone();
 
     for variant in rates.variants.values_mut() {
-        let remapped: HashMap<String, Vec<Option<f64>>> = variant
+        let remapped: HashMap<String, Vec<Option<models::Rate>>> = variant
             .card_rates
             .iter()
             .filter_map(|(raenonx_id, slots)| {

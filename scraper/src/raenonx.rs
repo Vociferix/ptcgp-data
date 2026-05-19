@@ -2,6 +2,7 @@ use std::collections::{HashMap, HashSet};
 
 use anyhow::{anyhow, bail, Result};
 use regex::Regex;
+use rust_decimal::Decimal;
 use serde::Deserialize;
 use serde_json::Value;
 use tracing::warn;
@@ -511,8 +512,8 @@ fn build_variants(
         .and_then(|m| m.get("normal"))
         .and_then(parse_rate_obj)
         .unwrap_or(Rate {
-            numerator: 1.0,
-            denominator: 1.0,
+            numerator: Decimal::ONE,
+            denominator: Decimal::ONE,
         });
 
     let rare_rate = type_rates
@@ -533,9 +534,9 @@ fn build_variants(
         .as_object()
         .ok_or_else(|| anyhow!("cardPullProbabilityMap is not an object"))?;
 
-    let mut normal_cards: HashMap<String, Vec<Option<f64>>> = HashMap::new();
-    let mut rare_cards: HashMap<String, Vec<Option<f64>>> = HashMap::new();
-    let mut plus1_cards: HashMap<String, Vec<Option<f64>>> = HashMap::new();
+    let mut normal_cards: HashMap<String, Vec<Option<Rate>>> = HashMap::new();
+    let mut rare_cards: HashMap<String, Vec<Option<Rate>>> = HashMap::new();
+    let mut plus1_cards: HashMap<String, Vec<Option<Rate>>> = HashMap::new();
 
     for (card_id, card_val) in card_obj {
         let by_pack = card_val.get("byPack").and_then(Value::as_object);
@@ -572,7 +573,6 @@ fn build_variants(
     variants.insert(
         "normal".to_string(),
         PackVariantRates {
-            rate: normal_rate.as_f64(),
             rate_numerator: normal_rate.numerator,
             rate_denominator: normal_rate.denominator,
             slot_count: normal_slot_count as u32,
@@ -585,7 +585,6 @@ fn build_variants(
         variants.insert(
             "rare".to_string(),
             PackVariantRates {
-                rate: r.as_f64(),
                 rate_numerator: r.numerator,
                 rate_denominator: r.denominator,
                 slot_count: rare_slot_count as u32,
@@ -599,7 +598,6 @@ fn build_variants(
         variants.insert(
             "plus1".to_string(),
             PackVariantRates {
-                rate: r.as_f64(),
                 rate_numerator: r.numerator,
                 rate_denominator: r.denominator,
                 slot_count: plus1_slot_count as u32,
@@ -609,35 +607,168 @@ fn build_variants(
         );
     }
 
+
     Ok(variants)
 }
 
-fn parse_slot_rates(val: &Value) -> Vec<Option<f64>> {
+fn parse_slot_rates(val: &Value) -> Vec<Option<Rate>> {
     val.as_array()
         .map(|arr| {
             arr.iter()
-                .map(|v| {
-                    if v.is_null() {
-                        None
-                    } else {
-                        parse_rate_obj(v).map(|r| r.as_f64())
-                    }
-                })
+                .map(|v| if v.is_null() { None } else { parse_rate_obj(v) })
                 .collect()
         })
         .unwrap_or_default()
 }
 
 fn parse_rate_obj(val: &Value) -> Option<Rate> {
-    let num = val.get("numerator")?.as_f64()?;
-    let den = val.get("denominator")?.as_f64()?;
+    let num_val = val.get("numerator")?;
+    let den_val = val.get("denominator")?;
+    let numerator: Decimal = serde_json::from_value(num_val.clone()).ok()?;
+    let denominator: Decimal = serde_json::from_value(den_val.clone()).ok()?;
+    let (n, d) = normalize_rate(numerator, denominator);
     Some(Rate {
-        numerator: num,
-        denominator: den,
+        numerator: Decimal::from(n),
+        denominator: Decimal::from(d),
     })
 }
 
-fn slot_rarity_rates(by_rarity: Option<&Value>, variant: &str) -> Vec<HashMap<String, f64>> {
+/// Normalize a rate to an exact integer fraction.
+///
+/// The API returns rarity rates as clean integer fractions but per-card rates as
+/// IEEE 754 floats with denominator 1 (e.g. 1/75 ≈ 0.013333.../1). Direct decimal
+/// scaling of such floats produces huge denominators that overflow LCM computations.
+/// We detect these cases and recover the intended exact fraction via continued fractions.
+fn normalize_rate(num: Decimal, den: Decimal) -> (i64, i64) {
+    let scale = num.scale().max(den.scale());
+    // 10^19 fits in u64 but 10^20 does not; skip direct scaling for large scales
+    // since they indicate float approximations that produce huge denominators anyway.
+    if scale <= 19 {
+        if let Some(factor) = 10u64.checked_pow(scale) {
+            let factor = Decimal::from(factor);
+            let n_opt: Option<i64> = (num * factor).try_into().ok();
+            let d_opt: Option<i64> = (den * factor).try_into().ok();
+            if let (Some(n), Some(d)) = (n_opt, d_opt) {
+                let g = rate_gcd(n.abs(), d.abs());
+                let (nr, dr) = (n / g, d / g);
+                if dr <= 2_000_000_000 {
+                    return (nr, dr);
+                }
+            }
+        }
+    }
+    // Float artifact: use continued fractions to recover the intended exact fraction.
+    use rust_decimal::prelude::ToPrimitive;
+    let x = (num / den).to_f64().expect("rate not representable as f64");
+    cf_rational(x, 2_000_000_000)
+        .unwrap_or_else(|| panic!("cannot find rational approximation for rate {num}/{den}"))
+}
+
+fn rate_gcd(a: i64, b: i64) -> i64 {
+    if b == 0 { a } else { rate_gcd(b, a % b) }
+}
+
+/// Find the simplest rational p/q with q ≤ max_denom that approximates x within 1e-9.
+/// Uses the continued fraction (convergents) algorithm.
+fn cf_rational(x: f64, max_denom: i64) -> Option<(i64, i64)> {
+    let neg = x < 0.0;
+    let x = x.abs();
+    let (mut h0, mut k0) = (1i64, 0i64);
+    let (mut h1, mut k1) = (x.floor() as i64, 1i64);
+    let mut frac = x - x.floor();
+    loop {
+        let approx = h1 as f64 / k1 as f64;
+        if frac < 1e-10 || (approx - x).abs() < 1e-9f64.max(x * 1e-9) {
+            return Some(if neg { (-h1, k1) } else { (h1, k1) });
+        }
+        let recip = 1.0 / frac;
+        let a = recip.floor() as i64;
+        frac = recip - a as f64;
+        let h2 = a * h1 + h0;
+        let k2 = a * k1 + k0;
+        if k2 > max_denom || k2 < 0 {
+            return Some(if neg { (-h1, k1) } else { (h1, k1) });
+        }
+        (h0, k0) = (h1, k1);
+        (h1, k1) = (h2, k2);
+    }
+}
+
+/// Derive card pull rates from rarity rates, replacing the API-provided float values.
+///
+/// Per-card rates are not stored directly in the PTCGP APK; RaenonX computes them
+/// as `rarity_total_rate / n_cards_of_that_rarity_in_slot`. This function performs
+/// the same computation to obtain exact integer fractions.
+///
+/// For verification, the API-provided value is compared against the derived rate;
+/// mismatches beyond floating-point rounding are logged as warnings.
+pub fn fix_card_rates_from_rarity(
+    rates: &mut crate::models::PackPullRates,
+    card_id_to_rarity: &HashMap<String, String>,
+) {
+    use rust_decimal::prelude::ToPrimitive;
+
+    for variant in rates.variants.values_mut() {
+        let slot_count = variant.rarity_rates_by_slot.len()
+            .max(variant.card_rates.values().map(|v| v.len()).max().unwrap_or(0));
+
+        for slot_idx in 0..slot_count {
+            // Count how many cards of each rarity appear in this slot.
+            let mut rarity_counts: HashMap<&str, usize> = HashMap::new();
+            for (card_id, slot_rates) in variant.card_rates.iter() {
+                if slot_rates.get(slot_idx).map_or(false, |r| r.is_some()) {
+                    let rarity = card_id_to_rarity.get(card_id).map(String::as_str).unwrap_or("");
+                    *rarity_counts.entry(rarity).or_insert(0) += 1;
+                }
+            }
+
+            let rarity_map = variant.rarity_rates_by_slot.get(slot_idx);
+
+            for (card_id, slot_rates) in variant.card_rates.iter_mut() {
+                let Some(Some(api_rate)) = slot_rates.get(slot_idx) else { continue };
+                let rarity = card_id_to_rarity.get(card_id).map(String::as_str).unwrap_or("");
+                let Some(rarity_rate) = rarity_map.and_then(|m| m.get(rarity)) else {
+                    warn!(
+                        card_id,
+                        slot = slot_idx,
+                        rarity,
+                        "card rarity not found in slot rarity rates; keeping API value"
+                    );
+                    continue;
+                };
+                let n = *rarity_counts.get(rarity).unwrap_or(&1) as i64;
+                let Ok(rn): Result<i64, _> = rarity_rate.numerator.try_into() else { continue };
+                let Ok(rd): Result<i64, _> = rarity_rate.denominator.try_into() else { continue };
+                let den = rd * n;
+                let g = rate_gcd(rn.abs(), den.abs());
+                let derived_num = rn / g;
+                let derived_den = den / g;
+
+                // Verify: the API float should match the derived exact fraction.
+                let api_f64 = api_rate.numerator.to_f64().unwrap_or(f64::NAN)
+                    / api_rate.denominator.to_f64().unwrap_or(1.0);
+                let derived_f64 = derived_num as f64 / derived_den as f64;
+                if api_f64.is_finite() && (api_f64 - derived_f64).abs() > api_f64.abs() * 1e-4 {
+                    warn!(
+                        card_id,
+                        slot = slot_idx,
+                        rarity,
+                        api_rate = api_f64,
+                        derived_rate = derived_f64,
+                        "card rate mismatch: API value does not match rarity/{n}"
+                    );
+                }
+
+                slot_rates[slot_idx] = Some(crate::models::Rate {
+                    numerator: Decimal::from(derived_num),
+                    denominator: Decimal::from(derived_den),
+                });
+            }
+        }
+    }
+}
+
+fn slot_rarity_rates(by_rarity: Option<&Value>, variant: &str) -> Vec<HashMap<String, Rate>> {
     let slots = by_rarity
         .and_then(|br| br.get(variant))
         .and_then(Value::as_array);
@@ -652,7 +783,7 @@ fn slot_rarity_rates(by_rarity: Option<&Value>, variant: &str) -> Vec<HashMap<St
                 .map(|obj| {
                     obj.iter()
                         .filter_map(|(rarity, v)| {
-                            parse_rate_obj(v).map(|r| (rarity.clone(), r.as_f64()))
+                            parse_rate_obj(v).map(|r| (rarity.clone(), r))
                         })
                         .collect()
                 })

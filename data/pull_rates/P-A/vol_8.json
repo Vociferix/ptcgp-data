@@ -3,36 +3,57 @@
   "subtitle": "Vol 8",
   "variants": {
     "normal": {
-      "rate": 1.0,
-      "rate_numerator": 2.0,
-      "rate_denominator": 2.0,
+      "rate_numerator": 1,
+      "rate_denominator": 1,
       "slot_count": 1,
       "rarity_rates_by_slot": [
         {
-          "R": 0.1582,
-          "C": 0.7152,
-          "AR": 0.1266
+          "C": {
+            "numerator": 447,
+            "denominator": 625
+          },
+          "AR": {
+            "numerator": 633,
+            "denominator": 5000
+          },
+          "R": {
+            "numerator": 791,
+            "denominator": 5000
+          }
         }
       ],
       "card_rates": {
-        "071": [
-          0.2384
-        ],
-        "070": [
-          0.1266
+        "072": [
+          {
+            "numerator": 149,
+            "denominator": 625
+          }
         ],
         "069": [
-          0.1582
-        ],
-        "072": [
-          0.2384
+          {
+            "numerator": 791,
+            "denominator": 5000
+          }
         ],
         "073": [
-          0.2384
+          {
+            "numerator": 149,
+            "denominator": 625
+          }
+        ],
+        "071": [
+          {
+            "numerator": 149,
+            "denominator": 625
+          }
+        ],
+        "070": [
+          {
+            "numerator": 633,
+            "denominator": 5000
+          }
         ]
       }
-    },
-    "rare": null,
-    "plus1": null
+    }
   }
 }
