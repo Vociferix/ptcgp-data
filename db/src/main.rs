@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{BTreeSet, HashMap};
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
@@ -325,6 +325,21 @@ fn insert_sets(tx: &rusqlite::Transaction, data: &Path) -> Result<HashMap<String
     let sets: Vec<SetSummary> = load_json(&path)?;
     let mut set_map = HashMap::new();
 
+    // Seed pack_subtitles alphabetically before inserting packs.
+    let mut all_subtitles: BTreeSet<String> = BTreeSet::new();
+    for set in &sets {
+        let detail_path = data.join("sets").join(&set.code).join("set.json");
+        if let Ok(detail) = load_json::<SetDetail>(&detail_path) {
+            all_subtitles.extend(detail.packs);
+        }
+    }
+    for subtitle in &all_subtitles {
+        tx.execute(
+            "INSERT OR IGNORE INTO pack_subtitles (subtitle) VALUES (?1)",
+            params![subtitle],
+        )?;
+    }
+
     for set in &sets {
         tx.execute(
             "INSERT OR IGNORE INTO series (code) VALUES (?1)",
@@ -372,10 +387,6 @@ fn insert_sets(tx: &rusqlite::Transaction, data: &Path) -> Result<HashMap<String
         }
         let detail: SetDetail = load_json(&detail_path)?;
         for subtitle in &detail.packs {
-            tx.execute(
-                "INSERT OR IGNORE INTO pack_subtitles (subtitle) VALUES (?1)",
-                params![subtitle],
-            )?;
             let subtitle_id: i64 = tx.query_row(
                 "SELECT id FROM pack_subtitles WHERE subtitle = ?1",
                 params![subtitle],
@@ -429,18 +440,77 @@ fn insert_abstract_cards(
         .collect();
     entries.sort_by_key(|e| e.path());
 
+    // Phase 1: load all cards.
+    let mut cards: Vec<AbstractCard> = Vec::with_capacity(entries.len());
+    for entry in &entries {
+        match load_json(&entry.path()) {
+            Ok(c) => cards.push(c),
+            Err(e) => v.add(format!("{}: failed to parse: {e}", entry.path().display())),
+        }
+    }
+
+    // Phase 2: seed all string tables alphabetically.
+    let mut card_names: BTreeSet<&str> = BTreeSet::new();
+    let mut stages: BTreeSet<&str> = BTreeSet::new();
+    let mut pokemon_variants: BTreeSet<&str> = BTreeSet::new();
+    let mut ability_names: BTreeSet<&str> = BTreeSet::new();
+    let mut ability_effects: BTreeSet<&str> = BTreeSet::new();
+    let mut attack_names: BTreeSet<&str> = BTreeSet::new();
+    let mut attack_effects: BTreeSet<&str> = BTreeSet::new();
+    let mut trainer_kinds: BTreeSet<&str> = BTreeSet::new();
+    let mut trainer_effects: BTreeSet<&str> = BTreeSet::new();
+    for card in &cards {
+        card_names.insert(&card.name);
+        if let Some(s) = &card.stage { stages.insert(s); }
+        for ident in &card.variants { pokemon_variants.insert(ident); }
+        if let Some(from) = &card.evolves_from { card_names.insert(from); }
+        if let Some(ab) = &card.ability {
+            ability_names.insert(&ab.name);
+            ability_effects.insert(&ab.effect);
+        }
+        for atk in &card.attacks {
+            attack_names.insert(&atk.name);
+            if let Some(fx) = &atk.effect { attack_effects.insert(fx); }
+        }
+        if let Some(kind) = &card.trainer_kind { trainer_kinds.insert(kind); }
+        if card.card_type == "trainer" {
+            trainer_effects.insert(card.trainer_effect.as_deref().unwrap_or(""));
+        }
+    }
+    for name in &card_names {
+        tx.execute("INSERT OR IGNORE INTO card_names (name) VALUES (?1)", params![name])?;
+    }
+    for name in &stages {
+        tx.execute("INSERT OR IGNORE INTO stages (name) VALUES (?1)", params![name])?;
+    }
+    for ident in &pokemon_variants {
+        tx.execute("INSERT OR IGNORE INTO pokemon_variants (ident) VALUES (?1)", params![ident])?;
+    }
+    for name in &ability_names {
+        tx.execute("INSERT OR IGNORE INTO ability_names (name) VALUES (?1)", params![name])?;
+    }
+    for effect in &ability_effects {
+        tx.execute("INSERT OR IGNORE INTO ability_effects (effect) VALUES (?1)", params![effect])?;
+    }
+    for name in &attack_names {
+        tx.execute("INSERT OR IGNORE INTO attack_names (name) VALUES (?1)", params![name])?;
+    }
+    for effect in &attack_effects {
+        tx.execute("INSERT OR IGNORE INTO attack_effects (effect) VALUES (?1)", params![effect])?;
+    }
+    for name in &trainer_kinds {
+        tx.execute("INSERT OR IGNORE INTO trainer_kinds (name) VALUES (?1)", params![name])?;
+    }
+    for effect in &trainer_effects {
+        tx.execute("INSERT OR IGNORE INTO trainer_effects (effect) VALUES (?1)", params![effect])?;
+    }
+
+    // Phase 3: insert cards (string inserts in sub-functions are now no-ops).
     let mut card_id_map = HashMap::new();
-    for entry in entries {
-        let card: AbstractCard = match load_json(&entry.path()) {
-            Ok(c) => c,
-            Err(e) => {
-                v.add(format!("{}: failed to parse: {e}", entry.path().display()));
-                continue;
-            }
-        };
+    for card in &cards {
         let json_id = card.id;
         let name = card.name.clone();
-        match insert_abstract_card(tx, &card, v) {
+        match insert_abstract_card(tx, card, v) {
             Ok(db_id) => {
                 card_id_map.insert(json_id, db_id);
             }
@@ -776,9 +846,8 @@ fn insert_card_versions(
     }
     let sets: Vec<SetSummary> = load_json(&sets_path)?;
 
-    let mut all_versions: Vec<CardVersion> = Vec::new();
-    let mut version_db_map: HashMap<(String, u32), i64> = HashMap::new();
-
+    // Phase 1: pre-load all card versions across all sets.
+    let mut loaded: Vec<(i64, CardVersion)> = Vec::new();
     for set in &sets {
         let cards_dir = data.join("sets").join(&set.code).join("cards");
         if !cards_dir.exists() {
@@ -799,107 +868,117 @@ fn insert_card_versions(
         entries.sort_by_key(|e| e.path());
 
         for entry in entries {
-            let version: CardVersion = match load_json(&entry.path()) {
-                Ok(cv) => cv,
-                Err(e) => {
-                    v.add(format!("{}: failed to parse: {e}", entry.path().display()));
-                    continue;
-                }
-            };
+            match load_json(&entry.path()) {
+                Ok(version) => loaded.push((set_id, version)),
+                Err(e) => v.add(format!("{}: failed to parse: {e}", entry.path().display())),
+            }
+        }
+    }
 
-            let Some(&card_db_id) = card_id_map.get(&version.card_id) else {
+    // Phase 2: seed illustrators alphabetically.
+    let illustrators: BTreeSet<&str> = loaded
+        .iter()
+        .filter_map(|(_, cv)| cv.illustrator.as_deref())
+        .collect();
+    for name in &illustrators {
+        tx.execute(
+            "INSERT OR IGNORE INTO illustrators (name) VALUES (?1)",
+            params![name],
+        )?;
+    }
+
+    // Phase 3: process versions.
+    let mut all_versions: Vec<CardVersion> = Vec::new();
+    let mut version_db_map: HashMap<(String, u32), i64> = HashMap::new();
+    for (set_id, version) in loaded {
+        let Some(&card_db_id) = card_id_map.get(&version.card_id) else {
+            v.add(format!(
+                "{}/{:03}: abstract card {:05} not found",
+                version.set, version.number, version.card_id
+            ));
+            continue;
+        };
+
+        let rarity_id = match tx.query_row::<i64, _, _>(
+            "SELECT id FROM rarities WHERE code = ?1",
+            params![version.rarity],
+            |row| row.get(0),
+        ) {
+            Ok(id) => id,
+            Err(_) => {
                 v.add(format!(
-                    "{}/{:03}: abstract card {:05} not found",
-                    version.set, version.number, version.card_id
+                    "{}/{:03}: unknown rarity '{}'",
+                    version.set, version.number, version.rarity
                 ));
                 continue;
-            };
+            }
+        };
 
-            let rarity_id = match tx.query_row::<i64, _, _>(
-                "SELECT id FROM rarities WHERE code = ?1",
-                params![version.rarity],
+        tx.execute(
+            "INSERT INTO card_versions (card_id, set_id, rarity_id, number) \
+             VALUES (?1, ?2, ?3, ?4)",
+            params![card_db_id, set_id, rarity_id, version.number],
+        )?;
+        let version_db_id = tx.last_insert_rowid();
+        version_db_map.insert((version.set.clone(), version.number), version_db_id);
+
+        if let Some(ill) = &version.illustrator {
+            let ill_id: i64 = tx.query_row(
+                "SELECT id FROM illustrators WHERE name = ?1",
+                params![ill],
                 |row| row.get(0),
-            ) {
-                Ok(id) => id,
-                Err(_) => {
-                    v.add(format!(
-                        "{}/{:03}: unknown rarity '{}'",
-                        version.set, version.number, version.rarity
-                    ));
-                    continue;
-                }
-            };
-
-            tx.execute(
-                "INSERT INTO card_versions (card_id, set_id, rarity_id, number) \
-                 VALUES (?1, ?2, ?3, ?4)",
-                params![card_db_id, set_id, rarity_id, version.number],
             )?;
-            let version_db_id = tx.last_insert_rowid();
-            version_db_map.insert((version.set.clone(), version.number), version_db_id);
+            tx.execute(
+                "INSERT OR IGNORE INTO card_version_illustrators \
+                 (card_version_id, illustrator_id) VALUES (?1, ?2)",
+                params![version_db_id, ill_id],
+            )?;
+        }
 
-            if let Some(ill) = &version.illustrator {
-                tx.execute(
-                    "INSERT OR IGNORE INTO illustrators (name) VALUES (?1)",
-                    params![ill],
-                )?;
-                let ill_id: i64 = tx.query_row(
-                    "SELECT id FROM illustrators WHERE name = ?1",
-                    params![ill],
-                    |row| row.get(0),
-                )?;
-                tx.execute(
-                    "INSERT OR IGNORE INTO card_version_illustrators \
-                     (card_version_id, illustrator_id) VALUES (?1, ?2)",
-                    params![version_db_id, ill_id],
-                )?;
-            }
+        if version.is_promo {
+            tx.execute(
+                "INSERT OR IGNORE INTO promo_card_versions (card_version_id) VALUES (?1)",
+                params![version_db_id],
+            )?;
+        }
+        if version.is_foil {
+            tx.execute(
+                "INSERT OR IGNORE INTO foil_card_versions (card_version_id) VALUES (?1)",
+                params![version_db_id],
+            )?;
+        }
 
-            if version.is_promo {
-                tx.execute(
-                    "INSERT OR IGNORE INTO promo_card_versions (card_version_id) VALUES (?1)",
-                    params![version_db_id],
-                )?;
-            }
-            if version.is_foil {
-                tx.execute(
-                    "INSERT OR IGNORE INTO foil_card_versions (card_version_id) VALUES (?1)",
-                    params![version_db_id],
-                )?;
-            }
-
-            for subtitle in &version.packs {
-                match lookup_pack(tx, set_id, subtitle) {
-                    Some(pid) => {
-                        tx.execute(
-                            "INSERT OR IGNORE INTO card_packs (card_version_id, pack_id) \
-                             VALUES (?1, ?2)",
-                            params![version_db_id, pid],
-                        )?;
-                    }
-                    None => v.add(format!(
-                        "{}/{:03}: pack '{subtitle}' not found",
-                        version.set, version.number
-                    )),
-                }
-            }
-
-            for source_code in &version.promo_sources {
-                if let Ok(source_id) = tx.query_row::<i64, _, _>(
-                    "SELECT id FROM promo_sources WHERE code = ?1",
-                    params![source_code],
-                    |row| row.get(0),
-                ) {
+        for subtitle in &version.packs {
+            match lookup_pack(tx, set_id, subtitle) {
+                Some(pid) => {
                     tx.execute(
-                        "INSERT OR IGNORE INTO card_version_promo_sources \
-                         (card_version_id, promo_source_id) VALUES (?1, ?2)",
-                        params![version_db_id, source_id],
+                        "INSERT OR IGNORE INTO card_packs (card_version_id, pack_id) \
+                         VALUES (?1, ?2)",
+                        params![version_db_id, pid],
                     )?;
                 }
+                None => v.add(format!(
+                    "{}/{:03}: pack '{subtitle}' not found",
+                    version.set, version.number
+                )),
             }
-
-            all_versions.push(version);
         }
+
+        for source_code in &version.promo_sources {
+            if let Ok(source_id) = tx.query_row::<i64, _, _>(
+                "SELECT id FROM promo_sources WHERE code = ?1",
+                params![source_code],
+                |row| row.get(0),
+            ) {
+                tx.execute(
+                    "INSERT OR IGNORE INTO card_version_promo_sources \
+                     (card_version_id, promo_source_id) VALUES (?1, ?2)",
+                    params![version_db_id, source_id],
+                )?;
+            }
+        }
+
+        all_versions.push(version);
     }
 
     insert_version_duplicates(tx, &all_versions, &version_db_map)?;
@@ -1027,6 +1106,28 @@ fn insert_pull_rates(
         .collect::<rusqlite::Result<_>>()?;
     drop(stmt);
 
+    // Seed pack_variant_names alphabetically before inserting pull rates.
+    let mut all_variant_names: BTreeSet<String> = BTreeSet::new();
+    for entry in std::fs::read_dir(&pull_rates_dir)?.filter_map(|e| e.ok()) {
+        if !entry.path().is_dir() { continue; }
+        for file in std::fs::read_dir(entry.path())?.filter_map(|e| e.ok()) {
+            if !file.path().extension().is_some_and(|x| x == "json") { continue; }
+            if let Ok(rates) = load_json::<PackPullRates>(&file.path()) {
+                for (name, variant) in &rates.variants {
+                    if variant.is_some() {
+                        all_variant_names.insert(name.clone());
+                    }
+                }
+            }
+        }
+    }
+    for name in &all_variant_names {
+        tx.execute(
+            "INSERT OR IGNORE INTO pack_variant_names (name) VALUES (?1)",
+            params![name],
+        )?;
+    }
+
     let mut set_dirs: Vec<_> = std::fs::read_dir(&pull_rates_dir)?
         .filter_map(|e| e.ok())
         .filter(|e| e.path().is_dir())
@@ -1094,10 +1195,6 @@ fn insert_pull_rates(
             for (variant_name, variant) in
                 rates.variants.iter().filter_map(|(k, v)| v.as_ref().map(|v| (k, v)))
             {
-                tx.execute(
-                    "INSERT OR IGNORE INTO pack_variant_names (name) VALUES (?1)",
-                    params![variant_name],
-                )?;
                 let name_id: i64 = tx.query_row(
                     "SELECT id FROM pack_variant_names WHERE name = ?1",
                     params![variant_name],
