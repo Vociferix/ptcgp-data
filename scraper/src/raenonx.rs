@@ -8,7 +8,7 @@ use serde_json::Value;
 use tracing::warn;
 
 use crate::client::Client;
-use crate::models::{CardEntry, PackPullRates, PackVariantRates, PackVariants, Rate};
+use crate::models::{CardEntry, PackPullRates, PackVariantRates, PackVariants, Rate, RaritySlotRates};
 
 const GLOBAL_MASTER_URL: &str = "https://ptcgp.raenonx.cc/api/data/global-master";
 
@@ -566,7 +566,12 @@ fn build_variants(
         let max_rare_card_len = rare_cards.values().map(Vec::len).max().unwrap_or(0);
         if rare_rarity.len() > max_rare_card_len && max_rare_card_len > 0 {
             let extra_are_artifacts = rare_rarity[max_rare_card_len..].iter().all(|slot| {
-                slot.len() == 1 && slot.values().all(|r| r.numerator == r.denominator)
+                slot.len() == 1
+                    && slot.values().all(|r| {
+                        r.normal
+                            .as_ref()
+                            .is_some_and(|rate| rate.numerator == rate.denominator)
+                    })
             });
             if extra_are_artifacts {
                 warn!(
@@ -783,8 +788,9 @@ pub fn fix_card_rates_from_rarity(
             for (rarity, &fc) in &foil_counts {
                 if nonfoil_counts.get(rarity).copied().unwrap_or(0) == 0 {
                     if let Some(rr) = rarity_map.and_then(|m| m.get(*rarity)) {
-                        let Ok(rn): Result<i64, _> = rr.numerator.try_into() else { continue };
-                        let Ok(rd): Result<i64, _> = rr.denominator.try_into() else { continue };
+                        let Some(total) = &rr.normal else { continue };
+                        let Ok(rn): Result<i64, _> = total.numerator.try_into() else { continue };
+                        let Ok(rd): Result<i64, _> = total.denominator.try_into() else { continue };
                         let den = rd * fc as i64;
                         let g = rate_gcd(rn.abs(), den.abs());
                         let candidate = (rn / g, den / g);
@@ -802,13 +808,13 @@ pub fn fix_card_rates_from_rarity(
                 }
             }
 
+            // Update per-card rates.
             for (card_id, slot_rates) in variant.card_rates.iter_mut() {
                 let Some(Some(api_rate)) = slot_rates.get(slot_idx) else { continue };
                 let rarity = card_id_to_rarity.get(card_id).map(String::as_str).unwrap_or("");
                 let is_foil = card_id_to_is_foil.get(card_id).copied().unwrap_or(false);
 
                 let derived = if is_foil {
-                    // All foil cards in a slot share the same mirror rate.
                     if let Some((mn, md)) = mirror_rate {
                         Some((mn, md))
                     } else {
@@ -829,17 +835,13 @@ pub fn fix_card_rates_from_rarity(
                         );
                         continue;
                     };
-                    let Ok(rn): Result<i64, _> = rarity_rate.numerator.try_into() else { continue };
-                    let Ok(rd): Result<i64, _> = rarity_rate.denominator.try_into() else { continue };
+                    let Some(total) = &rarity_rate.normal else { continue };
+                    let Ok(rn): Result<i64, _> = total.numerator.try_into() else { continue };
+                    let Ok(rd): Result<i64, _> = total.denominator.try_into() else { continue };
                     let nf_count = nonfoil_counts.get(rarity).copied().unwrap_or(0) as i64;
                     let f_count = foil_counts.get(rarity).copied().unwrap_or(0) as i64;
 
                     if f_count > 0 {
-                        // Mixed rarity: subtract foil contribution before dividing.
-                        // non_foil_total = rn/rd - f_count * mn/md
-                        //               = (rn*md - rd*f_count*mn) / (rd*md)
-                        // per_non_foil  = non_foil_total / nf_count
-                        //               = (rn*md - rd*f_count*mn) / (rd*md*nf_count)
                         let Some((mn, md)) = mirror_rate else {
                             warn!(
                                 card_id,
@@ -854,7 +856,6 @@ pub fn fix_card_rates_from_rarity(
                         let g = rate_gcd(num.abs(), den.abs());
                         Some((num / g, den / g))
                     } else {
-                        // All non-foil: standard derivation.
                         let den = rd * nf_count;
                         let g = rate_gcd(rn.abs(), den.abs());
                         Some((rn / g, den / g))
@@ -863,7 +864,6 @@ pub fn fix_card_rates_from_rarity(
 
                 let Some((derived_num, derived_den)) = derived else { continue };
 
-                // Verify the API float matches the derived exact fraction.
                 let api_f64 = api_rate.numerator.to_f64().unwrap_or(f64::NAN)
                     / api_rate.denominator.to_f64().unwrap_or(1.0);
                 let derived_f64 = derived_num as f64 / derived_den as f64;
@@ -884,11 +884,62 @@ pub fn fix_card_rates_from_rarity(
                     denominator: Decimal::from(derived_den),
                 });
             }
+
+            // Split each rarity's total rate into normal and foil sub-rates.
+            if let Some(slot_rarity) = variant.rarity_rates_by_slot.get_mut(slot_idx) {
+                for (rarity, rarity_rates) in slot_rarity.iter_mut() {
+                    let fc = foil_counts.get(rarity.as_str()).copied().unwrap_or(0) as i64;
+                    let nfc = nonfoil_counts.get(rarity.as_str()).copied().unwrap_or(0) as i64;
+
+                    if fc == 0 {
+                        continue; // all non-foil: keep as normal only
+                    }
+
+                    let Some(total) = rarity_rates.normal.take() else { continue };
+
+                    if nfc == 0 {
+                        // All foil: total rate belongs entirely to foil.
+                        rarity_rates.foil = Some(total);
+                    } else if let Some((mn, md)) = mirror_rate {
+                        // Mixed: foil portion = fc × mirror_rate; normal = total − foil.
+                        let Ok(rn): Result<i64, _> = total.numerator.try_into() else {
+                            rarity_rates.normal = Some(total);
+                            continue;
+                        };
+                        let Ok(rd): Result<i64, _> = total.denominator.try_into() else {
+                            rarity_rates.normal = Some(total);
+                            continue;
+                        };
+
+                        let foil_raw_n = fc * mn;
+                        let foil_raw_d = md;
+                        let gf = rate_gcd(foil_raw_n.abs(), foil_raw_d.abs());
+
+                        let normal_num = rn * md - rd * fc * mn;
+                        let normal_den = rd * md;
+                        let gn = rate_gcd(normal_num.abs(), normal_den.abs());
+
+                        rarity_rates.foil = Some(crate::models::Rate {
+                            numerator: Decimal::from(foil_raw_n / gf),
+                            denominator: Decimal::from(foil_raw_d / gf),
+                        });
+                        rarity_rates.normal = Some(crate::models::Rate {
+                            numerator: Decimal::from(normal_num / gn),
+                            denominator: Decimal::from(normal_den / gn),
+                        });
+                    } else {
+                        rarity_rates.normal = Some(total); // no mirror rate, leave unchanged
+                    }
+                }
+            }
         }
     }
 }
 
-fn slot_rarity_rates(by_rarity: Option<&Value>, variant: &str) -> Vec<HashMap<String, Rate>> {
+fn slot_rarity_rates(
+    by_rarity: Option<&Value>,
+    variant: &str,
+) -> Vec<HashMap<String, RaritySlotRates>> {
     let slots = by_rarity
         .and_then(|br| br.get(variant))
         .and_then(Value::as_array);
@@ -903,7 +954,9 @@ fn slot_rarity_rates(by_rarity: Option<&Value>, variant: &str) -> Vec<HashMap<St
                 .map(|obj| {
                     obj.iter()
                         .filter_map(|(rarity, v)| {
-                            parse_rate_obj(v).map(|r| (rarity.clone(), r))
+                            parse_rate_obj(v).map(|r| {
+                                (rarity.clone(), RaritySlotRates { normal: Some(r), foil: None })
+                            })
                         })
                         .collect()
                 })

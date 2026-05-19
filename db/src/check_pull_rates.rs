@@ -35,11 +35,17 @@ struct Rate {
 }
 
 #[derive(Deserialize)]
+struct RaritySlotRates {
+    normal: Option<Rate>,
+    foil: Option<Rate>,
+}
+
+#[derive(Deserialize)]
 struct PackVariantRates {
     rate_numerator: Decimal,
     rate_denominator: Decimal,
     slot_count: u32,
-    rarity_rates_by_slot: Vec<HashMap<String, Rate>>,
+    rarity_rates_by_slot: Vec<HashMap<String, RaritySlotRates>>,
     card_rates: HashMap<String, Vec<Option<Rate>>>,
 }
 
@@ -210,9 +216,14 @@ fn main() -> Result<()> {
                     if let Some(rarity_rates) =
                         variant.rarity_rates_by_slot.get(slot_idx as usize)
                     {
-                        for rate in rarity_rates.values() {
-                            let (_, d) = rate_to_integers(rate);
-                            expected_slot_denom = lcm(expected_slot_denom, d);
+                        for rates in rarity_rates.values() {
+                            for rate in [rates.normal.as_ref(), rates.foil.as_ref()]
+                                .into_iter()
+                                .flatten()
+                            {
+                                let (_, d) = rate_to_integers(rate);
+                                expected_slot_denom = lcm(expected_slot_denom, d);
+                            }
                         }
                     }
                     for slot_rates in variant.card_rates.values() {
@@ -247,32 +258,39 @@ fn main() -> Result<()> {
                     if let Some(rarity_rates) =
                         variant.rarity_rates_by_slot.get(slot_idx as usize)
                     {
-                        for (rarity_code, rate) in rarity_rates {
-                            let (rn, rd) = rate_to_integers(rate);
-                            let expected_num = rn * (expected_slot_denom / rd);
-                            match conn.query_row::<i64, _, _>(
-                                "SELECT rpr.rate_numerator \
-                                 FROM rarity_pull_rates rpr \
-                                 JOIN rarities r ON r.id = rpr.rarity_id \
-                                 WHERE rpr.slot_id = ?1 AND r.code = ?2",
-                                params![slot_id, rarity_code],
-                                |row| row.get(0),
-                            ) {
-                                Ok(db_num) => {
-                                    if db_num != expected_num {
-                                        mismatches.push(format!(
-                                            "{slot_prefix}/rarity={rarity_code}: \
-                                             numerator mismatch — db={db_num} \
-                                             expected={expected_num} \
-                                             (json={}/{})",
-                                            rate.numerator, rate.denominator
-                                        ));
+                        for (rarity_code, slot_rates) in rarity_rates {
+                            for (is_foil, rate) in [
+                                (0i64, slot_rates.normal.as_ref()),
+                                (1i64, slot_rates.foil.as_ref()),
+                            ] {
+                                let Some(rate) = rate else { continue };
+                                let (rn, rd) = rate_to_integers(rate);
+                                let expected_num = rn * (expected_slot_denom / rd);
+                                let foil_label = if is_foil == 1 { "foil" } else { "normal" };
+                                match conn.query_row::<i64, _, _>(
+                                    "SELECT rpr.rate_numerator \
+                                     FROM rarity_pull_rates rpr \
+                                     JOIN rarities r ON r.id = rpr.rarity_id \
+                                     WHERE rpr.slot_id = ?1 AND r.code = ?2 AND rpr.is_foil = ?3",
+                                    params![slot_id, rarity_code, is_foil],
+                                    |row| row.get(0),
+                                ) {
+                                    Ok(db_num) => {
+                                        if db_num != expected_num {
+                                            mismatches.push(format!(
+                                                "{slot_prefix}/rarity={rarity_code}/{foil_label}: \
+                                                 numerator mismatch — db={db_num} \
+                                                 expected={expected_num} \
+                                                 (json={}/{})",
+                                                rate.numerator, rate.denominator
+                                            ));
+                                        }
+                                        checked += 1;
                                     }
-                                    checked += 1;
+                                    Err(_) => mismatches.push(format!(
+                                        "{slot_prefix}/rarity={rarity_code}/{foil_label}: row missing"
+                                    )),
                                 }
-                                Err(_) => mismatches.push(format!(
-                                    "{slot_prefix}/rarity={rarity_code}: row missing"
-                                )),
                             }
                         }
                     }

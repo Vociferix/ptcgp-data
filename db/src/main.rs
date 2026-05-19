@@ -204,8 +204,14 @@ struct PackVariantRates {
     rate_numerator: Decimal,
     rate_denominator: Decimal,
     slot_count: u32,
-    rarity_rates_by_slot: Vec<HashMap<String, Rate>>,
+    rarity_rates_by_slot: Vec<HashMap<String, RaritySlotRates>>,
     card_rates: HashMap<String, Vec<Option<Rate>>>,
+}
+
+#[derive(Deserialize)]
+struct RaritySlotRates {
+    normal: Option<Rate>,
+    foil: Option<Rate>,
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
@@ -1374,9 +1380,14 @@ fn insert_pull_rates(
                     if let Some(rarity_rates) =
                         variant.rarity_rates_by_slot.get(slot_idx as usize)
                     {
-                        for rate in rarity_rates.values() {
-                            let (_, d) = rate_to_integers(rate);
-                            slot_denom = lcm(slot_denom, d);
+                        for rates in rarity_rates.values() {
+                            for rate in [rates.normal.as_ref(), rates.foil.as_ref()]
+                                .into_iter()
+                                .flatten()
+                            {
+                                let (_, d) = rate_to_integers(rate);
+                                slot_denom = lcm(slot_denom, d);
+                            }
                         }
                     }
                     for slot_rates in variant.card_rates.values() {
@@ -1401,16 +1412,23 @@ fn insert_pull_rates(
                     if let Some(rarity_rates) =
                         variant.rarity_rates_by_slot.get(slot_idx as usize)
                     {
-                        for (rarity_code, rate) in rarity_rates {
-                            let (rn, rd) = rate_to_integers(rate);
-                            let scaled_num = rn * (slot_denom / rd);
+                        for (rarity_code, slot_rates) in rarity_rates {
                             match rarity_ids.get(rarity_code.as_str()) {
                                 Some(&rarity_id) => {
-                                    tx.execute(
-                                        "INSERT OR IGNORE INTO rarity_pull_rates \
-                                         (slot_id, rarity_id, rate_numerator) VALUES (?1, ?2, ?3)",
-                                        params![slot_id, rarity_id, scaled_num],
-                                    )?;
+                                    for (is_foil, rate) in [
+                                        (0i64, slot_rates.normal.as_ref()),
+                                        (1i64, slot_rates.foil.as_ref()),
+                                    ] {
+                                        let Some(rate) = rate else { continue };
+                                        let (rn, rd) = rate_to_integers(rate);
+                                        let scaled_num = rn * (slot_denom / rd);
+                                        tx.execute(
+                                            "INSERT OR IGNORE INTO rarity_pull_rates \
+                                             (slot_id, rarity_id, is_foil, rate_numerator) \
+                                             VALUES (?1, ?2, ?3, ?4)",
+                                            params![slot_id, rarity_id, is_foil, scaled_num],
+                                        )?;
+                                    }
                                 }
                                 None => v.add(format!(
                                     "pull_rates/{set_code}/{}: unknown rarity '{rarity_code}'",

@@ -897,12 +897,11 @@ CREATE TABLE pack_slots (
 
 -- Rarity Pull Rates
 --
--- Each row represents the probability of pulling card of a
--- particular rarity for a particular pack variant slot. Note that
--- this information is mostly supplementary for users and does not
--- define the probability of pulling any card of the specified
--- rarity. In some cases, not all cards of the specified rarity
--- are obtainable from the slot.
+-- Each row represents the probability of pulling a card of a particular
+-- rarity and finish (foil or normal) from a particular pack variant slot.
+-- A rarity with only normal-finish cards has one row (is_foil = 0).
+-- A rarity with only foil-finish cards has one row (is_foil = 1).
+-- A rarity with a mix of both finishes has two rows, one for each.
 CREATE TABLE rarity_pull_rates (
     -- pack_slots.id - The slot this pull rate is for
     slot_id INTEGER NOT NULL,
@@ -910,7 +909,10 @@ CREATE TABLE rarity_pull_rates (
     -- rarities.id - The rarity with the pull rate described
     rarity_id INTEGER NOT NULL,
 
-    -- The numerator of the pull rate for this rarity.
+    -- Whether this row covers foil-finish cards (1) or normal-finish cards (0)
+    is_foil INTEGER NOT NULL CHECK (is_foil IN (0, 1)),
+
+    -- The numerator of the pull rate for this rarity + finish combination.
     --
     -- The denominator of the pull rate is specified in the
     -- pack_slots table. Together the numerator and denominator
@@ -919,7 +921,7 @@ CREATE TABLE rarity_pull_rates (
 
     FOREIGN KEY (slot_id) REFERENCES pack_slots (id),
     FOREIGN KEY (rarity_id) REFERENCES rarities (id),
-    UNIQUE (slot_id, rarity_id) ON CONFLICT FAIL
+    UNIQUE (slot_id, rarity_id, is_foil) ON CONFLICT FAIL
 );
 
 -- Card Version Pull Rates

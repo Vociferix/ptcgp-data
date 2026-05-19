@@ -255,8 +255,21 @@ pub struct PackVariantRates {
     #[serde(with = "rust_decimal::serde::arbitrary_precision")]
     pub rate_denominator: Decimal,
     pub slot_count: u32,
-    /// Per-slot rarity breakdown: each element maps rarity code -> exact fraction
-    pub rarity_rates_by_slot: Vec<HashMap<String, Rate>>,
+    /// Per-slot rarity breakdown: each element maps rarity code -> foil/normal sub-rates
+    pub rarity_rates_by_slot: Vec<HashMap<String, RaritySlotRates>>,
     /// Per-card pull rates: card key -> one Rate per slot (null = cannot appear)
     pub card_rates: HashMap<String, Vec<Option<Rate>>>,
+}
+
+/// Rarity pull rate split by foil vs non-foil finish.
+///
+/// For most rarities in most sets only `normal` is present. A rarity where all
+/// cards have a foil finish (e.g. C and U in A4b) carries only `foil`. A rarity
+/// with a mix of foil and non-foil cards (e.g. R in A4b) carries both.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RaritySlotRates {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub normal: Option<Rate>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub foil: Option<Rate>,
 }
