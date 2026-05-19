@@ -27,7 +27,10 @@ struct Violations {
 
 impl Violations {
     fn new(lenient: bool) -> Self {
-        Self { items: Vec::new(), lenient }
+        Self {
+            items: Vec::new(),
+            lenient,
+        }
     }
 
     fn add(&mut self, msg: impl std::fmt::Display) {
@@ -134,9 +137,11 @@ async fn main() -> Result<()> {
         Command::GlobalMaster => cmd_global_master(&client).await?,
         Command::Sets => cmd_sets(&client).await?,
         Command::BasePokemon => cmd_base_pokemon(&client).await?,
-        Command::Cards { set, force, lenient } => {
-            cmd_cards(&client, set.as_deref(), force, lenient).await?
-        }
+        Command::Cards {
+            set,
+            force,
+            lenient,
+        } => cmd_cards(&client, set.as_deref(), force, lenient).await?,
         Command::PullRates { pack, force } => {
             cmd_pull_rates(&client, pack.as_deref(), force).await?
         }
@@ -419,14 +424,18 @@ async fn run_cards(
         let abstract_id = match version_to_abstract.get(&(set.clone(), *num)) {
             Some(id) => *id,
             None => {
-                violations.add(format!("{set}/{num:03}: no abstract card mapping — version skipped"));
+                violations.add(format!(
+                    "{set}/{num:03}: no abstract card mapping — version skipped"
+                ));
                 continue;
             }
         };
         let entry_idx = match version_to_entry_idx.get(&(set.clone(), *num)) {
             Some(idx) => *idx,
             None => {
-                violations.add(format!("{set}/{num:03}: no card entry found — version skipped"));
+                violations.add(format!(
+                    "{set}/{num:03}: no card entry found — version skipped"
+                ));
                 continue;
             }
         };
@@ -502,14 +511,10 @@ async fn run_cards(
 
     // ── Data integrity validation pass ────────────────────────────────────────
 
-    let known_elements = load_known_set::<ElementInfo, _>(
-        &output::data_dir().join("elements.json"),
-        |e| e.name,
-    );
-    let known_rarities = load_known_set::<RarityInfo, _>(
-        &output::data_dir().join("rarities.json"),
-        |r| r.code,
-    );
+    let known_elements =
+        load_known_set::<ElementInfo, _>(&output::data_dir().join("elements.json"), |e| e.name);
+    let known_rarities =
+        load_known_set::<RarityInfo, _>(&output::data_dir().join("rarities.json"), |r| r.code);
     let known_card_names = collect_card_names()?;
     let base_pokemon_loaded = output::base_pokemon_exists();
 
@@ -529,15 +534,15 @@ async fn run_cards(
                     &known_card_names,
                     base_pokemon_loaded,
                 ),
-                Err(e) => violations.add(format!(
-                    "{}: parse error: {e}",
-                    entry.path().display()
-                )),
+                Err(e) => violations.add(format!("{}: parse error: {e}", entry.path().display())),
             }
         }
     }
 
-    for set in all_sets.iter().filter(|s| filter_set.is_none_or(|f| s.code == f)) {
+    for set in all_sets
+        .iter()
+        .filter(|s| filter_set.is_none_or(|f| s.code == f))
+    {
         match output::load_card_versions(&set.code) {
             Ok(versions) => {
                 for version in &versions {
@@ -1172,7 +1177,13 @@ fn validate_abstract_card(
         v.add(format!("card {:05} ({}): no versions", card.id, card.name));
     }
     match card.card_type.as_str() {
-        "pokemon" => validate_pokemon_card(v, card, known_elements, known_card_names, base_pokemon_loaded),
+        "pokemon" => validate_pokemon_card(
+            v,
+            card,
+            known_elements,
+            known_card_names,
+            base_pokemon_loaded,
+        ),
         "trainer" => validate_trainer_card(v, card),
         other => v.add(format!(
             "card {:05} ({}): unknown card_type '{other}'",
@@ -1218,7 +1229,9 @@ fn validate_pokemon_card(
     }
     if let Some(weakness) = &card.weakness {
         if !known_elements.is_empty() && !known_elements.contains(weakness) {
-            v.add(format!("pokemon {name}: unknown weakness element '{weakness}'"));
+            v.add(format!(
+                "pokemon {name}: unknown weakness element '{weakness}'"
+            ));
         }
     }
     if let Some(from) = &card.evolves_from {
@@ -1287,7 +1300,10 @@ fn validate_card_version(
     if !known_rarities.is_empty() && !known_rarities.contains(&version.rarity) {
         v.add(format!("{loc}: unknown rarity '{}'", version.rarity));
     }
-    let is_promo = set_is_promo.get(&version.set).copied().unwrap_or(version.is_promo);
+    let is_promo = set_is_promo
+        .get(&version.set)
+        .copied()
+        .unwrap_or(version.is_promo);
     if !is_promo && version.packs.is_empty() {
         v.add(format!("{loc}: non-promo card has no packs"));
     }

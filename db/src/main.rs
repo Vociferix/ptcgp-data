@@ -16,7 +16,10 @@ struct Violations {
 
 impl Violations {
     fn new(lenient: bool) -> Self {
-        Self { items: Vec::new(), lenient }
+        Self {
+            items: Vec::new(),
+            lenient,
+        }
     }
 
     fn add(&mut self, msg: impl std::fmt::Display) {
@@ -438,7 +441,10 @@ fn insert_abstract_card(
     match card.card_type.as_str() {
         "pokemon" => insert_pokemon_data(tx, card_id, card, v)?,
         "trainer" => insert_trainer_data(tx, card_id, card, v)?,
-        other => v.add(format!("card {} ({}): unknown card_type '{other}'", card.id, card.name)),
+        other => v.add(format!(
+            "card {} ({}): unknown card_type '{other}'",
+            card.id, card.name
+        )),
     }
 
     Ok(card_id)
@@ -458,12 +464,18 @@ fn insert_pokemon_data(
         ) {
             Ok(id) => id,
             Err(_) => {
-                v.add(format!("pokemon {}: natdex {natdex} not in base_pokemon — inserting by name", card.name));
+                v.add(format!(
+                    "pokemon {}: natdex {natdex} not in base_pokemon — inserting by name",
+                    card.name
+                ));
                 get_or_insert_base_pokemon(tx, &card.name, Some(natdex))?
             }
         }
     } else {
-        v.add(format!("pokemon {}: no natdex_number — inserting by name", card.name));
+        v.add(format!(
+            "pokemon {}: no natdex_number — inserting by name",
+            card.name
+        ));
         get_or_insert_base_pokemon(tx, &card.name, None)?
     };
 
@@ -622,7 +634,10 @@ fn insert_trainer_data(
     v: &mut Violations,
 ) -> Result<()> {
     let Some(kind) = card.trainer_kind.as_deref() else {
-        v.add(format!("trainer {}: missing trainer_kind — skipped", card.name));
+        v.add(format!(
+            "trainer {}: missing trainer_kind — skipped",
+            card.name
+        ));
         return Ok(());
     };
     tx.execute(
@@ -739,7 +754,10 @@ fn insert_card_versions(
             continue;
         }
         let Some(&set_id) = set_map.get(&set.code) else {
-            v.add(format!("{}: set missing from DB map — versions skipped", set.code));
+            v.add(format!(
+                "{}: set missing from DB map — versions skipped",
+                set.code
+            ));
             continue;
         };
 
