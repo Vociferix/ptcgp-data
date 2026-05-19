@@ -8,30 +8,36 @@
       "slot_count": 1,
       "rarity_rates_by_slot": [
         {
-          "R": {
-            "numerator": 791,
-            "denominator": 5000
-          },
           "RR": {
-            "numerator": 633,
-            "denominator": 5000
+            "normal": {
+              "numerator": 633,
+              "denominator": 5000
+            }
           },
           "C": {
-            "numerator": 447,
-            "denominator": 625
+            "normal": {
+              "numerator": 447,
+              "denominator": 625
+            }
+          },
+          "R": {
+            "normal": {
+              "numerator": 791,
+              "denominator": 5000
+            }
           }
         }
       ],
       "card_rates": {
+        "020": [
+          {
+            "numerator": 149,
+            "denominator": 625
+          }
+        ],
         "024": [
           {
             "numerator": 633,
-            "denominator": 5000
-          }
-        ],
-        "023": [
-          {
-            "numerator": 791,
             "denominator": 5000
           }
         ],
@@ -41,16 +47,16 @@
             "denominator": 625
           }
         ],
-        "020": [
+        "021": [
           {
             "numerator": 149,
             "denominator": 625
           }
         ],
-        "021": [
+        "023": [
           {
-            "numerator": 149,
-            "denominator": 625
+            "numerator": 791,
+            "denominator": 5000
           }
         ]
       }
