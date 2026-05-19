@@ -268,11 +268,29 @@ fn insert_promo_sources(tx: &rusqlite::Transaction, data: &Path) -> Result<()> {
         return Ok(());
     }
     let sources: Vec<PromoSourceInfo> = load_json(&path)?;
+
+    // Seed promo_source_descriptions alphabetically.
+    let descs: BTreeSet<&str> = sources
+        .iter()
+        .map(|s| s.description.as_deref().unwrap_or(""))
+        .collect();
+    for desc in &descs {
+        tx.execute(
+            "INSERT OR IGNORE INTO promo_source_descriptions (description) VALUES (?1)",
+            params![desc],
+        )?;
+    }
+
     for s in &sources {
         let desc = s.description.as_deref().unwrap_or("");
+        let desc_id: i64 = tx.query_row(
+            "SELECT id FROM promo_source_descriptions WHERE description = ?1",
+            params![desc],
+            |row| row.get(0),
+        )?;
         tx.execute(
-            "INSERT OR IGNORE INTO promo_sources (code, description) VALUES (?1, ?2)",
-            params![s.code, desc],
+            "INSERT OR IGNORE INTO promo_sources (code, description_id) VALUES (?1, ?2)",
+            params![s.code, desc_id],
         )?;
     }
     info!(count = sources.len(), "promo sources inserted");
@@ -286,6 +304,16 @@ fn insert_rarities(tx: &rusqlite::Transaction, data: &Path) -> Result<()> {
         return Ok(());
     }
     let rarities: Vec<RarityInfo> = load_json(&path)?;
+
+    // Seed rarity_names alphabetically.
+    let rarity_name_set: BTreeSet<&str> = rarities.iter().map(|r| r.name.as_str()).collect();
+    for name in &rarity_name_set {
+        tx.execute(
+            "INSERT OR IGNORE INTO rarity_names (name) VALUES (?1)",
+            params![name],
+        )?;
+    }
+
     for r in &rarities {
         tx.execute(
             "INSERT OR IGNORE INTO rarity_groups (name) VALUES (?1)",
@@ -305,10 +333,15 @@ fn insert_rarities(tx: &rusqlite::Transaction, data: &Path) -> Result<()> {
             params![group_id, r.group_symbol_count],
             |row| row.get(0),
         )?;
+        let name_id: i64 = tx.query_row(
+            "SELECT id FROM rarity_names WHERE name = ?1",
+            params![r.name],
+            |row| row.get(0),
+        )?;
         tx.execute(
-            "INSERT OR IGNORE INTO rarities (class_id, code, name, craft_cost, dupe_dust) \
+            "INSERT OR IGNORE INTO rarities (class_id, code, name_id, craft_cost, dupe_dust) \
              VALUES (?1, ?2, ?3, ?4, ?5)",
-            params![class_id, r.code, r.name, r.craft_cost, r.dupe_dust],
+            params![class_id, r.code, name_id, r.craft_cost, r.dupe_dust],
         )?;
     }
     info!(count = rarities.len(), "rarities inserted");
@@ -324,6 +357,15 @@ fn insert_sets(tx: &rusqlite::Transaction, data: &Path) -> Result<HashMap<String
     }
     let sets: Vec<SetSummary> = load_json(&path)?;
     let mut set_map = HashMap::new();
+
+    // Seed set_names alphabetically.
+    let set_name_set: BTreeSet<&str> = sets.iter().map(|s| s.name.as_str()).collect();
+    for name in &set_name_set {
+        tx.execute(
+            "INSERT OR IGNORE INTO set_names (name) VALUES (?1)",
+            params![name],
+        )?;
+    }
 
     // Seed pack_subtitles alphabetically before inserting packs.
     let mut all_subtitles: BTreeSet<String> = BTreeSet::new();
@@ -351,9 +393,14 @@ fn insert_sets(tx: &rusqlite::Transaction, data: &Path) -> Result<HashMap<String
             |row| row.get(0),
         )?;
 
+        let name_id: i64 = tx.query_row(
+            "SELECT id FROM set_names WHERE name = ?1",
+            params![set.name],
+            |row| row.get(0),
+        )?;
         tx.execute(
-            "INSERT OR IGNORE INTO sets (series_id, code, name) VALUES (?1, ?2, ?3)",
-            params![series_id, set.code, set.name],
+            "INSERT OR IGNORE INTO sets (series_id, code, name_id) VALUES (?1, ?2, ?3)",
+            params![series_id, set.code, name_id],
         )?;
         let set_id: i64 = tx.query_row(
             "SELECT id FROM sets WHERE code = ?1",
@@ -474,6 +521,7 @@ fn insert_abstract_cards(
     let mut attack_effects: BTreeSet<&str> = BTreeSet::new();
     let mut trainer_kinds: BTreeSet<&str> = BTreeSet::new();
     let mut trainer_effects: BTreeSet<&str> = BTreeSet::new();
+    let mut flavor_texts: BTreeSet<&str> = BTreeSet::new();
     for card in &cards {
         card_names.insert(&card.name);
         if let Some(s) = &card.stage { stages.insert(s); }
@@ -491,6 +539,7 @@ fn insert_abstract_cards(
         if card.card_type == "trainer" {
             trainer_effects.insert(card.trainer_effect.as_deref().unwrap_or(""));
         }
+        if let Some(flavor) = &card.flavor { flavor_texts.insert(flavor); }
     }
     for name in &card_names {
         tx.execute("INSERT OR IGNORE INTO card_names (name) VALUES (?1)", params![name])?;
@@ -518,6 +567,12 @@ fn insert_abstract_cards(
     }
     for effect in &trainer_effects {
         tx.execute("INSERT OR IGNORE INTO trainer_effects (effect) VALUES (?1)", params![effect])?;
+    }
+    for flavor in &flavor_texts {
+        tx.execute(
+            "INSERT OR IGNORE INTO pokemon_flavor_texts (flavor) VALUES (?1)",
+            params![flavor],
+        )?;
     }
 
     // Phase 3: insert cards (string inserts in sub-functions are now no-ops).
@@ -629,9 +684,14 @@ fn insert_pokemon_data(
     )?;
 
     if let Some(flavor) = &card.flavor {
+        let flavor_id: i64 = tx.query_row(
+            "SELECT id FROM pokemon_flavor_texts WHERE flavor = ?1",
+            params![flavor],
+            |row| row.get(0),
+        )?;
         tx.execute(
-            "INSERT OR IGNORE INTO pokemon_flavor_text (card_id, flavor) VALUES (?1, ?2)",
-            params![card_id, flavor],
+            "INSERT OR IGNORE INTO pokemon_flavor_text (card_id, flavor_id) VALUES (?1, ?2)",
+            params![card_id, flavor_id],
         )?;
     }
 

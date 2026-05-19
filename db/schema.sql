@@ -36,6 +36,15 @@ CREATE TABLE rarity_classes (
     UNIQUE (group_id, count) ON CONFLICT FAIL
 );
 
+-- Rarity Names
+CREATE TABLE rarity_names (
+    -- Primary key
+    id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
+
+    -- Full name of a rarity, such as "Common" or "Uncommon"
+    name TEXT UNIQUE NOT NULL
+);
+
 -- Card Rarity Categories
 --
 -- These are the rarities use internally in PTCGP.
@@ -49,8 +58,8 @@ CREATE TABLE rarities (
     -- 1 to 3 letter code, such as "C", "U", and "AR"
     code TEXT UNIQUE NOT NULL,
 
-    -- Full name of rarity, such as "Common" or "Uncommon"
-    name TEXT UNIQUE NOT NULL,
+    -- rarity_names.id - Full name of rarity, such as "Common" or "Uncommon"
+    name_id INTEGER UNIQUE NOT NULL,
 
     -- The wonder pick point cost to craft a card of this rarity.
     -- Null when crafting is not available for this rarity.
@@ -60,7 +69,8 @@ CREATE TABLE rarities (
     -- Null when duplicates do not yield points for this rarity.
     dupe_dust INTEGER,
 
-    FOREIGN KEY (class_id) REFERENCES rarity_classes (id)
+    FOREIGN KEY (class_id) REFERENCES rarity_classes (id),
+    FOREIGN KEY (name_id) REFERENCES rarity_names (id)
 );
 
 -- Card Series
@@ -72,6 +82,15 @@ CREATE TABLE series (
 
     -- The series letter, which is essentially also the name. "A" or "B"
     code TEXT UNIQUE NOT NULL
+);
+
+-- Set Names
+CREATE TABLE set_names (
+    -- Primary key
+    id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
+
+    -- The full name of a set, such as "Genetic Apex"
+    name TEXT UNIQUE NOT NULL
 );
 
 -- Card Sets
@@ -87,10 +106,11 @@ CREATE TABLE sets (
     -- The 2 to 3 letter set code, such as "A1" or "B2a"
     code TEXT UNIQUE NOT NULL,
 
-    -- The full name of the set, such as "Genetic Apex"
-    name TEXT UNIQUE NOT NULL,
+    -- set_names.id - The full name of the set, such as "Genetic Apex"
+    name_id INTEGER UNIQUE NOT NULL,
 
-    FOREIGN KEY (series_id) REFERENCES series (id)
+    FOREIGN KEY (series_id) REFERENCES series (id),
+    FOREIGN KEY (name_id) REFERENCES set_names (id)
 );
 
 -- Card Set Release Dates
@@ -232,6 +252,15 @@ CREATE TABLE card_version_illustrators (
     FOREIGN KEY (illustrator_id) REFERENCES illustrators (id)
 );
 
+-- Promo Source Descriptions
+CREATE TABLE promo_source_descriptions (
+    -- Primary key
+    id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
+
+    -- Human-readable description of a promo source
+    description TEXT UNIQUE NOT NULL
+);
+
 -- Promo Card Sources
 --
 -- The various channels through which promo cards can be obtained.
@@ -243,8 +272,10 @@ CREATE TABLE promo_sources (
     -- Short code / display name for this source
     code TEXT UNIQUE NOT NULL,
 
-    -- Human-readable description
-    description TEXT NOT NULL
+    -- promo_source_descriptions.id - Human-readable description
+    description_id INTEGER NOT NULL,
+
+    FOREIGN KEY (description_id) REFERENCES promo_source_descriptions (id)
 );
 
 -- Promo Card Source Mapping
@@ -604,6 +635,17 @@ CREATE TABLE pokemon_evolves_from (
     FOREIGN KEY (evolves_from_id) REFERENCES card_names (id)
 );
 
+-- Pokemon Card Flavor Texts
+--
+-- Flavor text strings, stored out-of-line for deduplication.
+CREATE TABLE pokemon_flavor_texts (
+    -- Primary key
+    id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
+
+    -- The flavor text
+    flavor TEXT UNIQUE NOT NULL
+);
+
 -- Pokemon Card Flavor Text
 --
 -- Each row represents the flavor text for a Pokemon card. Not all
@@ -616,10 +658,11 @@ CREATE TABLE pokemon_flavor_text (
     -- The card with this flavor text
     card_id INTEGER UNIQUE NOT NULL,
 
-    -- The flavor text
-    flavor TEXT NOT NULL,
+    -- pokemon_flavor_texts.id - The flavor text
+    flavor_id INTEGER NOT NULL,
 
-    FOREIGN KEY (card_id) REFERENCES cards (id)
+    FOREIGN KEY (card_id) REFERENCES cards (id),
+    FOREIGN KEY (flavor_id) REFERENCES pokemon_flavor_texts (id)
 );
 
 -- Pokemon Card Weaknesses
@@ -884,10 +927,10 @@ CREATE VIEW versions AS
         cv.card_id,
         cn.name             AS card_name,
         s.code              AS set_code,
-        s.name              AS set_name,
+        sn.name             AS set_name,
         cv.number,
         r.code              AS rarity_code,
-        r.name              AS rarity_name,
+        rn.name             AS rarity_name,
         rg.name             AS rarity_group,
         rc.count            AS rarity_count,
         i.name              AS illustrator,
@@ -900,7 +943,9 @@ CREATE VIEW versions AS
     JOIN cards                    c   ON c.id   = cv.card_id
     JOIN card_names               cn  ON cn.id  = c.name_id
     JOIN sets                     s   ON s.id   = cv.set_id
+    JOIN set_names                sn  ON sn.id  = s.name_id
     JOIN rarities                 r   ON r.id   = cv.rarity_id
+    JOIN rarity_names             rn  ON rn.id  = r.name_id
     JOIN rarity_classes           rc  ON rc.id  = r.class_id
     JOIN rarity_groups            rg  ON rg.id  = rc.group_id
     LEFT JOIN card_version_illustrators cvi ON cvi.card_version_id = cv.id
@@ -924,7 +969,7 @@ CREATE VIEW pokemon AS
         CASE WHEN exc.card_id IS NOT NULL THEN 1 ELSE 0 END AS is_ex,
         CASE WHEN mc.card_id  IS NOT NULL THEN 1 ELSE 0 END AS is_mega,
         efn.name            AS evolves_from,
-        pft.flavor,
+        pft_text.flavor,
         abn.name            AS ability_name,
         abe.effect          AS ability_effect
     FROM cards                c
@@ -940,7 +985,8 @@ CREATE VIEW pokemon AS
     LEFT JOIN mega_cards          mc  ON mc.card_id  = c.id
     LEFT JOIN pokemon_evolves_from pef ON pef.card_id = c.id
     LEFT JOIN card_names          efn ON efn.id = pef.evolves_from_id
-    LEFT JOIN pokemon_flavor_text pft ON pft.card_id = c.id
+    LEFT JOIN pokemon_flavor_text  pft      ON pft.card_id  = c.id
+    LEFT JOIN pokemon_flavor_texts pft_text ON pft_text.id  = pft.flavor_id
     LEFT JOIN pokemon_abilities   pab ON pab.card_id = c.id
     LEFT JOIN abilities           ab  ON ab.id  = pab.ability_id
     LEFT JOIN ability_names       abn ON abn.id = ab.name_id
@@ -965,12 +1011,13 @@ CREATE VIEW rarity_overview AS
     SELECT
         r.id            AS rarity_id,
         r.code,
-        r.name,
+        rn.name,
         rg.name         AS group_name,
         rc.count        AS symbol_count,
         r.craft_cost,
         r.dupe_dust
     FROM rarities           r
+    JOIN rarity_names       rn ON rn.id = r.name_id
     JOIN rarity_classes     rc ON rc.id = r.class_id
     JOIN rarity_groups      rg ON rg.id = rc.group_id;
 
