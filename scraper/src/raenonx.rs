@@ -558,6 +558,14 @@ fn build_variants(
         }
     }
 
+    // When byRarity has more slots than the card probability arrays, the card
+    // arrays use a compact representation starting at index 0 that actually
+    // corresponds to the LAST `card_array_len` slots of byRarity. Prepend None
+    // values to align the indices. (Observed in B2b's rare variant: 10 byRarity
+    // slots, 5-element card arrays — the 5 SSR cards belong in slots 5–9.)
+    align_card_slots_to_rarity(&mut rare_cards, rare_rarity.len());
+    align_card_slots_to_rarity(&mut plus1_cards, plus1_rarity.len());
+
     let normal_slot_count = normal_rarity
         .len()
         .max(normal_cards.values().map(Vec::len).max().unwrap_or(0));
@@ -609,6 +617,25 @@ fn build_variants(
 
 
     Ok(variants)
+}
+
+/// Shift card probability arrays forward when byRarity has more slots than
+/// the arrays. This aligns compact card arrays (starting at index 0) with
+/// their correct byRarity slots at the end of the slot list.
+fn align_card_slots_to_rarity(
+    cards: &mut HashMap<String, Vec<Option<Rate>>>,
+    rarity_len: usize,
+) {
+    let max_card_len = cards.values().map(Vec::len).max().unwrap_or(0);
+    if rarity_len <= max_card_len {
+        return;
+    }
+    let offset = rarity_len - max_card_len;
+    for slots in cards.values_mut() {
+        let mut shifted = vec![None; offset];
+        shifted.append(slots);
+        *slots = shifted;
+    }
 }
 
 fn parse_slot_rates(val: &Value) -> Vec<Option<Rate>> {
