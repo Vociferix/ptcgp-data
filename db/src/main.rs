@@ -3,8 +3,8 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
 use clap::Parser;
-use rust_decimal::Decimal;
 use rusqlite::{params, Connection};
+use rust_decimal::Decimal;
 use serde::Deserialize;
 use tracing::{error, info, warn};
 
@@ -591,49 +591,88 @@ fn insert_abstract_cards(
     let mut flavor_texts: BTreeSet<&str> = BTreeSet::new();
     for card in &cards {
         card_names.insert(&card.name);
-        if let Some(s) = &card.stage { stages.insert(s); }
-        for ident in &card.variants { pokemon_variants.insert(ident); }
-        if let Some(from) = &card.evolves_from { card_names.insert(from); }
+        if let Some(s) = &card.stage {
+            stages.insert(s);
+        }
+        for ident in &card.variants {
+            pokemon_variants.insert(ident);
+        }
+        if let Some(from) = &card.evolves_from {
+            card_names.insert(from);
+        }
         if let Some(ab) = &card.ability {
             ability_names.insert(&ab.name);
             ability_effects.insert(&ab.effect);
         }
         for atk in &card.attacks {
             attack_names.insert(&atk.name);
-            if let Some(fx) = &atk.effect { attack_effects.insert(fx); }
+            if let Some(fx) = &atk.effect {
+                attack_effects.insert(fx);
+            }
         }
-        if let Some(kind) = &card.trainer_kind { trainer_kinds.insert(kind); }
+        if let Some(kind) = &card.trainer_kind {
+            trainer_kinds.insert(kind);
+        }
         if card.card_type == "trainer" {
             trainer_effects.insert(card.trainer_effect.as_deref().unwrap_or(""));
         }
-        if let Some(flavor) = &card.flavor { flavor_texts.insert(flavor); }
+        if let Some(flavor) = &card.flavor {
+            flavor_texts.insert(flavor);
+        }
     }
     for name in &card_names {
-        tx.execute("INSERT OR IGNORE INTO card_names (name) VALUES (?1)", params![name])?;
+        tx.execute(
+            "INSERT OR IGNORE INTO card_names (name) VALUES (?1)",
+            params![name],
+        )?;
     }
     for name in &stages {
-        tx.execute("INSERT OR IGNORE INTO stages (name) VALUES (?1)", params![name])?;
+        tx.execute(
+            "INSERT OR IGNORE INTO stages (name) VALUES (?1)",
+            params![name],
+        )?;
     }
     for ident in &pokemon_variants {
-        tx.execute("INSERT OR IGNORE INTO pokemon_variants (ident) VALUES (?1)", params![ident])?;
+        tx.execute(
+            "INSERT OR IGNORE INTO pokemon_variants (ident) VALUES (?1)",
+            params![ident],
+        )?;
     }
     for name in &ability_names {
-        tx.execute("INSERT OR IGNORE INTO ability_names (name) VALUES (?1)", params![name])?;
+        tx.execute(
+            "INSERT OR IGNORE INTO ability_names (name) VALUES (?1)",
+            params![name],
+        )?;
     }
     for effect in &ability_effects {
-        tx.execute("INSERT OR IGNORE INTO ability_effects (effect) VALUES (?1)", params![effect])?;
+        tx.execute(
+            "INSERT OR IGNORE INTO ability_effects (effect) VALUES (?1)",
+            params![effect],
+        )?;
     }
     for name in &attack_names {
-        tx.execute("INSERT OR IGNORE INTO attack_names (name) VALUES (?1)", params![name])?;
+        tx.execute(
+            "INSERT OR IGNORE INTO attack_names (name) VALUES (?1)",
+            params![name],
+        )?;
     }
     for effect in &attack_effects {
-        tx.execute("INSERT OR IGNORE INTO attack_effects (effect) VALUES (?1)", params![effect])?;
+        tx.execute(
+            "INSERT OR IGNORE INTO attack_effects (effect) VALUES (?1)",
+            params![effect],
+        )?;
     }
     for name in &trainer_kinds {
-        tx.execute("INSERT OR IGNORE INTO trainer_kinds (name) VALUES (?1)", params![name])?;
+        tx.execute(
+            "INSERT OR IGNORE INTO trainer_kinds (name) VALUES (?1)",
+            params![name],
+        )?;
     }
     for effect in &trainer_effects {
-        tx.execute("INSERT OR IGNORE INTO trainer_effects (effect) VALUES (?1)", params![effect])?;
+        tx.execute(
+            "INSERT OR IGNORE INTO trainer_effects (effect) VALUES (?1)",
+            params![effect],
+        )?;
     }
     for flavor in &flavor_texts {
         tx.execute(
@@ -695,7 +734,10 @@ fn insert_pokemon_data(
     v: &mut Violations,
 ) -> Result<()> {
     let Some(natdex) = card.natdex_number else {
-        v.add(format!("pokemon {}: no natdex_number — skipping", card.name));
+        v.add(format!(
+            "pokemon {}: no natdex_number — skipping",
+            card.name
+        ));
         return Ok(());
     };
     let natdex = natdex as i64;
@@ -1192,11 +1234,7 @@ fn insert_version_duplicates(
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-fn get_or_insert_base_pokemon(
-    tx: &rusqlite::Transaction,
-    name: &str,
-    natdex: i64,
-) -> Result<()> {
+fn get_or_insert_base_pokemon(tx: &rusqlite::Transaction, name: &str, natdex: i64) -> Result<()> {
     tx.execute(
         "INSERT OR IGNORE INTO base_pokemon_names (name) VALUES (?1)",
         params![name],
@@ -1214,7 +1252,11 @@ fn get_or_insert_base_pokemon(
 }
 
 fn gcd(a: i64, b: i64) -> i64 {
-    if b == 0 { a } else { gcd(b, a % b) }
+    if b == 0 {
+        a
+    } else {
+        gcd(b, a % b)
+    }
 }
 
 fn lcm(a: i64, b: i64) -> i64 {
@@ -1259,13 +1301,17 @@ fn insert_pull_rates(
     // Build lookup tables from the DB.
     let mut stmt = tx.prepare("SELECT code, id FROM sets")?;
     let set_ids: HashMap<String, i64> = stmt
-        .query_map([], |row| Ok((row.get::<_, String>(0)?, row.get::<_, i64>(1)?)))?
+        .query_map([], |row| {
+            Ok((row.get::<_, String>(0)?, row.get::<_, i64>(1)?))
+        })?
         .collect::<rusqlite::Result<_>>()?;
     drop(stmt);
 
     let mut stmt = tx.prepare("SELECT code, id FROM rarities")?;
     let rarity_ids: HashMap<String, i64> = stmt
-        .query_map([], |row| Ok((row.get::<_, String>(0)?, row.get::<_, i64>(1)?)))?
+        .query_map([], |row| {
+            Ok((row.get::<_, String>(0)?, row.get::<_, i64>(1)?))
+        })?
         .collect::<rusqlite::Result<_>>()?;
     drop(stmt);
 
@@ -1328,7 +1374,13 @@ fn insert_pull_rates(
                 .variants
                 .values()
                 .flatten()
-                .map(|v| rate_to_integers(&Rate { numerator: v.rate_numerator, denominator: v.rate_denominator }).1)
+                .map(|v| {
+                    rate_to_integers(&Rate {
+                        numerator: v.rate_numerator,
+                        denominator: v.rate_denominator,
+                    })
+                    .1
+                })
                 .fold(1i64, lcm);
             tx.execute(
                 "INSERT OR IGNORE INTO pack_variant_rate_denominators \
@@ -1336,8 +1388,10 @@ fn insert_pull_rates(
                 params![pack_id, pack_denom],
             )?;
 
-            for (variant_code, variant) in
-                rates.variants.iter().filter_map(|(k, v)| v.as_ref().map(|v| (k, v)))
+            for (variant_code, variant) in rates
+                .variants
+                .iter()
+                .filter_map(|(k, v)| v.as_ref().map(|v| (k, v)))
             {
                 let kind_id: i64 = match tx.query_row::<i64, _, _>(
                     "SELECT pvk.id FROM pack_variant_kinds pvk \
@@ -1377,8 +1431,7 @@ fn insert_pull_rates(
                 for slot_idx in 0..variant.slot_count {
                     // Compute LCM of all rate denominators in this slot.
                     let mut slot_denom = 1i64;
-                    if let Some(rarity_rates) =
-                        variant.rarity_rates_by_slot.get(slot_idx as usize)
+                    if let Some(rarity_rates) = variant.rarity_rates_by_slot.get(slot_idx as usize)
                     {
                         for rates in rarity_rates.values() {
                             for rate in [rates.normal.as_ref(), rates.foil.as_ref()]
@@ -1409,8 +1462,7 @@ fn insert_pull_rates(
                         |row| row.get(0),
                     )?;
 
-                    if let Some(rarity_rates) =
-                        variant.rarity_rates_by_slot.get(slot_idx as usize)
+                    if let Some(rarity_rates) = variant.rarity_rates_by_slot.get(slot_idx as usize)
                     {
                         for (rarity_code, slot_rates) in rarity_rates {
                             match rarity_ids.get(rarity_code.as_str()) {

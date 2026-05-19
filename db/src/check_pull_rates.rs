@@ -3,8 +3,8 @@ use std::path::PathBuf;
 
 use anyhow::{Context, Result};
 use clap::Parser;
-use rust_decimal::Decimal;
 use rusqlite::{params, Connection};
+use rust_decimal::Decimal;
 use serde::Deserialize;
 
 #[derive(Parser)]
@@ -50,7 +50,11 @@ struct PackVariantRates {
 }
 
 fn gcd(a: i64, b: i64) -> i64 {
-    if b == 0 { a } else { gcd(b, a % b) }
+    if b == 0 {
+        a
+    } else {
+        gcd(b, a % b)
+    }
 }
 
 fn lcm(a: i64, b: i64) -> i64 {
@@ -72,8 +76,8 @@ fn rate_to_integers(rate: &Rate) -> (i64, i64) {
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
-    let conn = Connection::open(&cli.output)
-        .with_context(|| format!("opening {:?}", cli.output))?;
+    let conn =
+        Connection::open(&cli.output).with_context(|| format!("opening {:?}", cli.output))?;
 
     let mut mismatches: Vec<String> = Vec::new();
     let mut checked = 0usize;
@@ -171,7 +175,9 @@ fn main() -> Result<()> {
             }
 
             for (variant_code, maybe_variant) in &rates.variants {
-                let Some(variant) = maybe_variant else { continue };
+                let Some(variant) = maybe_variant else {
+                    continue;
+                };
                 let variant_prefix = format!("{file_prefix}/{variant_code}");
 
                 // Look up the pack_variant row.
@@ -213,8 +219,7 @@ fn main() -> Result<()> {
 
                     // Compute the expected LCM denominator for this slot.
                     let mut expected_slot_denom = 1i64;
-                    if let Some(rarity_rates) =
-                        variant.rarity_rates_by_slot.get(slot_idx as usize)
+                    if let Some(rarity_rates) = variant.rarity_rates_by_slot.get(slot_idx as usize)
                     {
                         for rates in rarity_rates.values() {
                             for rate in [rates.normal.as_ref(), rates.foil.as_ref()]
@@ -255,8 +260,7 @@ fn main() -> Result<()> {
                     checked += 1;
 
                     // Rarity rates for this slot.
-                    if let Some(rarity_rates) =
-                        variant.rarity_rates_by_slot.get(slot_idx as usize)
+                    if let Some(rarity_rates) = variant.rarity_rates_by_slot.get(slot_idx as usize)
                     {
                         for (rarity_code, slot_rates) in rarity_rates {
                             for (is_foil, rate) in [
@@ -303,9 +307,8 @@ fn main() -> Result<()> {
                         let card_num: u32 = match card_key.parse() {
                             Ok(n) => n,
                             Err(_) => {
-                                mismatches.push(format!(
-                                    "{slot_prefix}: invalid card key {card_key:?}"
-                                ));
+                                mismatches
+                                    .push(format!("{slot_prefix}: invalid card key {card_key:?}"));
                                 continue;
                             }
                         };
@@ -333,9 +336,8 @@ fn main() -> Result<()> {
                                 }
                                 checked += 1;
                             }
-                            Err(_) => mismatches.push(format!(
-                                "{slot_prefix}/card={card_num:03}: row missing"
-                            )),
+                            Err(_) => mismatches
+                                .push(format!("{slot_prefix}/card={card_num:03}: row missing")),
                         }
                     }
                 }
@@ -349,7 +351,10 @@ fn main() -> Result<()> {
         for m in &mismatches {
             eprintln!("FAIL: {m}");
         }
-        eprintln!("\n{} mismatch(es) out of {checked} checked values", mismatches.len());
+        eprintln!(
+            "\n{} mismatch(es) out of {checked} checked values",
+            mismatches.len()
+        );
         std::process::exit(1);
     }
 

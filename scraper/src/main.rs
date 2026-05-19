@@ -560,8 +560,7 @@ async fn run_cards(
                 .map(|d| (s.code.clone(), d.packs.into_iter().collect()))
         })
         .collect();
-    let all_known_packs: HashSet<String> =
-        set_packs.values().flatten().cloned().collect();
+    let all_known_packs: HashSet<String> = set_packs.values().flatten().cloned().collect();
 
     for set in all_sets
         .iter()
@@ -650,7 +649,11 @@ async fn run_pull_rates(
 
         match raenonx::fetch_pack_pull_rates(client, pack_id, set_code, &subtitle).await {
             Ok(mut rates) => {
-                raenonx::fix_card_rates_from_rarity(&mut rates, &card_id_to_rarity, &card_id_to_is_foil);
+                raenonx::fix_card_rates_from_rarity(
+                    &mut rates,
+                    &card_id_to_rarity,
+                    &card_id_to_is_foil,
+                );
                 remap_pull_rate_card_ids(&mut rates, &card_id_to_versions);
                 output::write_pull_rates(&rates)?;
                 let card_count = rates
