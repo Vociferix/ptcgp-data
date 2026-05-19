@@ -867,6 +867,106 @@ CREATE TABLE card_pull_rates (
     UNIQUE (card_version_id, slot_id) ON CONFLICT FAIL
 );
 
+-- ── Convenience views ────────────────────────────────────────────────────────
+
+-- versions: one row per card version with all commonly needed fields resolved.
+-- Covers the most painful joins in the schema (set, rarity hierarchy,
+-- illustrator, and the three boolean flags stored in satellite tables).
+CREATE VIEW versions AS
+    SELECT
+        cv.id               AS version_id,
+        cv.card_id,
+        cn.name             AS card_name,
+        s.code              AS set_code,
+        s.name              AS set_name,
+        cv.number,
+        r.code              AS rarity_code,
+        r.name              AS rarity_name,
+        rg.name             AS rarity_group,
+        rc.count            AS rarity_count,
+        i.name              AS illustrator,
+        CASE WHEN pcv.card_version_id IS NOT NULL THEN 1 ELSE 0 END AS is_promo,
+        CASE WHEN fcv.card_version_id IS NOT NULL THEN 1 ELSE 0 END AS is_foil,
+        CASE WHEN cvd.card_version_id IS NOT NULL
+              AND cvd.card_version_id != cvd.original_version_id
+             THEN 1 ELSE 0 END                                       AS is_reprint
+    FROM card_versions cv
+    JOIN cards                    c   ON c.id   = cv.card_id
+    JOIN card_names               cn  ON cn.id  = c.name_id
+    JOIN sets                     s   ON s.id   = cv.set_id
+    JOIN rarities                 r   ON r.id   = cv.rarity_id
+    JOIN rarity_classes           rc  ON rc.id  = r.class_id
+    JOIN rarity_groups            rg  ON rg.id  = rc.group_id
+    LEFT JOIN card_version_illustrators cvi ON cvi.card_version_id = cv.id
+    LEFT JOIN illustrators        i   ON i.id   = cvi.illustrator_id
+    LEFT JOIN promo_card_versions pcv ON pcv.card_version_id = cv.id
+    LEFT JOIN foil_card_versions  fcv ON fcv.card_version_id = cv.id
+    LEFT JOIN card_version_duplicates cvd ON cvd.card_version_id = cv.id;
+
+-- pokemon: one row per abstract pokemon card with all game data resolved.
+CREATE VIEW pokemon AS
+    SELECT
+        c.id                AS card_id,
+        cn.name             AS name,
+        bp.name             AS base_name,
+        bp.natdex_number,
+        e.name              AS element,
+        st.name             AS stage,
+        pc.hp,
+        pc.retreat_cost,
+        we.name             AS weakness,
+        CASE WHEN exc.card_id IS NOT NULL THEN 1 ELSE 0 END AS is_ex,
+        CASE WHEN mc.card_id  IS NOT NULL THEN 1 ELSE 0 END AS is_mega,
+        efn.name            AS evolves_from,
+        pft.flavor,
+        abn.name            AS ability_name,
+        abe.effect          AS ability_effect
+    FROM cards                c
+    JOIN card_names           cn  ON cn.id  = c.name_id
+    JOIN pokemon_cards        pc  ON pc.card_id = c.id
+    JOIN base_pokemon         bp  ON bp.id  = pc.base_id
+    JOIN elements             e   ON e.id   = pc.element_id
+    JOIN stages               st  ON st.id  = pc.stage_id
+    LEFT JOIN weaknesses          w   ON w.card_id  = c.id
+    LEFT JOIN elements            we  ON we.id       = w.element_id
+    LEFT JOIN ex_cards            exc ON exc.card_id = c.id
+    LEFT JOIN mega_cards          mc  ON mc.card_id  = c.id
+    LEFT JOIN pokemon_evolves_from pef ON pef.card_id = c.id
+    LEFT JOIN card_names          efn ON efn.id = pef.evolves_from_id
+    LEFT JOIN pokemon_flavor_text pft ON pft.card_id = c.id
+    LEFT JOIN pokemon_abilities   pab ON pab.card_id = c.id
+    LEFT JOIN abilities           ab  ON ab.id  = pab.ability_id
+    LEFT JOIN ability_names       abn ON abn.id = ab.name_id
+    LEFT JOIN ability_effects     abe ON abe.id = ab.effect_id;
+
+-- trainers: one row per abstract trainer card with all game data resolved.
+CREATE VIEW trainers AS
+    SELECT
+        c.id    AS card_id,
+        cn.name AS name,
+        tk.name AS kind,
+        te.effect
+    FROM cards              c
+    JOIN card_names         cn ON cn.id    = c.name_id
+    JOIN trainer_cards      tc ON tc.card_id = c.id
+    JOIN trainer_kinds      tk ON tk.id    = tc.kind_id
+    JOIN trainer_effects    te ON te.id    = tc.effect_id;
+
+-- rarity_overview: rarities with the group name and symbol count resolved,
+-- avoiding the two-hop join through rarity_classes and rarity_groups.
+CREATE VIEW rarity_overview AS
+    SELECT
+        r.id            AS rarity_id,
+        r.code,
+        r.name,
+        rg.name         AS group_name,
+        rc.count        AS symbol_count,
+        r.craft_cost,
+        r.dupe_dust
+    FROM rarities           r
+    JOIN rarity_classes     rc ON rc.id = r.class_id
+    JOIN rarity_groups      rg ON rg.id = rc.group_id;
+
 -- ── Image path views ─────────────────────────────────────────────────────────
 --
 -- Each view maps a database entity to its corresponding image file path
