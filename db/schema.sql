@@ -867,4 +867,79 @@ CREATE TABLE card_pull_rates (
     UNIQUE (card_version_id, slot_id) ON CONFLICT FAIL
 );
 
+-- ── Image path views ─────────────────────────────────────────────────────────
+--
+-- Each view maps a database entity to its corresponding image file path
+-- relative to the root of the ptcgp-images repository.
+
+CREATE VIEW card_version_images AS
+    SELECT
+        cv.id   AS card_version_id,
+        printf('cards/%s/%03d.png', s.code, cv.number) AS path
+    FROM card_versions cv
+    JOIN sets s ON s.id = cv.set_id;
+
+CREATE VIEW element_icons AS
+    SELECT
+        id AS element_id,
+        printf('elements/icons/%s.png', lower(name)) AS path
+    FROM elements;
+
+CREATE VIEW element_symbols AS
+    SELECT
+        id AS element_id,
+        printf('elements/symbols/%s.png', lower(name)) AS path
+    FROM elements;
+
+-- Only packs with a subtitle have art/logo images.
+CREATE VIEW pack_art AS
+    SELECT
+        p.id AS pack_id,
+        printf('packs/art/%s/%s.png', s.code, lower(replace(ps.subtitle, ' ', '_'))) AS path
+    FROM packs p
+    JOIN sets s ON s.id = p.set_id
+    JOIN pack_subtitles ps ON ps.pack_id = p.id;
+
+CREATE VIEW pack_logos AS
+    SELECT
+        p.id AS pack_id,
+        printf('packs/logos/%s/%s.png', s.code, lower(replace(ps.subtitle, ' ', '_'))) AS path
+    FROM packs p
+    JOIN sets s ON s.id = p.set_id
+    JOIN pack_subtitles ps ON ps.pack_id = p.id;
+
+CREATE VIEW promo_source_icons AS
+    SELECT
+        id AS promo_source_id,
+        printf('promo_sources/%s.png', lower(replace(code, ' ', '_'))) AS path
+    FROM promo_sources;
+
+CREATE VIEW rarity_icons AS
+    SELECT
+        r.id AS rarity_id,
+        printf('rarities/icons/%s/%d.png', lower(rg.name), rc.count) AS path
+    FROM rarities r
+    JOIN rarity_classes rc ON rc.id = r.class_id
+    JOIN rarity_groups rg ON rg.id = rc.group_id;
+
+CREATE VIEW rarity_symbols AS
+    SELECT
+        r.id AS rarity_id,
+        printf('rarities/symbols/%s/%d.png', lower(rg.name), rc.count) AS path
+    FROM rarities r
+    JOIN rarity_classes rc ON rc.id = r.class_id
+    JOIN rarity_groups rg ON rg.id = rc.group_id;
+
+CREATE VIEW set_logos AS
+    SELECT
+        id AS set_id,
+        printf('sets/logos/%s.png', code) AS path
+    FROM sets;
+
+CREATE VIEW set_icons AS
+    SELECT
+        id AS set_id,
+        printf('sets/icons/%s.png', code) AS path
+    FROM sets;
+
 COMMIT;
