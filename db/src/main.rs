@@ -189,6 +189,11 @@ fn main() -> Result<()> {
 
     let cli = Cli::parse();
 
+    if cli.output.exists() {
+        std::fs::remove_file(&cli.output)
+            .with_context(|| format!("removing existing {:?}", cli.output))?;
+    }
+
     let mut conn =
         Connection::open(&cli.output).with_context(|| format!("opening {:?}", cli.output))?;
     conn.execute_batch("PRAGMA foreign_keys = ON;")?;
