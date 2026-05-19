@@ -527,7 +527,7 @@ fn build_variants(
     let by_rarity = pack_data.and_then(|d| d.get("byRarity"));
 
     let normal_rarity = slot_rarity_rates(by_rarity, "normal");
-    let rare_rarity = slot_rarity_rates(by_rarity, "rare");
+    let mut rare_rarity = slot_rarity_rates(by_rarity, "rare");
     let plus1_rarity = slot_rarity_rates(by_rarity, "plus1");
 
     let card_obj = card_map
@@ -558,12 +558,29 @@ fn build_variants(
         }
     }
 
-    // When byRarity has more slots than the card probability arrays, the card
-    // arrays use a compact representation starting at index 0 that actually
-    // corresponds to the LAST `card_array_len` slots of byRarity. Prepend None
-    // values to align the indices. (Observed in B2b's rare variant: 10 byRarity
-    // slots, 5-element card arrays — the 5 SSR cards belong in slots 5–9.)
-    align_card_slots_to_rarity(&mut rare_cards, rare_rarity.len());
+    // For the rare variant: extra byRarity slots where every entry has exactly one
+    // rarity with rate = 1 are RaenonX artifacts (conditional probabilities, not
+    // absolute). Truncate rarity to the actual slot count and drop those card entries.
+    // For plus1: compact single-element card arrays represent the bonus slot; align them.
+    {
+        let max_rare_card_len = rare_cards.values().map(Vec::len).max().unwrap_or(0);
+        if rare_rarity.len() > max_rare_card_len && max_rare_card_len > 0 {
+            let extra_are_artifacts = rare_rarity[max_rare_card_len..].iter().all(|slot| {
+                slot.len() == 1 && slot.values().all(|r| r.numerator == r.denominator)
+            });
+            if extra_are_artifacts {
+                warn!(
+                    pack_id,
+                    extra_slots = rare_rarity.len() - max_rare_card_len,
+                    "truncating artifact slots from rare byRarity; discarding artifact card entries"
+                );
+                rare_rarity.truncate(max_rare_card_len);
+                rare_cards.clear();
+            } else {
+                align_card_slots_to_rarity(&mut rare_cards, rare_rarity.len());
+            }
+        }
+    }
     align_card_slots_to_rarity(&mut plus1_cards, plus1_rarity.len());
 
     let normal_slot_count = normal_rarity
