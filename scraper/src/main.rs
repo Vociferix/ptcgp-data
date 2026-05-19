@@ -150,7 +150,8 @@ async fn main() -> Result<()> {
             write_reference_data(&raw)?;
             let pack_names = fetch_pack_names(&client, &raw).await;
             let expansion_packs = raenonx::parse_expansion_packs(&raw);
-            run_sets(&client, &expansion_packs, &pack_names).await?;
+            let promo_subtitles = raenonx::parse_promo_pack_subtitles(&raw);
+            run_sets(&client, &expansion_packs, &pack_names, &promo_subtitles).await?;
             cmd_base_pokemon(&client).await?;
             run_cards(&client, &raw, &pack_names, None, force, lenient).await?;
             run_pull_rates(&client, &raw, &pack_names, None, force).await?;
@@ -212,13 +213,15 @@ async fn cmd_sets(client: &client::Client) -> Result<()> {
     let raw = raenonx::fetch_global_master(client).await?;
     let pack_names = fetch_pack_names(client, &raw).await;
     let expansion_packs = raenonx::parse_expansion_packs(&raw);
-    run_sets(client, &expansion_packs, &pack_names).await
+    let promo_subtitles = raenonx::parse_promo_pack_subtitles(&raw);
+    run_sets(client, &expansion_packs, &pack_names, &promo_subtitles).await
 }
 
 async fn run_sets(
     client: &client::Client,
     expansion_packs: &HashMap<String, Vec<String>>,
     pack_names: &HashMap<String, String>,
+    promo_subtitles: &HashMap<String, String>,
 ) -> Result<()> {
     info!("scraping set index from Limitless TCG");
     let sets = limitless::scrape_sets(client).await?;
@@ -227,7 +230,17 @@ async fn run_sets(
 
     for set in &sets {
         let subtitles: Vec<String> = if set.is_promo {
-            vec![]
+            let prefix = format!("PROMO_{}_", set.series.to_uppercase());
+            let mut vols: Vec<(u32, String)> = promo_subtitles
+                .keys()
+                .filter(|k| k.starts_with(&prefix))
+                .filter_map(|k| {
+                    let n: u32 = k.rsplit('_').next()?.parse().ok()?;
+                    Some((n, format!("Vol {n}")))
+                })
+                .collect();
+            vols.sort_by_key(|(n, _)| *n);
+            vols.into_iter().map(|(_, s)| s).collect()
         } else if let Some(pack_ids) = expansion_packs.get(&set.code) {
             pack_ids
                 .iter()
@@ -539,6 +552,17 @@ async fn run_cards(
         }
     }
 
+    let set_packs: HashMap<String, HashSet<String>> = all_sets
+        .iter()
+        .filter_map(|s| {
+            output::load_set_detail(&s.code)
+                .ok()
+                .map(|d| (s.code.clone(), d.packs.into_iter().collect()))
+        })
+        .collect();
+    let all_known_packs: HashSet<String> =
+        set_packs.values().flatten().cloned().collect();
+
     for set in all_sets
         .iter()
         .filter(|s| filter_set.is_none_or(|f| s.code == f))
@@ -546,7 +570,14 @@ async fn run_cards(
         match output::load_card_versions(&set.code) {
             Ok(versions) => {
                 for version in &versions {
-                    validate_card_version(&mut violations, version, &known_rarities, &set_is_promo);
+                    validate_card_version(
+                        &mut violations,
+                        version,
+                        &known_rarities,
+                        &set_is_promo,
+                        &set_packs,
+                        &all_known_packs,
+                    );
                 }
             }
             Err(e) => violations.add(format!("{}: failed to load card versions: {e}", set.code)),
@@ -1002,10 +1033,20 @@ fn build_pack_subtitle_map(
     pack_names: &HashMap<String, String>,
 ) -> HashMap<String, String> {
     let mut map = pack_names.clone();
-    for (pack_id, subtitle) in promo_subtitles {
-        map.insert(pack_id.clone(), subtitle.clone());
+    for pack_id in promo_subtitles.keys() {
+        map.insert(pack_id.clone(), promo_vol_label(pack_id));
     }
     map
+}
+
+/// Converts a PROMO_* pack ID (e.g. "PROMO_A_3") to its in-game display name ("Vol 3").
+fn promo_vol_label(pack_id: &str) -> String {
+    pack_id
+        .rsplit('_')
+        .next()
+        .and_then(|n| n.parse::<u32>().ok())
+        .map(|n| format!("Vol {n}"))
+        .unwrap_or_else(|| pack_id.to_string())
 }
 
 // ── Helper: remap pull rate card IDs to SET-NUM format ────────────────────────
@@ -1295,6 +1336,8 @@ fn validate_card_version(
     version: &CardVersion,
     known_rarities: &HashSet<String>,
     set_is_promo: &HashMap<String, bool>,
+    set_packs: &HashMap<String, HashSet<String>>,
+    all_known_packs: &HashSet<String>,
 ) {
     let loc = format!("{}/{:03}", version.set, version.number);
     if !known_rarities.is_empty() && !known_rarities.contains(&version.rarity) {
@@ -1309,6 +1352,13 @@ fn validate_card_version(
     }
     if is_promo && version.promo_sources.is_empty() {
         v.add(format!("{loc}: promo card has no promo_sources"));
+    }
+    if let Some(known_packs) = set_packs.get(&version.set) {
+        for pack in &version.packs {
+            if !known_packs.contains(pack) && !all_known_packs.contains(pack) {
+                v.add(format!("{loc}: pack '{pack}' not found in any set"));
+            }
+        }
     }
 }
 

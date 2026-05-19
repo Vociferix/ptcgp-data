@@ -882,6 +882,9 @@ fn insert_card_versions(
 }
 
 fn lookup_pack(tx: &rusqlite::Transaction, set_id: i64, subtitle: &str) -> Option<i64> {
+    // Prefer a pack within the card version's own set; fall back to a global
+    // search to handle cross-set pack references (e.g. Deluxe Pack sets whose
+    // cards can be obtained from packs defined in other sets).
     tx.query_row::<i64, _, _>(
         "SELECT p.id FROM packs p \
          JOIN pack_subtitles ps ON p.id = ps.pack_id \
@@ -890,6 +893,16 @@ fn lookup_pack(tx: &rusqlite::Transaction, set_id: i64, subtitle: &str) -> Optio
         |row| row.get(0),
     )
     .ok()
+    .or_else(|| {
+        tx.query_row::<i64, _, _>(
+            "SELECT p.id FROM packs p \
+             JOIN pack_subtitles ps ON p.id = ps.pack_id \
+             WHERE ps.subtitle = ?1",
+            params![subtitle],
+            |row| row.get(0),
+        )
+        .ok()
+    })
 }
 
 fn insert_version_duplicates(

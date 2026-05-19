@@ -107,6 +107,12 @@ pub fn write_pull_rates(rates: &PackPullRates) -> Result<()> {
     write_json(&pull_rates_dir(&rates.set).join(filename), rates)
 }
 
+pub fn load_set_detail(set_code: &str) -> Result<SetDetail> {
+    let path = set_dir(set_code).join("set.json");
+    let json = std::fs::read_to_string(&path)?;
+    Ok(serde_json::from_str(&json)?)
+}
+
 pub fn load_card_versions(set_code: &str) -> Result<Vec<CardVersion>> {
     let dir = cards_dir(set_code);
     if !dir.exists() {
