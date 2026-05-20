@@ -255,6 +255,8 @@ fn main() -> Result<()> {
 
     v.finish()?;
     tx.commit()?;
+    conn.execute_batch("ANALYZE;")?;
+    conn.execute_batch("VACUUM;")?;
     info!("database written to {:?}", cli.output);
     Ok(())
 }

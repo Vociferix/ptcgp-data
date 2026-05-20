@@ -947,6 +947,34 @@ CREATE TABLE card_pull_rates (
     UNIQUE (card_version_id, slot_id) ON CONFLICT FAIL
 );
 
+-- ── Indexes ──────────────────────────────────────────────────────────────────
+
+-- card_versions: foreign key columns used in joins and filters.
+-- set_id and rarity_id are not leftmost in any UNIQUE constraint.
+-- card_id has no UNIQUE constraint at all.
+CREATE INDEX idx_card_versions_card_id   ON card_versions (card_id);
+CREATE INDEX idx_card_versions_set_id    ON card_versions (set_id);
+CREATE INDEX idx_card_versions_rarity_id ON card_versions (rarity_id);
+
+-- packs: set_id is not covered by any constraint.
+CREATE INDEX idx_packs_set_id ON packs (set_id);
+
+-- pack_variants: pack_id is the second column in UNIQUE (kind_id, pack_id),
+-- so lookups by pack_id alone are not covered by that index.
+CREATE INDEX idx_pack_variants_pack_id ON pack_variants (pack_id);
+
+-- card_pull_rates: slot_id is the second column in UNIQUE (card_version_id, slot_id),
+-- so lookups by slot_id alone (e.g. all cards pullable from a slot) are not covered.
+CREATE INDEX idx_card_pull_rates_slot_id ON card_pull_rates (slot_id);
+
+-- card_packs: junction table with no constraints; both directions need indexes.
+CREATE INDEX idx_card_packs_card_version_id ON card_packs (card_version_id);
+CREATE INDEX idx_card_packs_pack_id         ON card_packs (pack_id);
+
+-- card_version_duplicates: original_version_id has no index, needed to find
+-- all members of a duplicate group given the original.
+CREATE INDEX idx_card_version_duplicates_original ON card_version_duplicates (original_version_id);
+
 -- ── Convenience views ────────────────────────────────────────────────────────
 
 -- versions: one row per card version with all commonly needed fields resolved.
