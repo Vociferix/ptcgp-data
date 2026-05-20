@@ -42,8 +42,7 @@ struct RaritySlotRates {
 
 #[derive(Deserialize)]
 struct PackVariantRates {
-    rate_numerator: Decimal,
-    rate_denominator: Decimal,
+    rate: Rate,
     slot_count: u32,
     rarity_rates_by_slot: Vec<HashMap<String, RaritySlotRates>>,
     card_rates: HashMap<String, Vec<Option<Rate>>>,
@@ -141,13 +140,7 @@ fn main() -> Result<()> {
                 .variants
                 .values()
                 .flatten()
-                .map(|v| {
-                    rate_to_integers(&Rate {
-                        numerator: v.rate_numerator,
-                        denominator: v.rate_denominator,
-                    })
-                    .1
-                })
+                .map(|v| rate_to_integers(&v.rate).1)
                 .fold(1i64, lcm);
 
             // Verify the stored pack denominator.
@@ -198,18 +191,14 @@ fn main() -> Result<()> {
                 };
 
                 // Verify rate_numerator scaled to the pack's LCM denominator.
-                let variant_rate = Rate {
-                    numerator: variant.rate_numerator,
-                    denominator: variant.rate_denominator,
-                };
-                let (vn, vd) = rate_to_integers(&variant_rate);
+                let (vn, vd) = rate_to_integers(&variant.rate);
                 let expected_rate_num = vn * (expected_pack_denom / vd);
                 if db_rate_num != expected_rate_num {
                     mismatches.push(format!(
                         "{variant_prefix}: rate_numerator mismatch — \
                          db={db_rate_num} expected={expected_rate_num} \
                          (json={}/{}, pack_denom={expected_pack_denom})",
-                        variant.rate_numerator, variant.rate_denominator
+                        variant.rate.numerator, variant.rate.denominator
                     ));
                 }
                 checked += 1;

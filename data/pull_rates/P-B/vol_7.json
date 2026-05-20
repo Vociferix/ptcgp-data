@@ -3,14 +3,22 @@
   "subtitle": "Vol 7",
   "variants": {
     "normal": {
-      "rate_numerator": 1,
-      "rate_denominator": 1,
+      "rate": {
+        "numerator": 1,
+        "denominator": 1
+      },
       "slot_count": 1,
       "rarity_rates_by_slot": [
         {
           "C": {
             "normal": {
               "numerator": 4821573,
+              "denominator": 10000000
+            }
+          },
+          "U": {
+            "normal": {
+              "numerator": 2330427,
               "denominator": 10000000
             }
           },
@@ -25,32 +33,14 @@
               "numerator": 633,
               "denominator": 5000
             }
-          },
-          "U": {
-            "normal": {
-              "numerator": 2330427,
-              "denominator": 10000000
-            }
           }
         }
       ],
       "card_rates": {
-        "053": [
-          {
-            "numerator": 633,
-            "denominator": 5000
-          }
-        ],
         "054": [
           {
             "numerator": 4821573,
             "denominator": 20000000
-          }
-        ],
-        "052": [
-          {
-            "numerator": 791,
-            "denominator": 5000
           }
         ],
         "050": [
@@ -63,6 +53,18 @@
           {
             "numerator": 4821573,
             "denominator": 20000000
+          }
+        ],
+        "053": [
+          {
+            "numerator": 633,
+            "denominator": 5000
+          }
+        ],
+        "052": [
+          {
+            "numerator": 791,
+            "denominator": 5000
           }
         ]
       }

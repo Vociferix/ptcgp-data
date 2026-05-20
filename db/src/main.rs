@@ -201,8 +201,7 @@ struct Rate {
 
 #[derive(Deserialize)]
 struct PackVariantRates {
-    rate_numerator: Decimal,
-    rate_denominator: Decimal,
+    rate: Rate,
     slot_count: u32,
     rarity_rates_by_slot: Vec<HashMap<String, RaritySlotRates>>,
     card_rates: HashMap<String, Vec<Option<Rate>>>,
@@ -1374,13 +1373,7 @@ fn insert_pull_rates(
                 .variants
                 .values()
                 .flatten()
-                .map(|v| {
-                    rate_to_integers(&Rate {
-                        numerator: v.rate_numerator,
-                        denominator: v.rate_denominator,
-                    })
-                    .1
-                })
+                .map(|v| rate_to_integers(&v.rate).1)
                 .fold(1i64, lcm);
             tx.execute(
                 "INSERT OR IGNORE INTO pack_variant_rate_denominators \
@@ -1411,11 +1404,7 @@ fn insert_pull_rates(
                 };
 
                 // Scale variant numerator to the pack's LCM denominator.
-                let variant_rate = Rate {
-                    numerator: variant.rate_numerator,
-                    denominator: variant.rate_denominator,
-                };
-                let (vn, vd) = rate_to_integers(&variant_rate);
+                let (vn, vd) = rate_to_integers(&variant.rate);
                 let rate_num = vn * (pack_denom / vd);
                 tx.execute(
                     "INSERT OR IGNORE INTO pack_variants \

@@ -644,8 +644,7 @@ fn build_variants(
     variants.insert(
         "normal".to_string(),
         PackVariantRates {
-            rate_numerator: normal_rate.numerator,
-            rate_denominator: normal_rate.denominator,
+            rate: normal_rate,
             slot_count: normal_slot_count as u32,
             rarity_rates_by_slot: normal_rarity,
             card_rates: normal_cards,
@@ -656,8 +655,7 @@ fn build_variants(
         variants.insert(
             "rare".to_string(),
             PackVariantRates {
-                rate_numerator: r.numerator,
-                rate_denominator: r.denominator,
+                rate: r,
                 slot_count: rare_slot_count as u32,
                 rarity_rates_by_slot: rare_rarity,
                 card_rates: rare_cards,
@@ -669,8 +667,7 @@ fn build_variants(
         variants.insert(
             "themed".to_string(),
             PackVariantRates {
-                rate_numerator: r.numerator,
-                rate_denominator: r.denominator,
+                rate: r,
                 slot_count: themed_slot_count as u32,
                 rarity_rates_by_slot: themed_rarity,
                 card_rates: themed_cards,
@@ -682,8 +679,7 @@ fn build_variants(
         variants.insert(
             "plus1".to_string(),
             PackVariantRates {
-                rate_numerator: r.numerator,
-                rate_denominator: r.denominator,
+                rate: r,
                 slot_count: plus1_slot_count as u32,
                 rarity_rates_by_slot: plus1_rarity,
                 card_rates: plus1_cards,

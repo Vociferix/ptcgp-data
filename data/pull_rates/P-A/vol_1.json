@@ -3,14 +3,16 @@
   "subtitle": "Vol 1",
   "variants": {
     "normal": {
-      "rate_numerator": 1,
-      "rate_denominator": 1,
+      "rate": {
+        "numerator": 1,
+        "denominator": 1
+      },
       "slot_count": 1,
       "rarity_rates_by_slot": [
         {
-          "RR": {
+          "R": {
             "normal": {
-              "numerator": 633,
+              "numerator": 791,
               "denominator": 5000
             }
           },
@@ -20,9 +22,9 @@
               "denominator": 625
             }
           },
-          "R": {
+          "RR": {
             "normal": {
-              "numerator": 791,
+              "numerator": 633,
               "denominator": 5000
             }
           }
@@ -41,10 +43,10 @@
             "denominator": 625
           }
         ],
-        "015": [
+        "013": [
           {
-            "numerator": 149,
-            "denominator": 625
+            "numerator": 791,
+            "denominator": 5000
           }
         ],
         "014": [
@@ -53,10 +55,10 @@
             "denominator": 5000
           }
         ],
-        "013": [
+        "015": [
           {
-            "numerator": 791,
-            "denominator": 5000
+            "numerator": 149,
+            "denominator": 625
           }
         ]
       }

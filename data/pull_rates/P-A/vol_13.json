@@ -3,8 +3,10 @@
   "subtitle": "Vol 13",
   "variants": {
     "normal": {
-      "rate_numerator": 1,
-      "rate_denominator": 1,
+      "rate": {
+        "numerator": 1,
+        "denominator": 1
+      },
       "slot_count": 1,
       "rarity_rates_by_slot": [
         {
@@ -29,16 +31,10 @@
         }
       ],
       "card_rates": {
-        "112": [
+        "114": [
           {
-            "numerator": 633,
-            "denominator": 5000
-          }
-        ],
-        "115": [
-          {
-            "numerator": 791,
-            "denominator": 5000
+            "numerator": 149,
+            "denominator": 625
           }
         ],
         "111": [
@@ -47,16 +43,22 @@
             "denominator": 625
           }
         ],
+        "112": [
+          {
+            "numerator": 633,
+            "denominator": 5000
+          }
+        ],
         "113": [
           {
             "numerator": 149,
             "denominator": 625
           }
         ],
-        "114": [
+        "115": [
           {
-            "numerator": 149,
-            "denominator": 625
+            "numerator": 791,
+            "denominator": 5000
           }
         ]
       }

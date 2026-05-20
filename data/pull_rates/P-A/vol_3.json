@@ -3,20 +3,22 @@
   "subtitle": "Vol 3",
   "variants": {
     "normal": {
-      "rate_numerator": 1,
-      "rate_denominator": 1,
+      "rate": {
+        "numerator": 1,
+        "denominator": 1
+      },
       "slot_count": 1,
       "rarity_rates_by_slot": [
         {
-          "R": {
-            "normal": {
-              "numerator": 791,
-              "denominator": 5000
-            }
-          },
           "AR": {
             "normal": {
               "numerator": 633,
+              "denominator": 5000
+            }
+          },
+          "R": {
+            "normal": {
+              "numerator": 791,
               "denominator": 5000
             }
           },
@@ -29,7 +31,19 @@
         }
       ],
       "card_rates": {
+        "031": [
+          {
+            "numerator": 149,
+            "denominator": 625
+          }
+        ],
         "027": [
+          {
+            "numerator": 149,
+            "denominator": 625
+          }
+        ],
+        "030": [
           {
             "numerator": 149,
             "denominator": 625
@@ -45,18 +59,6 @@
           {
             "numerator": 633,
             "denominator": 5000
-          }
-        ],
-        "031": [
-          {
-            "numerator": 149,
-            "denominator": 625
-          }
-        ],
-        "030": [
-          {
-            "numerator": 149,
-            "denominator": 625
           }
         ]
       }

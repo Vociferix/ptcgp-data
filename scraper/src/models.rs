@@ -250,10 +250,7 @@ pub type PackVariants = HashMap<String, PackVariantRates>;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PackVariantRates {
-    #[serde(with = "rust_decimal::serde::arbitrary_precision")]
-    pub rate_numerator: Decimal,
-    #[serde(with = "rust_decimal::serde::arbitrary_precision")]
-    pub rate_denominator: Decimal,
+    pub rate: Rate,
     pub slot_count: u32,
     /// Per-slot rarity breakdown: each element maps rarity code -> foil/normal sub-rates
     pub rarity_rates_by_slot: Vec<HashMap<String, RaritySlotRates>>,

@@ -3,8 +3,10 @@
   "subtitle": "Vol 2",
   "variants": {
     "normal": {
-      "rate_numerator": 1,
-      "rate_denominator": 1,
+      "rate": {
+        "numerator": 1,
+        "denominator": 1
+      },
       "slot_count": 1,
       "rarity_rates_by_slot": [
         {
@@ -29,22 +31,10 @@
         }
       ],
       "card_rates": {
-        "019": [
+        "018": [
           {
-            "numerator": 791,
+            "numerator": 633,
             "denominator": 5000
-          }
-        ],
-        "022": [
-          {
-            "numerator": 149,
-            "denominator": 625
-          }
-        ],
-        "021": [
-          {
-            "numerator": 149,
-            "denominator": 625
           }
         ],
         "020": [
@@ -53,10 +43,22 @@
             "denominator": 625
           }
         ],
-        "018": [
+        "022": [
           {
-            "numerator": 633,
+            "numerator": 149,
+            "denominator": 625
+          }
+        ],
+        "019": [
+          {
+            "numerator": 791,
             "denominator": 5000
+          }
+        ],
+        "021": [
+          {
+            "numerator": 149,
+            "denominator": 625
           }
         ]
       }
