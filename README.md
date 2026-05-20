@@ -1,5 +1,7 @@
 # ptcgp-data
 
+> **Disclaimer:** The literal and graphical information presented in this repository about Pokémon Trading Card Game Pocket, including card data and text, is copyright The Pokémon Company, DeNA Co., Ltd., and/or Creatures, Inc. This repository is not produced by, endorsed by, supported by, or affiliated with any of those copyright holders.
+
 Community-maintained data for Pokémon TCG Pocket, available in two formats:
 
 - **JSON** — human-readable, diff-friendly, accessible directly via `raw.githubusercontent.com`
