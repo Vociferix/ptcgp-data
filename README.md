@@ -202,8 +202,7 @@ Pull rate data for one pack. Rates are stored as exact integer fractions to avoi
   "subtitle": "Charizard",
   "variants": {
     "normal": {
-      "rate_numerator": 1999,
-      "rate_denominator": 2000,
+      "rate": { "numerator": 1999, "denominator": 2000 },
       "slot_count": 5,
       "rarity_rates_by_slot": [
         {
@@ -234,7 +233,7 @@ Pull rate data for one pack. Rates are stored as exact integer fractions to avoi
 | `rare` | 0.05% | 5 star-rarity cards |
 | `themed` | 0.005% | 5 guaranteed featured cards |
 
-**`rate_numerator` / `rate_denominator`** — probability of opening this variant. The numerators across all variants for a pack sum to the denominator (i.e. the rates sum to 1).
+**`rate`** — probability of opening this variant as an exact fraction `{ numerator, denominator }`. The numerators across all variants for a pack sum to the denominator (i.e. the rates sum to 1).
 
 **`rarity_rates_by_slot`** — array with one entry per card slot. Each entry maps a rarity code to a `{ normal, foil }` pair. A rarity with only non-foil cards has only a `normal` sub-object; a rarity where all cards have a foil finish has only a `foil` sub-object; a rarity with a mix has both. Each sub-object is an exact fraction `{ numerator, denominator }`.
 
