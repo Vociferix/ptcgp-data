@@ -1160,7 +1160,6 @@ fn insert_card_versions(
             }
         }
 
-
         all_versions.push(version);
     }
 
