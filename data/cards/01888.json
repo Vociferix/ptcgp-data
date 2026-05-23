@@ -1,30 +1,12 @@
 {
   "id": 1888,
-  "name": "Froakie",
-  "card_type": "pokemon",
-  "natdex_number": 656,
-  "element": "Water",
-  "stage": "Basic",
-  "hp": 60,
-  "retreat_cost": 1,
-  "weakness": "Lightning",
-  "flavor": "It protects its skin by covering its body in delicate bubbles. Beneath its happy-go-lucky air, it keeps a watchful eye on its surroundings.",
-  "is_ex": false,
-  "is_mega": false,
-  "attacks": [
-    {
-      "name": "Bubble",
-      "cost": [
-        "Water",
-        "Water"
-      ],
-      "damage": 20,
-      "effect": "Flip a coin. If heads, your opponent's Active Pokémon is now Paralyzed."
-    }
-  ],
+  "name": "Hand Scope",
+  "card_type": "trainer",
+  "trainer_kind": "Item",
+  "trainer_effect": "Your opponent reveals their hand.",
   "versions": [
     {
-      "set": "P-B",
+      "set": "P-A",
       "number": 3
     }
   ]

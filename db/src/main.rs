@@ -100,11 +100,18 @@ struct PackVariantKind {
 }
 
 #[derive(Deserialize)]
+struct Availability {
+    start: String,
+    #[serde(default)]
+    end: Option<String>,
+}
+
+#[derive(Deserialize)]
 struct SetSummary {
     code: String,
     name: String,
     series: String,
-    release_date: Option<String>,
+    availability: Option<Availability>,
     is_promo: bool,
     card_count: Option<u32>,
 }
@@ -476,10 +483,11 @@ fn insert_sets(tx: &rusqlite::Transaction, data: &Path) -> Result<HashMap<String
         )?;
         set_map.insert(set.code.clone(), set_id);
 
-        if let Some(date) = &set.release_date {
+        if let Some(avail) = &set.availability {
             tx.execute(
-                "INSERT OR IGNORE INTO set_release_dates (set_id, release_date) VALUES (?1, ?2)",
-                params![set_id, date],
+                "INSERT OR IGNORE INTO set_availability \
+                 (set_id, start_date, end_date) VALUES (?1, ?2, ?3)",
+                params![set_id, avail.start, avail.end],
             )?;
         }
         if let Some(count) = set.card_count {

@@ -113,16 +113,19 @@ CREATE TABLE sets (
     FOREIGN KEY (name_id) REFERENCES set_names (id)
 );
 
--- Card Set Release Dates
+-- Set Availability
 --
--- Promo sets don't have a release date, so they will not have a
--- corresponding row in this table.
-CREATE TABLE set_release_dates (
+-- The availability window for a set. Promo sets have no fixed window and
+-- will not have a corresponding row in this table.
+CREATE TABLE set_availability (
     -- sets.id - The set
     set_id INTEGER UNIQUE NOT NULL,
 
-    -- The release date of the set
-    release_date DATETIME NOT NULL,
+    -- The date the set became available (YYYY-MM-DD)
+    start_date DATETIME NOT NULL,
+
+    -- The date the set stopped being available (YYYY-MM-DD), or null if still available
+    end_date DATETIME,
 
     FOREIGN KEY (set_id) REFERENCES sets (id)
 );

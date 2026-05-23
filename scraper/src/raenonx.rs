@@ -272,6 +272,32 @@ pub fn parse_pack_name_from_title(html: &str) -> Option<String> {
     }
 }
 
+/// Parse expansion end dates from cardPackMap.timeframe.endEpoch.
+///
+/// Returns a map of set code → YYYY-MM-DD end date for expansions where the
+/// pack has a known end epoch. Most expansions have no end epoch (still available).
+pub fn parse_set_end_dates(raw: &Value) -> HashMap<String, String> {
+    let pack_map = match raw.get("cardPackMap").and_then(Value::as_object) {
+        Some(m) => m,
+        None => return HashMap::new(),
+    };
+    let mut result: HashMap<String, String> = HashMap::new();
+    for pval in pack_map.values() {
+        let Some(tf) = pval.get("timeframe") else {
+            continue;
+        };
+        let Some(end_epoch) = tf.get("endEpoch").and_then(Value::as_i64) else {
+            continue;
+        };
+        let Some(exp_id) = pval.get("expansionId").and_then(Value::as_str) else {
+            continue;
+        };
+        let set_code = normalize_expansion_id(exp_id);
+        result.insert(set_code, epoch_to_date(end_epoch));
+    }
+    result
+}
+
 /// Parse craft costs from cardPackPointMap.
 pub fn parse_craft_costs(raw: &Value) -> HashMap<String, u32> {
     parse_rarity_u32_map(raw, "cardPackPointMap")
@@ -342,6 +368,28 @@ pub fn normalize_expansion_id(id: &str) -> String {
         "unrecognized expansion ID pattern — normalization may be wrong"
     );
     id.to_string()
+}
+
+/// Convert a Unix epoch (seconds) to a YYYY-MM-DD string in UTC.
+///
+/// Uses Howard Hinnant's civil-from-days algorithm to avoid a chrono dependency.
+fn epoch_to_date(epoch: i64) -> String {
+    let days = epoch / 86400;
+    let z = days + 719468;
+    let era = if z >= 0 {
+        z / 146097
+    } else {
+        (z - 146096) / 146097
+    };
+    let doe = (z - era * 146097) as u32;
+    let yoe = (doe - doe / 1460 + doe / 36524 - doe / 146096) / 365;
+    let y = yoe as i64 + era * 400;
+    let doy = doe - (365 * yoe + yoe / 4 - yoe / 100);
+    let mp = (5 * doy + 2) / 153;
+    let d = doy - (153 * mp + 2) / 5 + 1;
+    let m = if mp < 10 { mp + 3 } else { mp - 9 };
+    let y = if m <= 2 { y + 1 } else { y };
+    format!("{y:04}-{m:02}-{d:02}")
 }
 
 fn parse_rarity_u32_map(raw: &Value, key: &str) -> HashMap<String, u32> {

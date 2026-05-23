@@ -3,7 +3,7 @@ use scraper::{Html, Selector};
 use tracing::warn;
 
 use crate::client::Client;
-use crate::models::{Ability, Attack, LimitlessCardData, SetSummary};
+use crate::models::{Ability, Attack, Availability, LimitlessCardData, SetSummary};
 
 const BASE: &str = "https://pocket.limitlesstcg.com";
 
@@ -92,7 +92,7 @@ fn parse_sets_index(html: &str) -> Result<Vec<SetSummary>> {
             code,
             name,
             series,
-            release_date,
+            availability: release_date.map(|start| Availability { start, end: None }),
             is_promo,
             card_count,
         });

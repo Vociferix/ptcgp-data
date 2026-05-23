@@ -5,14 +5,24 @@ use serde::{Deserialize, Serialize};
 
 // ── Set metadata ──────────────────────────────────────────────────────────────
 
+/// Availability window for a set — null for promo sets.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Availability {
+    /// YYYY-MM-DD date the set became available
+    pub start: String,
+    /// YYYY-MM-DD date the set stopped being available, if known
+    #[serde(skip_serializing_if = "Option::is_none", default)]
+    pub end: Option<String>,
+}
+
 /// One entry in data/sets.json
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SetSummary {
     pub code: String,
     pub name: String,
     pub series: String,
-    /// YYYY-MM-DD, null for promo sets
-    pub release_date: Option<String>,
+    /// Null for promo sets, which have no fixed availability window
+    pub availability: Option<Availability>,
     pub is_promo: bool,
     pub card_count: Option<u32>,
 }
@@ -23,7 +33,8 @@ pub struct SetDetail {
     pub code: String,
     pub name: String,
     pub series: String,
-    pub release_date: Option<String>,
+    /// Null for promo sets, which have no fixed availability window
+    pub availability: Option<Availability>,
     pub is_promo: bool,
     pub card_count: Option<u32>,
     /// Subtitle of each pack in this set (e.g. "Charizard", "Mewtwo")

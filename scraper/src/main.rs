@@ -151,7 +151,15 @@ async fn main() -> Result<()> {
             let pack_names = fetch_pack_names(&client, &raw).await;
             let expansion_packs = raenonx::parse_expansion_packs(&raw);
             let promo_subtitles = raenonx::parse_promo_pack_subtitles(&raw);
-            run_sets(&client, &expansion_packs, &pack_names, &promo_subtitles).await?;
+            let set_end_dates = raenonx::parse_set_end_dates(&raw);
+            run_sets(
+                &client,
+                &expansion_packs,
+                &pack_names,
+                &promo_subtitles,
+                &set_end_dates,
+            )
+            .await?;
             cmd_base_pokemon(&client).await?;
             run_cards(&client, &raw, &pack_names, None, force, lenient).await?;
             run_pull_rates(&client, &raw, &pack_names, None, force).await?;
@@ -214,7 +222,15 @@ async fn cmd_sets(client: &client::Client) -> Result<()> {
     let pack_names = fetch_pack_names(client, &raw).await;
     let expansion_packs = raenonx::parse_expansion_packs(&raw);
     let promo_subtitles = raenonx::parse_promo_pack_subtitles(&raw);
-    run_sets(client, &expansion_packs, &pack_names, &promo_subtitles).await
+    let set_end_dates = raenonx::parse_set_end_dates(&raw);
+    run_sets(
+        client,
+        &expansion_packs,
+        &pack_names,
+        &promo_subtitles,
+        &set_end_dates,
+    )
+    .await
 }
 
 async fn run_sets(
@@ -222,9 +238,20 @@ async fn run_sets(
     expansion_packs: &HashMap<String, Vec<String>>,
     pack_names: &HashMap<String, String>,
     promo_subtitles: &HashMap<String, String>,
+    set_end_dates: &HashMap<String, String>,
 ) -> Result<()> {
     info!("scraping set index from Limitless TCG");
-    let sets = limitless::scrape_sets(client).await?;
+    let mut sets = limitless::scrape_sets(client).await?;
+
+    // Patch in end dates from RaenonX for sets whose packs have a known endEpoch.
+    for set in &mut sets {
+        if let Some(avail) = &mut set.availability {
+            if let Some(end) = set_end_dates.get(&set.code) {
+                avail.end = Some(end.clone());
+            }
+        }
+    }
+
     output::write_sets(&sets)?;
     info!(count = sets.len(), "sets.json written");
 
@@ -250,7 +277,7 @@ async fn run_sets(
             code: set.code.clone(),
             name: set.name.clone(),
             series: set.series.clone(),
-            release_date: set.release_date.clone(),
+            availability: set.availability.clone(),
             is_promo: set.is_promo,
             card_count: set.card_count,
             packs: subtitles,
@@ -319,7 +346,11 @@ async fn run_cards(
 
     let release_dates: HashMap<String, String> = all_sets
         .iter()
-        .filter_map(|s| s.release_date.as_ref().map(|d| (s.code.clone(), d.clone())))
+        .filter_map(|s| {
+            s.availability
+                .as_ref()
+                .map(|a| (s.code.clone(), a.start.clone()))
+        })
         .collect();
 
     let set_is_promo: HashMap<String, bool> = all_sets
