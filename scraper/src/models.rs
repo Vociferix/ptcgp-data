@@ -112,8 +112,7 @@ pub struct CardVersion {
     /// Pack subtitles this version can be obtained from
     pub packs: Vec<String>,
     /// How this version is obtained (e.g. "Pack", "Shop", "Mission")
-    #[serde(skip_serializing_if = "Vec::is_empty", default)]
-    pub card_sources: Vec<String>,
+    pub source: String,
     /// Other versions with the same rarity, illustrator, and promo status (same physical card)
     #[serde(skip_serializing_if = "Vec::is_empty", default)]
     pub duplicates: Vec<VersionRef>,
@@ -224,7 +223,7 @@ pub struct CardEntry {
     /// Pack IDs this card can be obtained from (source.pack)
     pub source_packs: Vec<String>,
     /// Card source derived from RaenonX promotion/source fields
-    pub card_sources: Vec<String>,
+    pub card_source: Option<String>,
 }
 
 // ── Pull rate data ────────────────────────────────────────────────────────────

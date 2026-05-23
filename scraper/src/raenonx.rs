@@ -112,7 +112,7 @@ pub fn parse_card_entries(raw: &Value) -> Result<Vec<CardEntry>> {
             })
             .unwrap_or_default();
 
-        let card_sources = card_source_from_raenonx(val).into_iter().collect();
+        let card_source = card_source_from_raenonx(val);
 
         let is_foil = val.get("mirrorType").and_then(Value::as_str) == Some("normalMirror");
 
@@ -124,7 +124,7 @@ pub fn parse_card_entries(raw: &Value) -> Result<Vec<CardEntry>> {
             collection_nums,
             card_ids_group,
             source_packs,
-            card_sources,
+            card_source,
         });
     }
 

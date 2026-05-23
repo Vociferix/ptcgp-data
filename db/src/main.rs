@@ -162,8 +162,7 @@ struct CardVersion {
     is_reprint: bool,
     #[serde(default)]
     packs: Vec<String>,
-    #[serde(default)]
-    card_sources: Vec<String>,
+    source: String,
     #[serde(default)]
     duplicates: Vec<VersionRef>,
 }
@@ -1096,10 +1095,25 @@ fn insert_card_versions(
             }
         };
 
+        let source_id = match tx.query_row::<i64, _, _>(
+            "SELECT id FROM card_sources WHERE code = ?1",
+            params![version.source],
+            |row| row.get(0),
+        ) {
+            Ok(id) => id,
+            Err(_) => {
+                v.add(format!(
+                    "{}/{:03}: unknown card source '{}'",
+                    version.set, version.number, version.source
+                ));
+                continue;
+            }
+        };
+
         tx.execute(
-            "INSERT INTO card_versions (card_id, set_id, rarity_id, number) \
-             VALUES (?1, ?2, ?3, ?4)",
-            params![card_db_id, set_id, rarity_id, version.number],
+            "INSERT INTO card_versions (card_id, set_id, rarity_id, number, source_id) \
+             VALUES (?1, ?2, ?3, ?4, ?5)",
+            params![card_db_id, set_id, rarity_id, version.number, source_id],
         )?;
         let version_db_id = tx.last_insert_rowid();
         version_db_map.insert((version.set.clone(), version.number), version_db_id);
@@ -1146,19 +1160,6 @@ fn insert_card_versions(
             }
         }
 
-        for source_code in &version.card_sources {
-            if let Ok(source_id) = tx.query_row::<i64, _, _>(
-                "SELECT id FROM card_sources WHERE code = ?1",
-                params![source_code],
-                |row| row.get(0),
-            ) {
-                tx.execute(
-                    "INSERT OR IGNORE INTO card_version_card_sources \
-                     (card_version_id, card_source_id) VALUES (?1, ?2)",
-                    params![version_db_id, source_id],
-                )?;
-            }
-        }
 
         all_versions.push(version);
     }

@@ -330,6 +330,9 @@ async fn run_cards(
     // Build pack_id → subtitle mapping (used to resolve source.pack IDs on card entries)
     let pack_subtitle_map = build_pack_subtitle_map(&promo_subtitles, pack_names);
 
+    // Build pack_id → set code mapping (used to scope source.pack IDs to the card's own set)
+    let pack_expansion = raenonx::parse_pack_expansion(raw);
+
     // Build abstract card groups (regardless of set filter, since abstracts span sets)
     let groups = build_abstract_groups(&card_entries, &release_dates);
 
@@ -450,17 +453,24 @@ async fn run_cards(
         };
         let entry = &card_entries[entry_idx];
         let is_promo = *set_is_promo.get(set).unwrap_or(&false);
-        let version = build_card_version(
+        let version = match build_card_version(
             set,
             *num,
             abstract_id,
             entry,
             &pack_subtitle_map,
+            &pack_expansion,
             card_data.illustrator.clone(),
             card_data.card_source.as_deref(),
             is_promo,
             entry.is_foil,
-        );
+        ) {
+            Some(v) => v,
+            None => {
+                violations.add(format!("{set}/{num:03}: no card source — version skipped"));
+                continue;
+            }
+        };
         if let Err(e) = output::write_card_version(&version) {
             error!(set, number = num, "write failed: {e}");
         }
@@ -853,31 +863,35 @@ fn build_card_version(
     abstract_id: u32,
     entry: &CardEntry,
     pack_subtitle_map: &HashMap<String, String>,
+    pack_expansion: &HashMap<String, String>,
     illustrator: Option<String>,
     limitless_card_source: Option<&str>,
     is_promo: bool,
     is_foil: bool,
-) -> CardVersion {
-    // Map source.pack IDs to subtitles (filtering out unmapped IDs like TUTORIAL_*)
+) -> Option<CardVersion> {
+    // Map source.pack IDs to subtitles, keeping only packs that belong to this card's set.
+    // A single CardEntry can span multiple sets (reprints); without this filter every version
+    // would inherit packs from all sets, not just its own.
     let packs: Vec<String> = entry
         .source_packs
         .iter()
+        .filter(|id| pack_expansion.get(*id).is_some_and(|s| s == set))
         .filter_map(|id| pack_subtitle_map.get(id).cloned())
         .collect();
 
     // For promo cards: Limitless label is authoritative when present; fall back to RaenonX.
     // For non-promo cards: use RaenonX-derived source (e.g. "Pack" or "Mission").
-    let card_sources = if is_promo {
+    let card_source = if is_promo {
         limitless_card_source
-            .map(|s| vec![s.to_string()])
-            .unwrap_or_else(|| entry.card_sources.clone())
+            .map(|s| s.to_string())
+            .or_else(|| entry.card_source.clone())
     } else {
-        entry.card_sources.clone()
-    };
+        entry.card_source.clone()
+    }?;
 
     let rarity = entry.rarity.clone();
 
-    CardVersion {
+    Some(CardVersion {
         set: set.to_string(),
         number,
         card_id: abstract_id,
@@ -887,9 +901,9 @@ fn build_card_version(
         is_foil,
         is_reprint: false,
         packs,
-        card_sources,
+        source: card_source,
         duplicates: Vec::new(),
-    }
+    })
 }
 
 fn build_abstract_card(
@@ -1355,10 +1369,7 @@ fn validate_card_version(
         .get(&version.set)
         .copied()
         .unwrap_or(version.is_promo);
-    if version.card_sources.is_empty() {
-        v.add(format!("{loc}: card has no card_sources"));
-    }
-    let is_pack_card = version.card_sources.iter().any(|s| s == "Pack");
+    let is_pack_card = version.source == "Pack";
     if !is_promo && is_pack_card && version.packs.is_empty() {
         v.add(format!("{loc}: pack card has no packs"));
     }

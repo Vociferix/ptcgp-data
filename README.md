@@ -169,8 +169,8 @@ The `versions` array lists every card version that shares this abstract card's m
   "is_promo": false,
   "is_foil": false,
   "is_reprint": false,
-  "packs": ["Mewtwo", "ex"],
-  "card_sources": ["Pack"],
+  "packs": ["Mewtwo"],
+  "source": "Pack",
   "duplicates": [
     { "set": "A4b", "number": 1 }
   ]
@@ -185,7 +185,7 @@ The `versions` array lists every card version that shares this abstract card's m
 | `is_foil` | `true` when the card has a mirror/foil finish |
 | `is_reprint` | `true` when an identical version was released in an earlier set |
 | `packs` | Pack subtitles this version can be pulled from (empty for non-pack cards) |
-| `card_sources` | How this card is obtained; codes from `card_sources.json` (e.g. `["Pack"]`, `["Mission"]`) |
+| `source` | How this card is obtained; a code from `card_sources.json` (e.g. `"Pack"`, `"Mission"`) |
 | `duplicates` | Other versions with the same rarity, illustrator, and finish (i.e. the same physical card released again) |
 
 ---
@@ -267,7 +267,7 @@ The pre-built `ptcgp.db` is published with each [release](https://github.com/Voc
 
 | View | Description |
 |---|---|
-| `versions` | Flat join of card_versions with set, card name, rarity, illustrator, and finish flags |
+| `versions` | Flat join of card_versions with set, card name, rarity, illustrator, source, and finish flags |
 | `pokemon` | All Pokémon abstract cards with stats, attacks, and ability |
 | `trainers` | All Trainer abstract cards with kind and effect |
 | `rarity_overview` | Rarities with group name, symbol count, craft cost, and dupe dust |

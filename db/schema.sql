@@ -232,9 +232,13 @@ CREATE TABLE card_versions (
     -- The number of this card in its set
     number INTEGER,
 
+    -- card_sources.id - How this version is obtained (e.g. Pack, Mission, Shop)
+    source_id INTEGER NOT NULL,
+
     FOREIGN KEY (card_id) REFERENCES cards (id),
     FOREIGN KEY (set_id) REFERENCES sets (id),
-    FOREIGN KEY (rarity_id) REFERENCES rarities (id)
+    FOREIGN KEY (rarity_id) REFERENCES rarities (id),
+    FOREIGN KEY (source_id) REFERENCES card_sources (id)
 );
 
 -- Card Version Illustrators
@@ -276,22 +280,6 @@ CREATE TABLE card_sources (
     description_id INTEGER NOT NULL,
 
     FOREIGN KEY (description_id) REFERENCES card_source_descriptions (id)
-);
-
--- Card Version Source Mapping
---
--- Each row assigns a card source to a card version.
--- A card can be available from multiple sources.
-CREATE TABLE card_version_card_sources (
-    -- card_versions.id - The card version
-    card_version_id INTEGER NOT NULL,
-
-    -- card_sources.id - The source for this card
-    card_source_id INTEGER NOT NULL,
-
-    FOREIGN KEY (card_version_id) REFERENCES card_versions (id),
-    FOREIGN KEY (card_source_id) REFERENCES card_sources (id),
-    UNIQUE (card_version_id, card_source_id) ON CONFLICT IGNORE
 );
 
 -- Promo Stamp Card Versions
@@ -950,11 +938,12 @@ CREATE TABLE card_pull_rates (
 -- ── Indexes ──────────────────────────────────────────────────────────────────
 
 -- card_versions: foreign key columns used in joins and filters.
--- set_id and rarity_id are not leftmost in any UNIQUE constraint.
+-- set_id, rarity_id, and card_source_id are not leftmost in any UNIQUE constraint.
 -- card_id has no UNIQUE constraint at all.
-CREATE INDEX idx_card_versions_card_id   ON card_versions (card_id);
-CREATE INDEX idx_card_versions_set_id    ON card_versions (set_id);
-CREATE INDEX idx_card_versions_rarity_id ON card_versions (rarity_id);
+CREATE INDEX idx_card_versions_card_id        ON card_versions (card_id);
+CREATE INDEX idx_card_versions_set_id         ON card_versions (set_id);
+CREATE INDEX idx_card_versions_rarity_id      ON card_versions (rarity_id);
+CREATE INDEX idx_card_versions_source_id ON card_versions (source_id);
 
 -- packs: set_id is not covered by any constraint.
 CREATE INDEX idx_packs_set_id ON packs (set_id);
@@ -993,6 +982,7 @@ CREATE VIEW versions AS
         rg.name             AS rarity_group,
         rc.count            AS rarity_count,
         i.name              AS illustrator,
+        cs.code             AS card_source,
         CASE WHEN pcv.card_version_id IS NOT NULL THEN 1 ELSE 0 END AS is_promo,
         CASE WHEN fcv.card_version_id IS NOT NULL THEN 1 ELSE 0 END AS is_foil,
         CASE WHEN cvd.card_version_id IS NOT NULL
@@ -1009,6 +999,7 @@ CREATE VIEW versions AS
     JOIN rarity_groups            rg  ON rg.id  = rc.group_id
     LEFT JOIN card_version_illustrators cvi ON cvi.card_version_id = cv.id
     LEFT JOIN illustrators        i   ON i.id   = cvi.illustrator_id
+    JOIN  card_sources            cs  ON cs.id  = cv.source_id
     LEFT JOIN promo_card_versions pcv ON pcv.card_version_id = cv.id
     LEFT JOIN foil_card_versions  fcv ON fcv.card_version_id = cv.id
     LEFT JOIN card_version_duplicates cvd ON cvd.card_version_id = cv.id;
