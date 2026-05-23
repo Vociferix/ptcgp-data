@@ -80,9 +80,9 @@ Energy types. Keys are element names; values include an optional single-letter `
 
 Pokédex reference. Array of objects with `natdex_number` and `name`.
 
-#### `data/promo_sources.json`
+#### `data/card_sources.json`
 
-How promo cards can be obtained. Each entry has a `code` and optional `description`.
+How cards can be obtained. Each entry has a `code` and optional `description`. Examples: `Pack`, `Wonder Pick`, `Mission`, `Premium Mission`, `Gold Shop`, `Shop`.
 
 #### `data/pack_variant_names.json`
 
@@ -170,7 +170,7 @@ The `versions` array lists every card version that shares this abstract card's m
   "is_foil": false,
   "is_reprint": false,
   "packs": ["Mewtwo", "ex"],
-  "promo_sources": [],
+  "card_sources": ["Pack"],
   "duplicates": [
     { "set": "A4b", "number": 1 }
   ]
@@ -184,8 +184,8 @@ The `versions` array lists every card version that shares this abstract card's m
 | `is_promo` | `true` when the card carries a promo stamp |
 | `is_foil` | `true` when the card has a mirror/foil finish |
 | `is_reprint` | `true` when an identical version was released in an earlier set |
-| `packs` | Pack subtitles this version can be pulled from (empty for promo-only cards) |
-| `promo_sources` | Acquisition methods from `promo_sources.json` (empty for non-promo cards) |
+| `packs` | Pack subtitles this version can be pulled from (empty for non-pack cards) |
+| `card_sources` | How this card is obtained; codes from `card_sources.json` (e.g. `["Pack"]`, `["Mission"]`) |
 | `duplicates` | Other versions with the same rarity, illustrator, and finish (i.e. the same physical card released again) |
 
 ---
@@ -278,7 +278,7 @@ The pre-built `ptcgp.db` is published with each [release](https://github.com/Voc
 | `set_logos` | Set ID → set logo image path |
 | `rarity_icons` | Rarity ID → rarity icon image path |
 | `element_icons` | Element ID → element icon image path |
-| `promo_source_icons` | Promo source ID → icon image path |
+| `card_source_icons` | Card source ID → icon image path |
 
 ### Pull rate fractions
 

@@ -111,9 +111,9 @@ pub struct CardVersion {
     pub is_reprint: bool,
     /// Pack subtitles this version can be obtained from
     pub packs: Vec<String>,
-    /// Promo source categories (only present for promo cards)
+    /// How this version is obtained (e.g. "Pack", "Shop", "Mission")
     #[serde(skip_serializing_if = "Vec::is_empty", default)]
-    pub promo_sources: Vec<String>,
+    pub card_sources: Vec<String>,
     /// Other versions with the same rarity, illustrator, and promo status (same physical card)
     #[serde(skip_serializing_if = "Vec::is_empty", default)]
     pub duplicates: Vec<VersionRef>,
@@ -145,6 +145,8 @@ pub struct LimitlessCardData {
 
     /// Version-specific (moves to CardVersion)
     pub illustrator: Option<String>,
+    /// Card source label scraped from Limitless (e.g. "Pack", "Mission"). None if absent.
+    pub card_source: Option<String>,
 }
 
 // ── Shared card sub-types ─────────────────────────────────────────────────────
@@ -196,9 +198,9 @@ pub struct RarityInfo {
     pub dupe_dust: Option<u32>,
 }
 
-/// One entry in data/promo_sources.json
+/// One entry in data/card_sources.json
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct PromoSource {
+pub struct CardSource {
     pub code: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
@@ -221,8 +223,8 @@ pub struct CardEntry {
     pub card_ids_group: Vec<String>,
     /// Pack IDs this card can be obtained from (source.pack)
     pub source_packs: Vec<String>,
-    /// Promo source categories derived from source.* fields
-    pub promo_sources: Vec<String>,
+    /// Card source derived from RaenonX promotion/source fields
+    pub card_sources: Vec<String>,
 }
 
 // ── Pull rate data ────────────────────────────────────────────────────────────

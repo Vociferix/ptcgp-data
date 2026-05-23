@@ -1,12 +1,29 @@
 {
   "id": 1885,
-  "name": "X Speed",
-  "card_type": "trainer",
-  "trainer_kind": "Item",
-  "trainer_effect": "During this turn, the Retreat Cost of your Active Pokémon is 1 less.",
+  "name": "Petilil",
+  "card_type": "pokemon",
+  "natdex_number": 548,
+  "element": "Grass",
+  "stage": "Basic",
+  "hp": 50,
+  "retreat_cost": 1,
+  "weakness": "Fire",
+  "flavor": "If the leaves on its head are pruned with regularity, this Pokémon can be grown into a fine plump shape.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Surprise Attack",
+      "cost": [
+        "Grass"
+      ],
+      "damage": 30,
+      "effect": "Flip a coin. If tails, this attack does nothing."
+    }
+  ],
   "versions": [
     {
-      "set": "P-A",
+      "set": "P-B",
       "number": 2
     }
   ]

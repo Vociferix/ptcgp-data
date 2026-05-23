@@ -14,15 +14,17 @@ use crate::models::{
 
 const GLOBAL_MASTER_URL: &str = "https://ptcgp.raenonx.cc/api/data/global-master";
 
-/// Known promo source fields in the RaenonX `source` object, mapped to display names.
-/// The `pack` field is excluded — it maps to pack subtitles via `source_packs`.
-const PROMO_SOURCE_FIELDS: &[(&str, &str)] = &[
-    ("wonderPick", "Wonder Pick"),
-    ("goldShop", "Gold Shop"),
-    ("itemShop", "Shop"),
-    ("mission", "Mission"),
-];
 pub const PACK_PAGE_BASE: &str = "https://ptcgp.raenonx.cc/en/pack";
+
+/// Canonical order for promo source display names in output.
+const CARD_SOURCE_ORDER: &[&str] = &[
+    "Pack",
+    "Wonder Pick",
+    "Gold Shop",
+    "Shop",
+    "Mission",
+    "Premium Mission",
+];
 
 // ── Public entry points ──────────────────────────────────────────────────────
 
@@ -110,7 +112,7 @@ pub fn parse_card_entries(raw: &Value) -> Result<Vec<CardEntry>> {
             })
             .unwrap_or_default();
 
-        let promo_sources = extract_promo_sources(source);
+        let card_sources = card_source_from_raenonx(val).into_iter().collect();
 
         let is_foil = val.get("mirrorType").and_then(Value::as_str) == Some("normalMirror");
 
@@ -122,7 +124,7 @@ pub fn parse_card_entries(raw: &Value) -> Result<Vec<CardEntry>> {
             collection_nums,
             card_ids_group,
             source_packs,
-            promo_sources,
+            card_sources,
         });
     }
 
@@ -282,60 +284,24 @@ pub fn parse_dupe_dust(raw: &Value) -> HashMap<String, u32> {
 
 /// Collect all promo source codes seen across all card entries, in display order.
 /// "Pack" is included first when any card has an AP*** promo pack source.
-pub fn parse_promo_source_codes(raw: &Value) -> Vec<String> {
+pub fn parse_card_source_codes(raw: &Value) -> Vec<String> {
     let entry_map = match raw.get("cardEntryMap").and_then(Value::as_object) {
         Some(m) => m,
         None => return Vec::new(),
     };
 
-    let field_to_display: HashMap<&str, &str> = PROMO_SOURCE_FIELDS.iter().copied().collect();
     let mut seen: HashSet<String> = HashSet::new();
-    let mut has_ap_packs = false;
-
     for val in entry_map.values() {
-        let source = match val.get("source").and_then(Value::as_object) {
-            Some(s) => s,
-            None => continue,
-        };
-
-        for (field, v) in source {
-            if field == "pack" {
-                if v.as_array().is_some_and(|arr| {
-                    arr.iter()
-                        .any(|p| p.as_str().is_some_and(|s| s.starts_with("AP")))
-                }) {
-                    has_ap_packs = true;
-                }
-                continue;
-            }
-            if !source_field_has_content(v) {
-                continue;
-            }
-            let code = field_to_display
-                .get(field.as_str())
-                .map(|s| s.to_string())
-                .unwrap_or_else(|| {
-                    warn!(
-                        field,
-                        "unknown promo source field — add to PROMO_SOURCE_FIELDS in raenonx.rs"
-                    );
-                    field.clone()
-                });
-            seen.insert(code);
+        if let Some(source) = card_source_from_raenonx(val) {
+            seen.insert(source);
         }
     }
 
-    // Preserve known-field order, then append unknowns sorted.
-    let mut result = Vec::new();
-    if has_ap_packs {
-        result.push("Pack".to_string());
-    }
-    for (_, display) in PROMO_SOURCE_FIELDS {
-        let s = display.to_string();
-        if seen.remove(&s) {
-            result.push(s);
-        }
-    }
+    let mut result: Vec<String> = CARD_SOURCE_ORDER
+        .iter()
+        .filter(|s| seen.remove(**s))
+        .map(|s| s.to_string())
+        .collect();
     let mut unknowns: Vec<String> = seen.into_iter().collect();
     unknowns.sort();
     result.extend(unknowns);
@@ -392,59 +358,88 @@ fn parse_rarity_u32_map(raw: &Value, key: &str) -> HashMap<String, u32> {
         .unwrap_or_default()
 }
 
-/// Extract human-readable promo source names from a card's source object.
-/// Iterates over all source fields (excluding `pack`) and maps them to display names.
-fn extract_promo_sources(source: Option<&Value>) -> Vec<String> {
-    let Some(source) = source.and_then(Value::as_object) else {
-        return Vec::new();
-    };
-
-    let field_to_display: HashMap<&str, &str> = PROMO_SOURCE_FIELDS.iter().copied().collect();
-
-    // Collect seen display names, then re-order to match PROMO_SOURCE_FIELDS order.
-    let mut seen: HashSet<String> = HashSet::new();
-    for (field, val) in source {
-        if field == "pack" {
-            continue;
-        }
-        if !source_field_has_content(val) {
-            continue;
-        }
-        let code = field_to_display
-            .get(field.as_str())
-            .map(|s| s.to_string())
-            .unwrap_or_else(|| {
-                warn!(
-                    field,
-                    "unknown promo source field — add to PROMO_SOURCE_FIELDS in raenonx.rs"
-                );
-                field.clone()
-            });
-        seen.insert(code);
+/// Derive a card source display name from RaenonX data.
+/// Prefers `promotion.sourceI18nId`; falls back to inferring from `source.*` fields
+/// for cards that have no `promotion` (e.g. special non-promo mission cards).
+fn card_source_from_raenonx(val: &Value) -> Option<String> {
+    if let Some(source_id) = val
+        .get("promotion")
+        .and_then(|p| p.get("sourceI18nId"))
+        .and_then(Value::as_str)
+    {
+        let source = val.get("source");
+        let display = match source_id {
+            "PACK" => "Pack",
+            "FEED" => "Wonder Pick",
+            "MISSION" | "CAMPAIGN" => "Mission",
+            "SHOP" => {
+                let item_shop = source
+                    .and_then(|s| s.get("itemShop"))
+                    .and_then(Value::as_array);
+                let gold_shop = source
+                    .and_then(|s| s.get("goldShop"))
+                    .and_then(Value::as_array);
+                if item_shop.is_some_and(|arr| arr.iter().any(|v| v.as_str() == Some("PREMIUM"))) {
+                    "Premium Mission"
+                } else if gold_shop.is_some_and(|arr| !arr.is_empty()) {
+                    "Gold Shop"
+                } else {
+                    "Shop"
+                }
+            }
+            other => {
+                warn!(source_id = other, "unknown promotion.sourceI18nId");
+                other
+            }
+        };
+        return Some(display.to_string());
     }
 
-    let mut result = Vec::new();
-    for (_, display) in PROMO_SOURCE_FIELDS {
-        let s = display.to_string();
-        if seen.remove(&s) {
-            result.push(s);
-        }
+    // Fallback for cards with no promotion field: infer from source.* content.
+    let source = val.get("source")?.as_object()?;
+    if source
+        .get("pack")
+        .and_then(Value::as_array)
+        .is_some_and(|a| !a.is_empty())
+    {
+        return Some("Pack".to_string());
     }
-    let mut unknowns: Vec<String> = seen.into_iter().collect();
-    unknowns.sort();
-    result.extend(unknowns);
-    result
-}
-
-fn source_field_has_content(val: &Value) -> bool {
-    match val {
-        Value::Null => false,
-        Value::Bool(b) => *b,
-        Value::Number(n) => n.as_f64().is_some_and(|f| f != 0.0),
-        Value::String(s) => !s.is_empty(),
-        Value::Array(arr) => !arr.is_empty(),
-        Value::Object(obj) => obj.values().any(source_field_has_content),
+    let wp = source.get("wonderPick").and_then(Value::as_object);
+    if wp.is_some_and(|o| {
+        o.values()
+            .any(|v| v.as_array().is_some_and(|a| !a.is_empty()))
+    }) {
+        return Some("Wonder Pick".to_string());
     }
+    if source
+        .get("mission")
+        .and_then(Value::as_array)
+        .is_some_and(|a| !a.is_empty())
+    {
+        return Some("Mission".to_string());
+    }
+    if source
+        .get("itemShop")
+        .and_then(Value::as_array)
+        .is_some_and(|arr| arr.iter().any(|v| v.as_str() == Some("PREMIUM")))
+    {
+        return Some("Premium Mission".to_string());
+    }
+    if source
+        .get("goldShop")
+        .and_then(Value::as_array)
+        .is_some_and(|a| !a.is_empty())
+    {
+        return Some("Gold Shop".to_string());
+    }
+    if source
+        .get("itemShop")
+        .and_then(Value::as_array)
+        .is_some_and(|a| !a.is_empty())
+    {
+        return Some("Shop".to_string());
+    }
+    None
 }
 
 // ── RSC pull rate parser ─────────────────────────────────────────────────────

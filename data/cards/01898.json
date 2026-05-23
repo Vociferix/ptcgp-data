@@ -1,26 +1,24 @@
 {
   "id": 1898,
-  "name": "Hawlucha",
+  "name": "Jigglypuff",
   "card_type": "pokemon",
-  "natdex_number": 701,
-  "element": "Fighting",
+  "natdex_number": 39,
+  "element": "Colorless",
   "stage": "Basic",
-  "hp": 70,
+  "hp": 60,
   "retreat_cost": 1,
-  "weakness": "Lightning",
-  "flavor": "Hawlucha live quietly without flocking together. They fight constantly with their natural enemies: noisy groups of Primeape.",
+  "weakness": "Fighting",
+  "flavor": "When its huge eyes waver, it sings a mysteriously soothing melody that lulls its enemies to sleep.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Aerial Ace",
+      "name": "Sing",
       "cost": [
-        "Colorless",
         "Colorless"
       ],
-      "damage": 40,
-      "damage_suffix": "+",
-      "effect": "Flip a coin. If heads, this attack does 30 more damage."
+      "damage": 0,
+      "effect": "Your opponent's Active Pokémon is now Asleep."
     }
   ],
   "versions": [

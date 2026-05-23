@@ -5,14 +5,14 @@ mod output;
 mod pokeapi;
 mod raenonx;
 
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeSet, HashMap, HashSet};
 use std::sync::Arc;
 
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 use futures::stream::{self, StreamExt};
 use models::{
-    Ability, AbstractCard, CardEntry, CardVersion, ElementInfo, LimitlessCardData, PromoSource,
+    Ability, AbstractCard, CardEntry, CardSource, CardVersion, ElementInfo, LimitlessCardData,
     RarityInfo, SetDetail, SetSummary, VersionRef,
 };
 use serde_json::Value;
@@ -181,10 +181,10 @@ fn write_reference_data(raw: &Value) -> Result<()> {
     output::write_rarities(&rarities)?;
     info!(count = rarities.len(), "rarities.json written");
 
-    let promo_source_codes = raenonx::parse_promo_source_codes(raw);
-    let promo_sources = build_promo_sources(&promo_source_codes);
-    output::write_promo_sources(&promo_sources)?;
-    info!(count = promo_sources.len(), "promo_sources.json written");
+    let card_source_codes = raenonx::parse_card_source_codes(raw);
+    let card_sources = build_card_sources(&card_source_codes);
+    output::write_card_sources(&card_sources)?;
+    info!(count = card_sources.len(), "card_sources.json written");
 
     Ok(())
 }
@@ -231,16 +231,12 @@ async fn run_sets(
     for set in &sets {
         let subtitles: Vec<String> = if set.is_promo {
             let prefix = format!("PROMO_{}_", set.series.to_uppercase());
-            let mut vols: Vec<(u32, String)> = promo_subtitles
-                .keys()
-                .filter(|k| k.starts_with(&prefix))
-                .filter_map(|k| {
-                    let n: u32 = k.rsplit('_').next()?.parse().ok()?;
-                    Some((n, format!("Vol {n}")))
-                })
+            let vol_nums: BTreeSet<u32> = promo_subtitles
+                .values()
+                .filter(|v| v.starts_with(&prefix))
+                .filter_map(|v| v.rsplit('_').next()?.parse().ok())
                 .collect();
-            vols.sort_by_key(|(n, _)| *n);
-            vols.into_iter().map(|(_, s)| s).collect()
+            vol_nums.into_iter().map(|n| format!("Vol {n}")).collect()
         } else if let Some(pack_ids) = expansion_packs.get(&set.code) {
             pack_ids
                 .iter()
@@ -461,6 +457,7 @@ async fn run_cards(
             entry,
             &pack_subtitle_map,
             card_data.illustrator.clone(),
+            card_data.card_source.as_deref(),
             is_promo,
             entry.is_foil,
         );
@@ -857,6 +854,7 @@ fn build_card_version(
     entry: &CardEntry,
     pack_subtitle_map: &HashMap<String, String>,
     illustrator: Option<String>,
+    limitless_card_source: Option<&str>,
     is_promo: bool,
     is_foil: bool,
 ) -> CardVersion {
@@ -867,13 +865,15 @@ fn build_card_version(
         .filter_map(|id| pack_subtitle_map.get(id).cloned())
         .collect();
 
-    // Promo sources: if any source.pack entry is an AP pack, add "Pack"
-    let mut promo_sources = entry.promo_sources.clone();
-    if entry.source_packs.iter().any(|id| id.starts_with("AP"))
-        && !promo_sources.contains(&"Pack".to_string())
-    {
-        promo_sources.insert(0, "Pack".to_string());
-    }
+    // For promo cards: Limitless label is authoritative when present; fall back to RaenonX.
+    // For non-promo cards: use RaenonX-derived source (e.g. "Pack" or "Mission").
+    let card_sources = if is_promo {
+        limitless_card_source
+            .map(|s| vec![s.to_string()])
+            .unwrap_or_else(|| entry.card_sources.clone())
+    } else {
+        entry.card_sources.clone()
+    };
 
     let rarity = entry.rarity.clone();
 
@@ -887,7 +887,7 @@ fn build_card_version(
         is_foil,
         is_reprint: false,
         packs,
-        promo_sources,
+        card_sources,
         duplicates: Vec::new(),
     }
 }
@@ -1355,11 +1355,12 @@ fn validate_card_version(
         .get(&version.set)
         .copied()
         .unwrap_or(version.is_promo);
-    if !is_promo && version.packs.is_empty() {
-        v.add(format!("{loc}: non-promo card has no packs"));
+    if version.card_sources.is_empty() {
+        v.add(format!("{loc}: card has no card_sources"));
     }
-    if is_promo && version.promo_sources.is_empty() {
-        v.add(format!("{loc}: promo card has no promo_sources"));
+    let is_pack_card = version.card_sources.iter().any(|s| s == "Pack");
+    if !is_promo && is_pack_card && version.packs.is_empty() {
+        v.add(format!("{loc}: pack card has no packs"));
     }
     if let Some(known_packs) = set_packs.get(&version.set) {
         for pack in &version.packs {
@@ -1370,21 +1371,20 @@ fn validate_card_version(
     }
 }
 
-fn build_promo_sources(codes: &[String]) -> Vec<PromoSource> {
-    // Display names and descriptions for known promo source codes.
-    // Unknown future codes will still appear in output without a description.
+fn build_card_sources(codes: &[String]) -> Vec<CardSource> {
     let descriptions: &[(&str, &str)] = &[
-        ("Pack", "Obtainable from promo packs"),
+        ("Pack", "Obtainable from packs"),
         ("Wonder Pick", "Obtainable via Wonder Pick"),
         ("Gold Shop", "Purchasable in the Gold Shop"),
         ("Shop", "Purchasable in the Shop"),
         ("Mission", "Obtainable via Missions"),
+        ("Premium Mission", "Obtainable via Premium Pass missions"),
     ];
     let desc_lookup: HashMap<&str, &str> = descriptions.iter().copied().collect();
 
     codes
         .iter()
-        .map(|code| PromoSource {
+        .map(|code| CardSource {
             code: code.clone(),
             description: desc_lookup.get(code.as_str()).map(|d| d.to_string()),
         })

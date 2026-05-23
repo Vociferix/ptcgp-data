@@ -4,7 +4,7 @@ use anyhow::Result;
 use serde::Serialize;
 
 use crate::models::{
-    AbstractCard, BasePokemon, CardVersion, ElementInfo, PackPullRates, PromoSource, RarityInfo,
+    AbstractCard, BasePokemon, CardSource, CardVersion, ElementInfo, PackPullRates, RarityInfo,
     SetDetail, SetSummary,
 };
 
@@ -76,9 +76,9 @@ pub fn write_rarities(rarities: &[RarityInfo]) -> Result<()> {
     write_json(&data_dir().join("rarities.json"), rarities)
 }
 
-pub fn write_promo_sources(sources: &[PromoSource]) -> Result<()> {
+pub fn write_card_sources(sources: &[CardSource]) -> Result<()> {
     std::fs::create_dir_all(data_dir())?;
-    write_json(&data_dir().join("promo_sources.json"), sources)
+    write_json(&data_dir().join("card_sources.json"), sources)
 }
 
 pub fn write_set_detail(set: &SetDetail) -> Result<()> {

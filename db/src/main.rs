@@ -88,7 +88,7 @@ struct RarityInfo {
 }
 
 #[derive(Deserialize)]
-struct PromoSourceInfo {
+struct CardSourceInfo {
     code: String,
     description: Option<String>,
 }
@@ -163,7 +163,7 @@ struct CardVersion {
     #[serde(default)]
     packs: Vec<String>,
     #[serde(default)]
-    promo_sources: Vec<String>,
+    card_sources: Vec<String>,
     #[serde(default)]
     duplicates: Vec<VersionRef>,
 }
@@ -244,7 +244,7 @@ fn main() -> Result<()> {
     let tx = conn.transaction()?;
 
     insert_static_data(&tx, &cli.data, &mut v)?;
-    insert_promo_sources(&tx, &cli.data)?;
+    insert_card_sources(&tx, &cli.data)?;
     insert_rarities(&tx, &cli.data)?;
     insert_pack_variant_kinds(&tx, &cli.data)?;
     let set_map = insert_sets(&tx, &cli.data)?;
@@ -282,22 +282,22 @@ fn insert_static_data(tx: &rusqlite::Transaction, data: &Path, v: &mut Violation
 
 // ── Reference data from JSON ──────────────────────────────────────────────────
 
-fn insert_promo_sources(tx: &rusqlite::Transaction, data: &Path) -> Result<()> {
-    let path = data.join("promo_sources.json");
+fn insert_card_sources(tx: &rusqlite::Transaction, data: &Path) -> Result<()> {
+    let path = data.join("card_sources.json");
     if !path.exists() {
-        warn!("promo_sources.json not found, skipping");
+        warn!("card_sources.json not found, skipping");
         return Ok(());
     }
-    let sources: Vec<PromoSourceInfo> = load_json(&path)?;
+    let sources: Vec<CardSourceInfo> = load_json(&path)?;
 
-    // Seed promo_source_descriptions alphabetically.
+    // Seed card_source_descriptions alphabetically.
     let descs: BTreeSet<&str> = sources
         .iter()
         .map(|s| s.description.as_deref().unwrap_or(""))
         .collect();
     for desc in &descs {
         tx.execute(
-            "INSERT OR IGNORE INTO promo_source_descriptions (description) VALUES (?1)",
+            "INSERT OR IGNORE INTO card_source_descriptions (description) VALUES (?1)",
             params![desc],
         )?;
     }
@@ -305,16 +305,16 @@ fn insert_promo_sources(tx: &rusqlite::Transaction, data: &Path) -> Result<()> {
     for s in &sources {
         let desc = s.description.as_deref().unwrap_or("");
         let desc_id: i64 = tx.query_row(
-            "SELECT id FROM promo_source_descriptions WHERE description = ?1",
+            "SELECT id FROM card_source_descriptions WHERE description = ?1",
             params![desc],
             |row| row.get(0),
         )?;
         tx.execute(
-            "INSERT OR IGNORE INTO promo_sources (code, description_id) VALUES (?1, ?2)",
+            "INSERT OR IGNORE INTO card_sources (code, description_id) VALUES (?1, ?2)",
             params![s.code, desc_id],
         )?;
     }
-    info!(count = sources.len(), "promo sources inserted");
+    info!(count = sources.len(), "card sources inserted");
     Ok(())
 }
 
@@ -1146,15 +1146,15 @@ fn insert_card_versions(
             }
         }
 
-        for source_code in &version.promo_sources {
+        for source_code in &version.card_sources {
             if let Ok(source_id) = tx.query_row::<i64, _, _>(
-                "SELECT id FROM promo_sources WHERE code = ?1",
+                "SELECT id FROM card_sources WHERE code = ?1",
                 params![source_code],
                 |row| row.get(0),
             ) {
                 tx.execute(
-                    "INSERT OR IGNORE INTO card_version_promo_sources \
-                     (card_version_id, promo_source_id) VALUES (?1, ?2)",
+                    "INSERT OR IGNORE INTO card_version_card_sources \
+                     (card_version_id, card_source_id) VALUES (?1, ?2)",
                     params![version_db_id, source_id],
                 )?;
             }

@@ -175,6 +175,18 @@ fn parse_card(html: &str, set_code: &str) -> Result<LimitlessCardData> {
         .map(|e| e.text().collect::<String>().trim().to_string())
         .filter(|s| !s.is_empty());
 
+    let promo_label_sel = sel!("div.prints-current-details span:not(.text-lg)");
+    let card_source = doc.select(&promo_label_sel).next().and_then(|span| {
+        let text = span.text().collect::<String>();
+        let after = text.split_once('·')?.1;
+        let label = after.trim();
+        if label.is_empty() {
+            None
+        } else {
+            Some(normalize_promo_label(label))
+        }
+    });
+
     let artist_sel = sel!("div.card-text-artist a");
     let illustrator = doc
         .select(&artist_sel)
@@ -233,6 +245,7 @@ fn parse_card(html: &str, set_code: &str) -> Result<LimitlessCardData> {
         trainer_kind,
         trainer_effect,
         illustrator,
+        card_source,
     })
 }
 
@@ -489,6 +502,16 @@ fn parse_damage(raw: &str) -> (u32, Option<String>) {
         .find(|c| !c.is_ascii_digit() && !c.is_whitespace())
         .map(|c| c.to_string());
     (damage, suffix)
+}
+
+fn normalize_promo_label(label: &str) -> String {
+    match label {
+        "Promo pack" | "Promo Pack" => "Pack",
+        "Missions" | "Campaign" => "Mission",
+        "Premium Missions" => "Premium Mission",
+        other => other,
+    }
+    .to_string()
 }
 
 // ── Date parsing ─────────────────────────────────────────────────────────────

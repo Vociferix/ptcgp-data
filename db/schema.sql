@@ -252,46 +252,46 @@ CREATE TABLE card_version_illustrators (
     FOREIGN KEY (illustrator_id) REFERENCES illustrators (id)
 );
 
--- Promo Source Descriptions
-CREATE TABLE promo_source_descriptions (
+-- Card Source Descriptions
+CREATE TABLE card_source_descriptions (
     -- Primary key
     id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
 
-    -- Human-readable description of a promo source
+    -- Human-readable description of a card source
     description TEXT UNIQUE NOT NULL
 );
 
--- Promo Card Sources
+-- Card Sources
 --
--- The various channels through which promo cards can be obtained.
--- Examples: "Pack", "Wonder Pick", "Gold Shop", "Shop", "Mission"
-CREATE TABLE promo_sources (
+-- The various channels through which cards can be obtained.
+-- Examples: "Pack", "Wonder Pick", "Gold Shop", "Shop", "Mission", "Premium Mission"
+CREATE TABLE card_sources (
     -- Primary key
     id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
 
     -- Short code / display name for this source
     code TEXT UNIQUE NOT NULL,
 
-    -- promo_source_descriptions.id - Human-readable description
+    -- card_source_descriptions.id - Human-readable description
     description_id INTEGER NOT NULL,
 
-    FOREIGN KEY (description_id) REFERENCES promo_source_descriptions (id)
+    FOREIGN KEY (description_id) REFERENCES card_source_descriptions (id)
 );
 
--- Promo Card Source Mapping
+-- Card Version Source Mapping
 --
--- Each row assigns a promo source to a promo card version.
--- A promo card can be available from multiple sources.
-CREATE TABLE card_version_promo_sources (
-    -- card_versions.id - The promo card version
+-- Each row assigns a card source to a card version.
+-- A card can be available from multiple sources.
+CREATE TABLE card_version_card_sources (
+    -- card_versions.id - The card version
     card_version_id INTEGER NOT NULL,
 
-    -- promo_sources.id - The source for this card
-    promo_source_id INTEGER NOT NULL,
+    -- card_sources.id - The source for this card
+    card_source_id INTEGER NOT NULL,
 
     FOREIGN KEY (card_version_id) REFERENCES card_versions (id),
-    FOREIGN KEY (promo_source_id) REFERENCES promo_sources (id),
-    UNIQUE (card_version_id, promo_source_id) ON CONFLICT IGNORE
+    FOREIGN KEY (card_source_id) REFERENCES card_sources (id),
+    UNIQUE (card_version_id, card_source_id) ON CONFLICT IGNORE
 );
 
 -- Promo Stamp Card Versions
@@ -1121,11 +1121,11 @@ CREATE VIEW pack_logos AS
     JOIN sets s ON s.id = p.set_id
     JOIN pack_subtitles ps ON ps.id = p.subtitle_id;
 
-CREATE VIEW promo_source_icons AS
+CREATE VIEW card_source_icons AS
     SELECT
-        id AS promo_source_id,
-        printf('promo_sources/%s.png', lower(replace(code, ' ', '_'))) AS path
-    FROM promo_sources;
+        id AS card_source_id,
+        printf('card_sources/%s.png', lower(replace(code, ' ', '_'))) AS path
+    FROM card_sources;
 
 CREATE VIEW rarity_icons AS
     SELECT
