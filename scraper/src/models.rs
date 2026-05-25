@@ -212,6 +212,13 @@ pub struct CardSource {
     pub description: Option<String>,
 }
 
+/// One entry in data/pack_variant_names.json
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PackVariantName {
+    pub code: String,
+    pub name: String,
+}
+
 // ── RaenonX global-master parsed data ────────────────────────────────────────
 
 /// One entry from global-master cardEntryMap, with all fields we care about.

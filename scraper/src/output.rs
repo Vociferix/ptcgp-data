@@ -4,8 +4,8 @@ use anyhow::Result;
 use serde::Serialize;
 
 use crate::models::{
-    AbstractCard, BasePokemon, CardSource, CardVersion, ElementInfo, PackPullRates, RarityInfo,
-    SetSummary,
+    AbstractCard, BasePokemon, CardSource, CardVersion, ElementInfo, PackPullRates, PackVariantName,
+    RarityInfo, SetSummary,
 };
 
 // ── Path helpers ─────────────────────────────────────────────────────────────
@@ -75,6 +75,11 @@ pub fn write_rarities(rarities: &[RarityInfo]) -> Result<()> {
 pub fn write_card_sources(sources: &[CardSource]) -> Result<()> {
     std::fs::create_dir_all(data_dir())?;
     write_json(&data_dir().join("card_sources.json"), sources)
+}
+
+pub fn write_pack_variant_names(variants: &[PackVariantName]) -> Result<()> {
+    std::fs::create_dir_all(data_dir())?;
+    write_json(&data_dir().join("pack_variant_names.json"), variants)
 }
 
 /// Write data/card_versions/{SET}/{NUM:03}.json — card version file.
