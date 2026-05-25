@@ -29,9 +29,10 @@ Array of every set, ordered newest-first.
     "code": "B3",
     "name": "Pulsing Aura",
     "series": "B",
-    "release_date": "2026-04-28",
+    "availability": { "start": "2026-04-28" },
     "is_promo": false,
-    "card_count": 234
+    "card_count": 234,
+    "packs": ["Pulsing Aura"]
   }
 ]
 ```
@@ -40,9 +41,10 @@ Array of every set, ordered newest-first.
 |---|---|
 | `code` | Short identifier used in paths throughout the data (`A1`, `B2a`, `P-A`, …) |
 | `series` | Series letter (`A` or `B`). Promo sets belong to the series of their release period |
-| `release_date` | ISO 8601 date, `null` for promo sets |
+| `availability` | `{ "start": "YYYY-MM-DD" }` with an optional `"end"` date. `null` for promo sets, which have no fixed availability window |
 | `is_promo` | `true` for promo sets (`P-A`, `P-B`, …) |
 | `card_count` | Total number of cards in the set, `null` if unknown |
+| `packs` | Pack subtitles for this set (e.g. `["Mewtwo", "Charizard", "Pikachu"]`). Empty array for promo sets |
 
 #### `data/rarities.json`
 
@@ -90,34 +92,12 @@ Display names for pack variant codes (`normal`, `rare`, `plus1`, `themed`).
 
 ---
 
-### Sets
-
-#### `data/sets/{SET}/set.json`
-
-Full detail for one set, including the list of pack subtitles.
-
-```json
-{
-  "code": "A1",
-  "name": "Genetic Apex",
-  "series": "A",
-  "release_date": "2024-10-30",
-  "is_promo": false,
-  "card_count": 286,
-  "packs": ["Mewtwo", "Charizard", "Pikachu"]
-}
-```
-
-`packs` is absent for promo sets, which have no booster packs.
-
----
-
 ### Cards
 
 Cards are split into two layers:
 
 - **Abstract card** (`data/cards/{ID:05}.json`) — game mechanics shared by all art/rarity variants of the same Pokémon or Trainer card
-- **Card version** (`data/sets/{SET}/cards/{NUM:03}.json`) — one specific physical card: a set, collector number, rarity, illustrator, and finish
+- **Card version** (`data/card_versions/{SET}/{NUM:03}.json`) — one specific physical card: a set, collector number, rarity, illustrator, and finish
 
 #### `data/cards/{ID:05}.json`
 
@@ -157,7 +137,7 @@ Trainer cards omit Pokémon fields and instead have `trainer_kind` and `trainer_
 
 The `versions` array lists every card version that shares this abstract card's mechanics.
 
-#### `data/sets/{SET}/cards/{NUM:03}.json`
+#### `data/card_versions/{SET}/{NUM:03}.json`
 
 ```json
 {
@@ -169,6 +149,7 @@ The `versions` array lists every card version that shares this abstract card's m
   "is_promo": false,
   "is_foil": false,
   "is_reprint": false,
+  "is_tradable": true,
   "packs": ["Mewtwo"],
   "source": "Pack",
   "duplicates": [
@@ -184,6 +165,7 @@ The `versions` array lists every card version that shares this abstract card's m
 | `is_promo` | `true` when the card carries a promo stamp |
 | `is_foil` | `true` when the card has a mirror/foil finish |
 | `is_reprint` | `true` when an identical version was released in an earlier set |
+| `is_tradable` | `false` for cards that cannot be offered in a trade: all IM and UR cards, and all promo versions |
 | `packs` | Pack subtitles this version can be pulled from (empty for non-pack cards) |
 | `source` | How this card is obtained; a code from `card_sources.json` (e.g. `"Pack"`, `"Mission"`) |
 | `duplicates` | Other versions with the same rarity, illustrator, and finish (i.e. the same physical card released again) |
@@ -267,7 +249,7 @@ The pre-built `ptcgp.db` is published with each [release](https://github.com/Voc
 
 | View | Description |
 |---|---|
-| `versions` | Flat join of card_versions with set, card name, rarity, illustrator, source, and finish flags |
+| `versions` | Flat join of card_versions with set, card name, rarity, illustrator, source, finish flags, and `is_tradeable` |
 | `pokemon` | All Pokémon abstract cards with stats, attacks, and ability |
 | `trainers` | All Trainer abstract cards with kind and effect |
 | `rarity_overview` | Rarities with group name, symbol count, craft cost, and dupe dust |

@@ -1,29 +1,29 @@
 {
   "id": 1895,
-  "name": "Swablu",
+  "name": "Mankey",
   "card_type": "pokemon",
-  "natdex_number": 333,
-  "element": "Colorless",
+  "natdex_number": 56,
+  "element": "Fighting",
   "stage": "Basic",
   "hp": 50,
   "retreat_cost": 1,
-  "weakness": "Lightning",
-  "flavor": "It can’t relax if it or its surroundings are not clean. It wipes off dirt with its wings.",
+  "weakness": "Psychic",
+  "flavor": "It lives in groups in the treetops. If it loses sight of its group, it becomes infuriated by its loneliness.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Find a Friend",
+      "name": "Reckless Charge",
       "cost": [
-        "Colorless"
+        "Fighting"
       ],
-      "damage": 0,
-      "effect": "Put a random Pokémon from your deck into your hand."
+      "damage": 30,
+      "effect": "This Pokémon also does 10 damage to itself."
     }
   ],
   "versions": [
     {
-      "set": "P-B",
+      "set": "P-A",
       "number": 17
     }
   ]

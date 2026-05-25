@@ -5,7 +5,7 @@ use serde::Serialize;
 
 use crate::models::{
     AbstractCard, BasePokemon, CardSource, CardVersion, ElementInfo, PackPullRates, RarityInfo,
-    SetDetail, SetSummary,
+    SetSummary,
 };
 
 // ── Path helpers ─────────────────────────────────────────────────────────────
@@ -14,12 +14,8 @@ pub fn data_dir() -> PathBuf {
     PathBuf::from("data")
 }
 
-fn set_dir(set_code: &str) -> PathBuf {
-    data_dir().join("sets").join(set_code)
-}
-
 fn cards_dir(set_code: &str) -> PathBuf {
-    set_dir(set_code).join("cards")
+    data_dir().join("card_versions").join(set_code)
 }
 
 fn abstract_cards_dir() -> PathBuf {
@@ -81,12 +77,7 @@ pub fn write_card_sources(sources: &[CardSource]) -> Result<()> {
     write_json(&data_dir().join("card_sources.json"), sources)
 }
 
-pub fn write_set_detail(set: &SetDetail) -> Result<()> {
-    ensure_set_dirs(&set.code)?;
-    write_json(&set_dir(&set.code).join("set.json"), set)
-}
-
-/// Write data/sets/{SET}/cards/{NUM:03}.json — card version file.
+/// Write data/card_versions/{SET}/{NUM:03}.json — card version file.
 pub fn write_card_version(version: &CardVersion) -> Result<()> {
     ensure_set_dirs(&version.set)?;
     let filename = format!("{:03}.json", version.number);
@@ -105,12 +96,6 @@ pub fn write_pull_rates(rates: &PackPullRates) -> Result<()> {
     ensure_pull_rates_dir(&rates.set)?;
     let filename = format!("{}.json", pack_slug(&rates.subtitle));
     write_json(&pull_rates_dir(&rates.set).join(filename), rates)
-}
-
-pub fn load_set_detail(set_code: &str) -> Result<SetDetail> {
-    let path = set_dir(set_code).join("set.json");
-    let json = std::fs::read_to_string(&path)?;
-    Ok(serde_json::from_str(&json)?)
 }
 
 pub fn load_card_versions(set_code: &str) -> Result<Vec<CardVersion>> {

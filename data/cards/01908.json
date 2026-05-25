@@ -1,33 +1,29 @@
 {
   "id": 1908,
-  "name": "Cresselia ex",
+  "name": "Frigibax",
   "card_type": "pokemon",
-  "natdex_number": 488,
-  "element": "Psychic",
+  "natdex_number": 996,
+  "element": "Water",
   "stage": "Basic",
-  "hp": 140,
-  "retreat_cost": 2,
-  "weakness": "Darkness",
-  "is_ex": true,
+  "hp": 60,
+  "retreat_cost": 1,
+  "weakness": "Metal",
+  "flavor": "This Pokémon lives in forests and craggy areas. Using the power of its dorsal fin, it cools the inside of its nest like a refrigerator.",
+  "is_ex": false,
   "is_mega": false,
-  "ability": {
-    "name": "Lunar Plumage",
-    "effect": "Whenever you attach a [P] Energy from your Energy Zone to this Pokémon, heal 20 damage from this Pokémon."
-  },
   "attacks": [
     {
-      "name": "Psychic Flash",
+      "name": "Stiffen",
       "cost": [
-        "Psychic",
-        "Psychic",
-        "Colorless"
+        "Water"
       ],
-      "damage": 80
+      "damage": 0,
+      "effect": "During your opponent's next turn, this Pokémon takes −20 damage from attacks."
     }
   ],
   "versions": [
     {
-      "set": "P-A",
+      "set": "P-B",
       "number": 37
     }
   ]

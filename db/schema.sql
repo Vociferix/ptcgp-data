@@ -307,6 +307,18 @@ CREATE TABLE foil_card_versions (
     FOREIGN KEY (card_version_id) REFERENCES card_versions (id)
 );
 
+-- Untradable Card Versions
+--
+-- Card versions in this table cannot be offered in a trade.
+-- All other card versions are tradable.
+-- Untradable versions are those with rarity IM or UR, or from a promo set (P-A, P-B, …).
+CREATE TABLE untradable_card_versions (
+    -- card_versions.id - The card version that cannot be traded
+    card_version_id INTEGER UNIQUE NOT NULL,
+
+    FOREIGN KEY (card_version_id) REFERENCES card_versions (id)
+);
+
 -- Card Version Duplicates
 --
 -- Each row identifies a card version as part of a duplicate group —
@@ -990,7 +1002,8 @@ CREATE VIEW versions AS
         CASE WHEN fcv.card_version_id IS NOT NULL THEN 1 ELSE 0 END AS is_foil,
         CASE WHEN cvd.card_version_id IS NOT NULL
               AND cvd.card_version_id != cvd.original_version_id
-             THEN 1 ELSE 0 END                                       AS is_reprint
+             THEN 1 ELSE 0 END                                       AS is_reprint,
+        CASE WHEN ucv.card_version_id IS NOT NULL THEN 0 ELSE 1 END AS is_tradeable
     FROM card_versions cv
     JOIN cards                    c   ON c.id   = cv.card_id
     JOIN card_names               cn  ON cn.id  = c.name_id
@@ -1003,9 +1016,10 @@ CREATE VIEW versions AS
     LEFT JOIN card_version_illustrators cvi ON cvi.card_version_id = cv.id
     LEFT JOIN illustrators        i   ON i.id   = cvi.illustrator_id
     JOIN  card_sources            cs  ON cs.id  = cv.source_id
-    LEFT JOIN promo_card_versions pcv ON pcv.card_version_id = cv.id
-    LEFT JOIN foil_card_versions  fcv ON fcv.card_version_id = cv.id
-    LEFT JOIN card_version_duplicates cvd ON cvd.card_version_id = cv.id;
+    LEFT JOIN promo_card_versions     pcv ON pcv.card_version_id = cv.id
+    LEFT JOIN foil_card_versions      fcv ON fcv.card_version_id = cv.id
+    LEFT JOIN untradable_card_versions ucv ON ucv.card_version_id = cv.id
+    LEFT JOIN card_version_duplicates  cvd ON cvd.card_version_id = cv.id;
 
 -- pokemon: one row per abstract pokemon card with all game data resolved.
 CREATE VIEW pokemon AS

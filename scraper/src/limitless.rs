@@ -95,6 +95,7 @@ fn parse_sets_index(html: &str) -> Result<Vec<SetSummary>> {
             availability: release_date.map(|start| Availability { start, end: None }),
             is_promo,
             card_count,
+            packs: vec![],
         });
     }
 

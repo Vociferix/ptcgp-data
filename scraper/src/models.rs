@@ -25,19 +25,8 @@ pub struct SetSummary {
     pub availability: Option<Availability>,
     pub is_promo: bool,
     pub card_count: Option<u32>,
-}
-
-/// Full set detail — data/sets/{SET}/set.json
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct SetDetail {
-    pub code: String,
-    pub name: String,
-    pub series: String,
-    /// Null for promo sets, which have no fixed availability window
-    pub availability: Option<Availability>,
-    pub is_promo: bool,
-    pub card_count: Option<u32>,
     /// Subtitle of each pack in this set (e.g. "Charizard", "Mewtwo")
+    #[serde(default)]
     pub packs: Vec<String>,
 }
 
@@ -101,7 +90,7 @@ pub struct VersionRef {
     pub number: u32,
 }
 
-/// Card version file — data/sets/{SET}/cards/{NUM:03}.json
+/// Card version file — data/card_versions/{SET}/{NUM:03}.json
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CardVersion {
     pub set: String,
@@ -120,6 +109,9 @@ pub struct CardVersion {
     /// True when an identical version (same rarity, illustrator, promo status, foil status) was released earlier
     #[serde(default)]
     pub is_reprint: bool,
+    /// True when this version can be offered in a trade. False for IM/UR cards and all promo versions.
+    #[serde(default = "default_tradable")]
+    pub is_tradable: bool,
     /// Pack subtitles this version can be obtained from
     pub packs: Vec<String>,
     /// How this version is obtained (e.g. "Pack", "Shop", "Mission")
@@ -127,6 +119,10 @@ pub struct CardVersion {
     /// Other versions with the same rarity, illustrator, and promo status (same physical card)
     #[serde(skip_serializing_if = "Vec::is_empty", default)]
     pub duplicates: Vec<VersionRef>,
+}
+
+fn default_tradable() -> bool {
+    true
 }
 
 // ── Card content from Limitless scraping ─────────────────────────────────────
@@ -227,6 +223,8 @@ pub struct CardEntry {
     pub rarity: String,
     /// True when mirrorType == "normalMirror" (foil/mirror finish variant)
     pub is_foil: bool,
+    /// True when this card can be offered in a trade (isTradable from RaenonX)
+    pub is_tradable: bool,
     /// All (expansion_id, card_number) pairs for this entry (may span multiple sets)
     pub collection_nums: Vec<(String, u32)>,
     /// All variant card IDs that share the same abstract card (play.cardIds)

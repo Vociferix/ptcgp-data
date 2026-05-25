@@ -114,10 +114,7 @@ struct SetSummary {
     availability: Option<Availability>,
     is_promo: bool,
     card_count: Option<u32>,
-}
-
-#[derive(Deserialize)]
-struct SetDetail {
+    #[serde(default)]
     packs: Vec<String>,
 }
 
@@ -157,6 +154,10 @@ struct AbstractCard {
     trainer_effect: Option<String>,
 }
 
+fn bool_true() -> bool {
+    true
+}
+
 #[derive(Deserialize, Clone)]
 struct CardVersion {
     set: String,
@@ -167,6 +168,8 @@ struct CardVersion {
     is_promo: bool,
     is_foil: bool,
     is_reprint: bool,
+    #[serde(default = "bool_true")]
+    is_tradable: bool,
     #[serde(default)]
     packs: Vec<String>,
     source: String,
@@ -442,13 +445,10 @@ fn insert_sets(tx: &rusqlite::Transaction, data: &Path) -> Result<HashMap<String
     }
 
     // Seed pack_subtitles alphabetically before inserting packs.
-    let mut all_subtitles: BTreeSet<String> = BTreeSet::new();
-    for set in &sets {
-        let detail_path = data.join("sets").join(&set.code).join("set.json");
-        if let Ok(detail) = load_json::<SetDetail>(&detail_path) {
-            all_subtitles.extend(detail.packs);
-        }
-    }
+    let all_subtitles: BTreeSet<&str> = sets
+        .iter()
+        .flat_map(|s| s.packs.iter().map(String::as_str))
+        .collect();
     for subtitle in &all_subtitles {
         tx.execute(
             "INSERT OR IGNORE INTO pack_subtitles (subtitle) VALUES (?1)",
@@ -503,12 +503,7 @@ fn insert_sets(tx: &rusqlite::Transaction, data: &Path) -> Result<HashMap<String
             )?;
         }
 
-        let detail_path = data.join("sets").join(&set.code).join("set.json");
-        if !detail_path.exists() {
-            continue;
-        }
-        let detail: SetDetail = load_json(&detail_path)?;
-        for subtitle in &detail.packs {
+        for subtitle in &set.packs {
             let subtitle_id: i64 = tx.query_row(
                 "SELECT id FROM pack_subtitles WHERE subtitle = ?1",
                 params![subtitle],
@@ -1038,7 +1033,7 @@ fn insert_card_versions(
     // Phase 1: pre-load all card versions across all sets.
     let mut loaded: Vec<(i64, CardVersion)> = Vec::new();
     for set in &sets {
-        let cards_dir = data.join("sets").join(&set.code).join("cards");
+        let cards_dir = data.join("card_versions").join(&set.code);
         if !cards_dir.exists() {
             continue;
         }
@@ -1148,6 +1143,12 @@ fn insert_card_versions(
         if version.is_foil {
             tx.execute(
                 "INSERT OR IGNORE INTO foil_card_versions (card_version_id) VALUES (?1)",
+                params![version_db_id],
+            )?;
+        }
+        if !version.is_tradable {
+            tx.execute(
+                "INSERT OR IGNORE INTO untradable_card_versions (card_version_id) VALUES (?1)",
                 params![version_db_id],
             )?;
         }

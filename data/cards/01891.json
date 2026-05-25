@@ -1,12 +1,31 @@
 {
   "id": 1891,
-  "name": "Red Card",
-  "card_type": "trainer",
-  "trainer_kind": "Item",
-  "trainer_effect": "Your opponent shuffles their hand into their deck and draws 3 cards.",
+  "name": "Mega Pidgeot ex",
+  "card_type": "pokemon",
+  "natdex_number": 18,
+  "element": "Colorless",
+  "stage": "Stage 2",
+  "hp": 210,
+  "retreat_cost": 2,
+  "weakness": "Lightning",
+  "is_ex": true,
+  "is_mega": true,
+  "attacks": [
+    {
+      "name": "Giant Twister",
+      "cost": [
+        "Colorless",
+        "Colorless",
+        "Colorless"
+      ],
+      "damage": 100,
+      "effect": "Flip 3 coins. For each heads, discard a random Energy from your opponent's Active Pokémon. If all of them are tails, this attack does nothing."
+    }
+  ],
+  "evolves_from": "Pidgeotto",
   "versions": [
     {
-      "set": "P-A",
+      "set": "P-B",
       "number": 6
     }
   ]

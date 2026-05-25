@@ -115,12 +115,17 @@ pub fn parse_card_entries(raw: &Value) -> Result<Vec<CardEntry>> {
         let card_source = card_source_from_raenonx(val);
 
         let is_foil = val.get("mirrorType").and_then(Value::as_str) == Some("normalMirror");
+        let is_tradable = val
+            .get("isTradable")
+            .and_then(Value::as_bool)
+            .unwrap_or(true);
 
         entries.push(CardEntry {
             card_id: card_id.clone(),
             card_type,
             rarity,
             is_foil,
+            is_tradable,
             collection_nums,
             card_ids_group,
             source_packs,

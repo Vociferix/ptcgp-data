@@ -13,7 +13,7 @@ use clap::{Parser, Subcommand};
 use futures::stream::{self, StreamExt};
 use models::{
     Ability, AbstractCard, CardEntry, CardSource, CardVersion, ElementInfo, LimitlessCardData,
-    RarityInfo, SetDetail, SetSummary, VersionRef,
+    RarityInfo, SetSummary, VersionRef,
 };
 use serde_json::Value;
 use tracing::{error, info, warn};
@@ -252,11 +252,8 @@ async fn run_sets(
         }
     }
 
-    output::write_sets(&sets)?;
-    info!(count = sets.len(), "sets.json written");
-
-    for set in &sets {
-        let subtitles: Vec<String> = if set.is_promo {
+    for set in &mut sets {
+        set.packs = if set.is_promo {
             let prefix = format!("PROMO_{}_", set.series.to_uppercase());
             let vol_nums: BTreeSet<u32> = promo_subtitles
                 .values()
@@ -272,20 +269,10 @@ async fn run_sets(
         } else {
             vec![]
         };
-
-        let detail = SetDetail {
-            code: set.code.clone(),
-            name: set.name.clone(),
-            series: set.series.clone(),
-            availability: set.availability.clone(),
-            is_promo: set.is_promo,
-            card_count: set.card_count,
-            packs: subtitles,
-        };
-
-        output::write_set_detail(&detail)?;
-        info!(set = set.code, "set detail written");
     }
+
+    output::write_sets(&sets)?;
+    info!(count = sets.len(), "sets.json written");
 
     Ok(())
 }
@@ -495,6 +482,7 @@ async fn run_cards(
             card_data.card_source.as_deref(),
             is_promo,
             entry.is_foil,
+            entry.is_tradable,
         ) {
             Some(v) => v,
             None => {
@@ -592,11 +580,7 @@ async fn run_cards(
 
     let set_packs: HashMap<String, HashSet<String>> = all_sets
         .iter()
-        .filter_map(|s| {
-            output::load_set_detail(&s.code)
-                .ok()
-                .map(|d| (s.code.clone(), d.packs.into_iter().collect()))
-        })
+        .map(|s| (s.code.clone(), s.packs.iter().cloned().collect()))
         .collect();
     let all_known_packs: HashSet<String> = set_packs.values().flatten().cloned().collect();
 
@@ -899,6 +883,7 @@ fn build_card_version(
     limitless_card_source: Option<&str>,
     is_promo: bool,
     is_foil: bool,
+    is_tradable: bool,
 ) -> Option<CardVersion> {
     // Map source.pack IDs to subtitles, keeping only packs that belong to this card's set.
     // A single CardEntry can span multiple sets (reprints); without this filter every version
@@ -931,6 +916,7 @@ fn build_card_version(
         is_promo,
         is_foil,
         is_reprint: false,
+        is_tradable,
         packs,
         source: card_source,
         duplicates: Vec::new(),
