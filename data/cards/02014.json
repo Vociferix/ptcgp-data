@@ -1,0 +1,32 @@
+{
+  "id": 2014,
+  "name": "Raichu ex",
+  "card_type": "pokemon",
+  "natdex_number": 26,
+  "element": "Lightning",
+  "stage": "Stage 1",
+  "hp": 140,
+  "retreat_cost": 1,
+  "weakness": "Fighting",
+  "is_ex": true,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Volt Tackle",
+      "cost": [
+        "Lightning",
+        "Lightning",
+        "Lightning"
+      ],
+      "damage": 130,
+      "effect": "This Pokémon also does 30 damage to itself."
+    }
+  ],
+  "evolves_from": "Pikachu",
+  "versions": [
+    {
+      "set": "P-A",
+      "number": 112
+    }
+  ]
+}
