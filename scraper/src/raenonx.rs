@@ -614,8 +614,9 @@ fn build_variants(
     //   - byPackType "rare" rate → "themed" variant rate
     //   - actual "rare" rate = 1 − (normal + themed + plus1) [the remaining probability]
     //   - byRarity.rare[0..N] → "rare" rarity; byRarity.rare[N..] → "themed" rarity
-    //   - rare_cards (SSR cards with N-element arrays) → "themed" card rates (no alignment)
-    //   - "rare" card rates → empty (no per-card data for regular rare pack)
+    //   - rare_cards with any non-None slot → "themed" card rates (e.g. SSR 1/1 per slot)
+    //   - rare_cards with all-None slots → stay in "rare"; fix_card_rates_from_rarity
+    //     derives their per-slot rates from the byRarity.rare distribution
     // For plus1: compact single-element card arrays represent the bonus slot; align them.
     let mut themed_rate: Option<Rate> = None;
     let mut themed_rarity: Vec<HashMap<String, RaritySlotRates>> = Vec::new();
@@ -640,10 +641,16 @@ fn build_variants(
                 );
                 // Split byRarity slots: [0..N] stay with "rare", [N..] go to "themed".
                 themed_rarity = rare_rarity.split_off(max_rare_card_len);
-                // rare_cards are the themed pack's cards; rare gets no per-card rates.
-                // Drop all-null entries (cards that cannot appear in the themed pack).
-                themed_cards = std::mem::take(&mut rare_cards);
-                themed_cards.retain(|_, slots| slots.iter().any(Option::is_some));
+                // Partition rare_cards: cards with any non-None slot are the themed
+                // pack's cards; all-None cards remain in rare_cards so
+                // fix_card_rates_from_rarity can derive their rates from byRarity.rare.
+                for (card_id, slots) in std::mem::take(&mut rare_cards) {
+                    if slots.iter().any(Option::is_some) {
+                        themed_cards.insert(card_id, slots);
+                    } else {
+                        rare_cards.insert(card_id, vec![None; max_rare_card_len]);
+                    }
+                }
                 // byPackType "rare" rate → themed; derive actual rare rate as remainder.
                 if let Some(rr) = rare_rate.take() {
                     let mut sum = normal_rate.numerator / normal_rate.denominator;
@@ -868,6 +875,78 @@ pub fn fix_card_rates_from_rarity(
                 .max()
                 .unwrap_or(0),
         );
+
+        // If all card_rates have all-None slots (e.g., rare variant after themed split),
+        // derive per-card rates from the rarity distribution without an API reference rate.
+        if !variant.card_rates.is_empty()
+            && variant
+                .card_rates
+                .values()
+                .all(|s| s.iter().all(Option::is_none))
+        {
+            let mut foil_count_by_rarity: HashMap<&str, usize> = HashMap::new();
+            let mut nonfoil_count_by_rarity: HashMap<&str, usize> = HashMap::new();
+            for card_id in variant.card_rates.keys() {
+                let rarity = card_id_to_rarity
+                    .get(card_id)
+                    .map(String::as_str)
+                    .unwrap_or("");
+                if card_id_to_is_foil.get(card_id).copied().unwrap_or(false) {
+                    *foil_count_by_rarity.entry(rarity).or_insert(0) += 1;
+                } else {
+                    *nonfoil_count_by_rarity.entry(rarity).or_insert(0) += 1;
+                }
+            }
+
+            for slot_idx in 0..slot_count {
+                let rarity_map = variant.rarity_rates_by_slot.get(slot_idx);
+                for (card_id, slot_rates) in variant.card_rates.iter_mut() {
+                    if slot_idx >= slot_rates.len() {
+                        continue;
+                    }
+                    let rarity = card_id_to_rarity
+                        .get(card_id)
+                        .map(String::as_str)
+                        .unwrap_or("");
+                    if card_id_to_is_foil.get(card_id).copied().unwrap_or(false) {
+                        warn!(
+                            card_id,
+                            slot = slot_idx,
+                            "foil card in all-None variant; rate not derived"
+                        );
+                        continue;
+                    }
+                    let Some(rarity_rate) = rarity_map.and_then(|m| m.get(rarity)) else {
+                        continue; // rarity not in this slot
+                    };
+                    let Some(total) = &rarity_rate.normal else {
+                        continue;
+                    };
+                    let Ok(rn): Result<i64, _> = total.numerator.try_into() else {
+                        continue;
+                    };
+                    let Ok(rd): Result<i64, _> = total.denominator.try_into() else {
+                        continue;
+                    };
+                    let nf_count =
+                        nonfoil_count_by_rarity.get(rarity).copied().unwrap_or(0) as i64;
+                    if nf_count == 0 {
+                        continue;
+                    }
+                    let den = rd * nf_count;
+                    let g = rate_gcd(rn.abs(), den.abs());
+                    slot_rates[slot_idx] = Some(crate::models::Rate {
+                        numerator: Decimal::from(rn / g),
+                        denominator: Decimal::from(den / g),
+                    });
+                }
+            }
+            // Remove cards whose rarity doesn't appear in any slot of this variant.
+            variant
+                .card_rates
+                .retain(|_, slots| slots.iter().any(Option::is_some));
+            continue;
+        }
 
         for slot_idx in 0..slot_count {
             // Count foil and non-foil cards per rarity in this slot.
