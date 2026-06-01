@@ -1,23 +1,30 @@
 {
   "id": 1902,
-  "name": "Snivy",
+  "name": "Miraidon ex",
   "card_type": "pokemon",
-  "natdex_number": 495,
-  "element": "Grass",
+  "natdex_number": 1008,
+  "element": "Lightning",
   "stage": "Basic",
-  "hp": 60,
-  "retreat_cost": 1,
-  "weakness": "Fire",
-  "flavor": "Being exposed to sunlight makes its movements swifter. It uses vines more adeptly than its hands.",
-  "is_ex": false,
+  "hp": 140,
+  "retreat_cost": 2,
+  "weakness": "Fighting",
+  "is_ex": true,
   "is_mega": false,
+  "ability": {
+    "name": "Legendary Drive",
+    "effect": "Once during your turn, when you put this Pokémon from your hand onto your Bench, you may switch it with your Active Pokémon. If you do, move all of your Energy in play to this Pokémon."
+  },
   "attacks": [
     {
-      "name": "Tackle",
+      "name": "Hadron Ray",
       "cost": [
-        "Grass"
+        "Colorless",
+        "Colorless",
+        "Colorless"
       ],
-      "damage": 20
+      "damage": 20,
+      "damage_suffix": "+",
+      "effect": "This attack does 20 more damage for each [L] Energy attached to this Pokémon."
     }
   ],
   "versions": [

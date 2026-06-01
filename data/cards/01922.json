@@ -1,30 +1,28 @@
 {
   "id": 1922,
-  "name": "Rayquaza",
+  "name": "Weavile",
   "card_type": "pokemon",
-  "natdex_number": 384,
-  "element": "Colorless",
-  "stage": "Basic",
-  "hp": 100,
+  "natdex_number": 461,
+  "element": "Darkness",
+  "stage": "Stage 1",
+  "hp": 90,
   "retreat_cost": 1,
-  "weakness": "Lightning",
-  "flavor": "It lives in the ozone layer far above the clouds and cannot be seen from the ground.",
+  "weakness": "Grass",
+  "flavor": "They travel in groups of four or five, leaving signs for one another on trees and rocks. They bring down their prey with coordinated attacks.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Spiral Rush",
+      "name": "Raid",
       "cost": [
-        "Colorless",
-        "Colorless",
-        "Colorless",
-        "Colorless"
+        "Darkness"
       ],
-      "damage": 70,
+      "damage": 40,
       "damage_suffix": "+",
-      "effect": "Flip a coin until you get tails. This attack does 30 more damage for each heads."
+      "effect": "If this Pokémon evolved from Sneasel during this turn, this attack does 20 more damage."
     }
   ],
+  "evolves_from": "Sneasel",
   "versions": [
     {
       "set": "B3a",

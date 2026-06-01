@@ -1,26 +1,27 @@
 {
   "id": 1895,
-  "name": "Swablu",
+  "name": "Frosmoth",
   "card_type": "pokemon",
-  "natdex_number": 333,
-  "element": "Colorless",
-  "stage": "Basic",
-  "hp": 50,
+  "natdex_number": 873,
+  "element": "Water",
+  "stage": "Stage 1",
+  "hp": 100,
   "retreat_cost": 1,
-  "weakness": "Lightning",
-  "flavor": "It can’t relax if it or its surroundings are not clean. It wipes off dirt with its wings.",
+  "weakness": "Metal",
+  "flavor": "It causes blizzards as it flies around with its huge, chill-emanating wings. Clean meltwater is its favorite thing to drink.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Find a Friend",
+      "name": "Aurora Beam",
       "cost": [
+        "Water",
         "Colorless"
       ],
-      "damage": 0,
-      "effect": "Put a random Pokémon from your deck into your hand."
+      "damage": 60
     }
   ],
+  "evolves_from": "Snom",
   "versions": [
     {
       "set": "B3a",

@@ -1,24 +1,27 @@
 {
   "id": 1911,
-  "name": "Varoom",
+  "name": "Iron Leaves",
   "card_type": "pokemon",
-  "natdex_number": 965,
-  "element": "Metal",
+  "natdex_number": 1010,
+  "element": "Psychic",
   "stage": "Basic",
-  "hp": 60,
+  "hp": 90,
   "retreat_cost": 1,
-  "weakness": "Fire",
-  "flavor": "The steel section is Varoom’s actual body. This Pokémon clings to rocks and converts the minerals within into energy to fuel its activities.",
+  "weakness": "Darkness",
+  "flavor": "According to the few eyewitness accounts that exist, it used its shining blades to julienne large trees and boulders.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Poison Gas",
+      "name": "Avenging Edge",
       "cost": [
-        "Metal"
+        "Psychic",
+        "Colorless",
+        "Colorless"
       ],
-      "damage": 0,
-      "effect": "Your opponent's Active Pokémon is now Poisoned."
+      "damage": 50,
+      "damage_suffix": "+",
+      "effect": "If any of your Pokémon were Knocked Out by damage from an attack during your opponent's last turn, this attack does 50 more damage."
     }
   ],
   "versions": [

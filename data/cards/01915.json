@@ -1,28 +1,27 @@
 {
   "id": 1915,
-  "name": "Zygarde",
+  "name": "Naclstack",
   "card_type": "pokemon",
-  "natdex_number": 718,
+  "natdex_number": 933,
   "element": "Fighting",
-  "stage": "Basic",
-  "hp": 120,
-  "retreat_cost": 2,
+  "stage": "Stage 1",
+  "hp": 110,
+  "retreat_cost": 3,
   "weakness": "Grass",
-  "flavor": "Some say it can change to an even more powerful form when battling those who threaten the ecosystem.",
+  "flavor": "It compresses rock salt inside its body and shoots out hardened salt pellets with enough force to perforate an iron sheet.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Cell Storm",
+      "name": "Rock Throw",
       "cost": [
         "Fighting",
-        "Fighting",
-        "Colorless"
+        "Fighting"
       ],
-      "damage": 60,
-      "effect": "Heal 20 damage from this Pokémon."
+      "damage": 50
     }
   ],
+  "evolves_from": "Nacli",
   "versions": [
     {
       "set": "B3a",

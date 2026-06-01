@@ -1,26 +1,26 @@
 {
   "id": 1935,
-  "name": "Poliwag",
+  "name": "Altaria",
   "card_type": "pokemon",
-  "natdex_number": 60,
-  "element": "Water",
-  "stage": "Basic",
-  "hp": 60,
+  "natdex_number": 334,
+  "element": "Dragon",
+  "stage": "Stage 1",
+  "hp": 100,
   "retreat_cost": 1,
-  "weakness": "Lightning",
-  "flavor": "For Poliwag, swimming is easier than walking. The swirl pattern on its belly is actually part of the Pokémon’s innards showing through the skin.",
+  "flavor": "On sunny days, it flies freely through the sky and blends into the clouds. It sings in a beautiful soprano.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Surprise Attack",
+      "name": "Fly",
       "cost": [
         "Colorless"
       ],
-      "damage": 40,
-      "effect": "Flip a coin. If tails, this attack does nothing."
+      "damage": 50,
+      "effect": "Flip a coin. If tails, this attack does nothing. If heads, during your opponent's next turn, prevent all damage from—and effects of—attacks done to this Pokémon."
     }
   ],
+  "evolves_from": "Swablu",
   "versions": [
     {
       "set": "B3a",

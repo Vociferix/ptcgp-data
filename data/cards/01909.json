@@ -1,24 +1,24 @@
 {
   "id": 1909,
-  "name": "Misdreavus",
+  "name": "Flutter Mane ex",
   "card_type": "pokemon",
-  "natdex_number": 200,
+  "natdex_number": 987,
   "element": "Psychic",
   "stage": "Basic",
-  "hp": 60,
+  "hp": 130,
   "retreat_cost": 1,
-  "weakness": "Darkness",
-  "flavor": "This Pokémon startles people in the middle of the night. It gathers fear as its energy.",
-  "is_ex": false,
+  "weakness": "Metal",
+  "is_ex": true,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Confuse Ray",
+      "name": "Spellbinding Start",
       "cost": [
+        "Psychic",
         "Psychic"
       ],
-      "damage": 0,
-      "effect": "Your opponent's Active Pokémon is now Confused."
+      "damage": 70,
+      "effect": "If this is the first time this Pokémon has used an attack after coming into play, during your opponent's next turn, they can't use any Trainer cards from their hand."
     }
   ],
   "versions": [

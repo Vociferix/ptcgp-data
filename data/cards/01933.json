@@ -1,29 +1,31 @@
 {
   "id": 1933,
-  "name": "Blissey ex",
+  "name": "Copperajah",
   "card_type": "pokemon",
-  "natdex_number": 242,
-  "element": "Colorless",
+  "natdex_number": 879,
+  "element": "Metal",
   "stage": "Stage 1",
-  "hp": 180,
-  "retreat_cost": 3,
-  "weakness": "Fighting",
-  "is_ex": true,
+  "hp": 170,
+  "retreat_cost": 4,
+  "weakness": "Fire",
+  "flavor": "Copperajah are prideful, cantankerous Pokémon. Specimens with vibrant green skin command the respect of others of their kind.",
+  "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Happy Punch",
+      "name": "Iron Swing",
       "cost": [
-        "Colorless",
-        "Colorless",
+        "Metal",
+        "Metal",
         "Colorless",
         "Colorless"
       ],
       "damage": 100,
-      "effect": "Flip a coin. If heads, heal 60 damage from this Pokémon."
+      "damage_suffix": "x",
+      "effect": "Flip 2 coins. This attack does 100 damage for each heads."
     }
   ],
-  "evolves_from": "Chansey",
+  "evolves_from": "Cufant",
   "versions": [
     {
       "set": "B3a",

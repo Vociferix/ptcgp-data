@@ -1,27 +1,25 @@
 {
   "id": 1921,
-  "name": "Dwebble",
+  "name": "Sneasel",
   "card_type": "pokemon",
-  "natdex_number": 557,
-  "element": "Fighting",
+  "natdex_number": 215,
+  "element": "Darkness",
   "stage": "Basic",
-  "hp": 70,
-  "retreat_cost": 2,
+  "hp": 60,
+  "retreat_cost": 1,
   "weakness": "Grass",
-  "flavor": "It first tries to find a rock to live in, but if there are no suitable rocks to be found, Dwebble may move in to the ports of a Hippowdon.",
+  "flavor": "This is a smart and sneaky Pokémon. A pair may work together to steal eggs by having one lure the parents away.",
   "is_ex": false,
   "is_mega": false,
-  "ability": {
-    "name": "Shell Armor",
-    "effect": "This Pokémon takes −10 damage from attacks."
-  },
   "attacks": [
     {
-      "name": "Stampede",
+      "name": "Quick Attack",
       "cost": [
-        "Fighting"
+        "Darkness"
       ],
-      "damage": 10
+      "damage": 10,
+      "damage_suffix": "+",
+      "effect": "Flip a coin. If heads, this attack does 20 more damage."
     }
   ],
   "versions": [

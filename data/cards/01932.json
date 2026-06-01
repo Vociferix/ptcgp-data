@@ -1,24 +1,25 @@
 {
   "id": 1932,
-  "name": "Chinchou",
+  "name": "Cufant",
   "card_type": "pokemon",
-  "natdex_number": 170,
-  "element": "Lightning",
+  "natdex_number": 878,
+  "element": "Metal",
   "stage": "Basic",
-  "hp": 60,
-  "retreat_cost": 1,
-  "weakness": "Fighting",
-  "flavor": "Its antennae, which evolved from a fin, have both positive and negative charges flowing through them.",
+  "hp": 100,
+  "retreat_cost": 3,
+  "weakness": "Fire",
+  "flavor": "Cufant can lift loads weighing five tons. In the mornings, it heads into caves with its herd, in search of the ore on which these Pokémon feed.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Luring Glow",
+      "name": "Strength",
       "cost": [
-        "Lightning"
+        "Metal",
+        "Colorless",
+        "Colorless"
       ],
-      "damage": 0,
-      "effect": "Flip a coin. If heads, switch in 1 of your opponent's Benched Pokémon to the Active Spot."
+      "damage": 60
     }
   ],
   "versions": [

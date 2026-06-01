@@ -1,27 +1,28 @@
 {
   "id": 1893,
-  "name": "Magikarp",
+  "name": "Floatzel",
   "card_type": "pokemon",
-  "natdex_number": 129,
+  "natdex_number": 419,
   "element": "Water",
-  "stage": "Basic",
-  "hp": 30,
+  "stage": "Stage 1",
+  "hp": 100,
   "retreat_cost": 1,
   "weakness": "Lightning",
-  "flavor": "In the distant past, it was somewhat stronger than the horribly weak descendants that exist today.",
+  "flavor": "It is a common sight around fishing ports. It is known to rescue people and help fishers carry what they caught.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Expert Splasher",
+      "name": "Waterfall",
       "cost": [
+        "Water",
+        "Water",
         "Water"
       ],
-      "damage": 10,
-      "damage_suffix": "+",
-      "effect": "Flip 2 coins. If both of them are heads, this attack does 20 more damage."
+      "damage": 90
     }
   ],
+  "evolves_from": "Buizel",
   "versions": [
     {
       "set": "B3a",

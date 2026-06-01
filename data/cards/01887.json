@@ -1,25 +1,26 @@
 {
   "id": 1887,
-  "name": "Froakie",
+  "name": "Slither Wing",
   "card_type": "pokemon",
-  "natdex_number": 656,
-  "element": "Water",
+  "natdex_number": 988,
+  "element": "Grass",
   "stage": "Basic",
-  "hp": 60,
-  "retreat_cost": 1,
-  "weakness": "Lightning",
-  "flavor": "It protects its skin by covering its body in delicate bubbles. Beneath its happy-go-lucky air, it keeps a watchful eye on its surroundings.",
+  "hp": 120,
+  "retreat_cost": 2,
+  "weakness": "Fire",
+  "flavor": "This Pokémon somewhat resembles an ancient form of Volcarona that was introduced in a dubious magazine.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Bubble",
+      "name": "Wildly Writhe",
       "cost": [
-        "Water",
-        "Water"
+        "Grass",
+        "Grass",
+        "Colorless"
       ],
-      "damage": 20,
-      "effect": "Flip a coin. If heads, your opponent's Active Pokémon is now Paralyzed."
+      "damage": 120,
+      "effect": "This Pokémon also does 60 damage to itself."
     }
   ],
   "versions": [

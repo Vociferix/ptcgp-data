@@ -1,24 +1,27 @@
 {
   "id": 1900,
-  "name": "Mega Latios ex",
+  "name": "Iron Hands",
   "card_type": "pokemon",
-  "natdex_number": 381,
-  "element": "Dragon",
+  "natdex_number": 992,
+  "element": "Lightning",
   "stage": "Basic",
-  "hp": 180,
-  "retreat_cost": 2,
-  "is_ex": true,
-  "is_mega": true,
+  "hp": 120,
+  "retreat_cost": 3,
+  "weakness": "Fighting",
+  "flavor": "This Pokémon shares many similarities with Iron Hands, an object mentioned in a certain expedition journal.",
+  "is_ex": false,
+  "is_mega": false,
   "attacks": [
     {
-      "name": "Sonic Impulse",
+      "name": "Successive Slapping",
       "cost": [
-        "Water",
-        "Water",
-        "Psychic"
+        "Lightning",
+        "Lightning",
+        "Colorless"
       ],
-      "damage": 160,
-      "effect": "Discard all Energy from this Pokémon."
+      "damage": 70,
+      "damage_suffix": "x",
+      "effect": "Flip 2 coins. This attack does 70 damage for each heads."
     }
   ],
   "versions": [

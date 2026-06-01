@@ -1,9 +1,27 @@
 {
   "id": 1886,
-  "name": "X Speed",
-  "card_type": "trainer",
-  "trainer_kind": "Item",
-  "trainer_effect": "During this turn, the Retreat Cost of your Active Pokémon is 1 less.",
+  "name": "Brute Bonnet",
+  "card_type": "pokemon",
+  "natdex_number": 986,
+  "element": "Grass",
+  "stage": "Basic",
+  "hp": 100,
+  "retreat_cost": 2,
+  "weakness": "Fire",
+  "flavor": "It bears a slight resemblance to a Pokémon described in a dubious magazine as a cross between a dinosaur and a mushroom.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Spirited Smack",
+      "cost": [
+        "Grass",
+        "Colorless"
+      ],
+      "damage": 90,
+      "effect": "Flip a coin. If tails, this attack does nothing."
+    }
+  ],
   "versions": [
     {
       "set": "B3a",

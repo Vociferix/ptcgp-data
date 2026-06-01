@@ -1,24 +1,29 @@
 {
   "id": 1919,
-  "name": "Ekans",
+  "name": "Koraidon ex",
   "card_type": "pokemon",
-  "natdex_number": 23,
-  "element": "Darkness",
+  "natdex_number": 1007,
+  "element": "Fighting",
   "stage": "Basic",
-  "hp": 60,
-  "retreat_cost": 1,
-  "weakness": "Fighting",
-  "flavor": "By dislocating its jaw, it can swallow prey larger than itself. After a meal, it curls up and rests.",
-  "is_ex": false,
+  "hp": 150,
+  "retreat_cost": 2,
+  "weakness": "Psychic",
+  "is_ex": true,
   "is_mega": false,
+  "ability": {
+    "name": "Legendary Drive",
+    "effect": "Once during your turn, when you put this Pokémon from your hand onto your Bench, you may switch it with your Active Pokémon. If you do, move all of your Energy in play to this Pokémon."
+  },
   "attacks": [
     {
-      "name": "Poison Sting",
+      "name": "World Wrecker",
       "cost": [
-        "Darkness"
+        "Fighting",
+        "Fighting",
+        "Fighting"
       ],
-      "damage": 0,
-      "effect": "Your opponent's Active Pokémon is now Poisoned."
+      "damage": 110,
+      "effect": "Discard the top card of your deck."
     }
   ],
   "versions": [

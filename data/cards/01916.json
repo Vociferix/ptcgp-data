@@ -1,28 +1,32 @@
 {
   "id": 1916,
-  "name": "Floatzel",
+  "name": "Garganacl",
   "card_type": "pokemon",
-  "natdex_number": 419,
-  "element": "Water",
-  "stage": "Stage 1",
-  "hp": 100,
-  "retreat_cost": 1,
-  "weakness": "Lightning",
-  "flavor": "With its flotation sac inflated, it can carry people on its back. It deflates the sac before it dives.",
+  "natdex_number": 934,
+  "element": "Fighting",
+  "stage": "Stage 2",
+  "hp": 150,
+  "retreat_cost": 3,
+  "weakness": "Grass",
+  "flavor": "Many Pokémon gather around Garganacl, hoping to lick at its mineral-rich salt.",
   "is_ex": false,
   "is_mega": false,
+  "ability": {
+    "name": "Blessed Salt",
+    "effect": "During Pokémon Checkup, heal 10 damage from each of your Pokémon."
+  },
   "attacks": [
     {
-      "name": "Attack the Wound",
+      "name": "Land Crush",
       "cost": [
-        "Water"
+        "Fighting",
+        "Fighting",
+        "Fighting"
       ],
-      "damage": 10,
-      "damage_suffix": "+",
-      "effect": "If your opponent's Active Pokémon has damage on it, this attack does 60 more damage."
+      "damage": 90
     }
   ],
-  "evolves_from": "Buizel",
+  "evolves_from": "Naclstack",
   "versions": [
     {
       "set": "B3a",

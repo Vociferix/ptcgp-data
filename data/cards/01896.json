@@ -1,27 +1,28 @@
 {
   "id": 1896,
-  "name": "Haunter",
+  "name": "Iron Bundle ex",
   "card_type": "pokemon",
-  "natdex_number": 93,
-  "element": "Psychic",
-  "stage": "Stage 1",
-  "hp": 70,
+  "natdex_number": 991,
+  "element": "Water",
+  "stage": "Basic",
+  "hp": 130,
   "retreat_cost": 1,
-  "weakness": "Darkness",
-  "flavor": "It likes to lurk in the dark and tap shoulders with a gaseous hand. Its touch causes endless shuddering.",
-  "is_ex": false,
+  "weakness": "Lightning",
+  "is_ex": true,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Surprise Attack",
+      "name": "Cold Start",
       "cost": [
-        "Psychic"
+        "Water",
+        "Water",
+        "Colorless"
       ],
-      "damage": 50,
-      "effect": "Flip a coin. If tails, this attack does nothing."
+      "damage": 60,
+      "damage_suffix": "+",
+      "effect": "If this is the first time this Pokémon has used an attack after coming into play, this attack does 20 more damage, and your opponent's Active Pokémon is now Paralyzed."
     }
   ],
-  "evolves_from": "Gastly",
   "versions": [
     {
       "set": "B3a",

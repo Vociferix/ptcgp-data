@@ -1,24 +1,28 @@
 {
   "id": 1910,
-  "name": "Electrike",
+  "name": "Iron Valiant",
   "card_type": "pokemon",
-  "natdex_number": 309,
-  "element": "Lightning",
+  "natdex_number": 1006,
+  "element": "Psychic",
   "stage": "Basic",
-  "hp": 60,
-  "retreat_cost": 1,
-  "weakness": "Fighting",
-  "flavor": "It stores electricity in its fur. It gives off sparks from all over its body in seasons when the air is dry.",
+  "hp": 100,
+  "retreat_cost": 2,
+  "weakness": "Metal",
+  "flavor": "It’s possible that this is the object listed as Iron Valiant in a certain expedition journal.",
   "is_ex": false,
   "is_mega": false,
+  "ability": {
+    "name": "Future System",
+    "effect": "Attacks used by your Future Pokémon cost 1 less [C] Energy."
+  },
   "attacks": [
     {
-      "name": "Reckless Charge",
+      "name": "Slicing Blade",
       "cost": [
-        "Lightning"
+        "Psychic",
+        "Psychic"
       ],
-      "damage": 30,
-      "effect": "This Pokémon also does 10 damage to itself."
+      "damage": 50
     }
   ],
   "versions": [

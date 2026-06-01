@@ -1,26 +1,23 @@
 {
   "id": 1897,
-  "name": "Onix",
+  "name": "Pawmi",
   "card_type": "pokemon",
-  "natdex_number": 95,
-  "element": "Fighting",
+  "natdex_number": 921,
+  "element": "Lightning",
   "stage": "Basic",
-  "hp": 100,
-  "retreat_cost": 3,
-  "weakness": "Grass",
-  "flavor": "It rapidly bores through the ground at 50 mph by squirming and twisting its massive, rugged body.",
+  "hp": 50,
+  "retreat_cost": 1,
+  "weakness": "Fighting",
+  "flavor": "The pads of its paws are electricity-discharging organs. Pawmi fires electricity from its forepaws while standing unsteadily on its hind legs.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Tail Smash",
+      "name": "Bite",
       "cost": [
-        "Colorless",
-        "Colorless",
-        "Colorless"
+        "Lightning"
       ],
-      "damage": 90,
-      "effect": "Flip a coin. If tails, this attack does nothing."
+      "damage": 30
     }
   ],
   "versions": [

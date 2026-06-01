@@ -1,39 +1,31 @@
 {
   "id": 1928,
-  "name": "Ultra Necrozma ex",
+  "name": "Glimmora",
   "card_type": "pokemon",
-  "natdex_number": 800,
-  "element": "Dragon",
-  "stage": "Basic",
-  "hp": 150,
+  "natdex_number": 970,
+  "element": "Darkness",
+  "stage": "Stage 1",
+  "hp": 90,
   "retreat_cost": 2,
-  "is_ex": true,
+  "weakness": "Fighting",
+  "flavor": "Glimmora’s petals are made of crystallized poison energy. It has recently become evident that these petals resemble Tera Jewels.",
+  "is_ex": false,
   "is_mega": false,
-  "variants": [
-    "Ultra"
-  ],
+  "ability": {
+    "name": "Shattering Crystal",
+    "effect": "When this Pokémon is Knocked Out, flip a coin. If heads, your opponent can't get any points for it."
+  },
   "attacks": [
     {
-      "name": "Photon Claw",
+      "name": "Venomous Hit",
       "cost": [
-        "Colorless",
-        "Colorless",
-        "Colorless"
+        "Darkness"
       ],
-      "damage": 60
-    },
-    {
-      "name": "Shoegaze",
-      "cost": [
-        "Psychic",
-        "Psychic",
-        "Metal",
-        "Metal"
-      ],
-      "damage": 120,
-      "effect": "Discard the top 5 cards of each player's deck."
+      "damage": 30,
+      "effect": "Your opponent's Active Pokémon is now Poisoned."
     }
   ],
+  "evolves_from": "Glimmet",
   "versions": [
     {
       "set": "B3a",

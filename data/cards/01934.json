@@ -1,26 +1,27 @@
 {
   "id": 1934,
-  "name": "Tropius",
+  "name": "Iron Treads",
   "card_type": "pokemon",
-  "natdex_number": 357,
-  "element": "Grass",
+  "natdex_number": 990,
+  "element": "Metal",
   "stage": "Basic",
   "hp": 100,
   "retreat_cost": 2,
   "weakness": "Fire",
-  "flavor": "It lives in tropical jungles. The bunch of fruit around its neck is delicious. The fruit grows twice a year.",
+  "flavor": "Sightings of this Pokémon have occurred in recent years. It resembles a mysterious object described in an old expedition journal.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Double Smash",
+      "name": "Roll and Release",
       "cost": [
-        "Colorless",
+        "Metal",
+        "Metal",
         "Colorless"
       ],
-      "damage": 40,
-      "damage_suffix": "x",
-      "effect": "Flip 2 coins. This attack does 40 damage for each heads."
+      "damage": 50,
+      "damage_suffix": "+",
+      "effect": "Flip a coin until you get tails. This attack does 30 more damage for each heads."
     }
   ],
   "versions": [

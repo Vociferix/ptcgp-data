@@ -1,9 +1,28 @@
 {
   "id": 1891,
-  "name": "Red Card",
-  "card_type": "trainer",
-  "trainer_kind": "Item",
-  "trainer_effect": "Your opponent shuffles their hand into their deck and draws 3 cards.",
+  "name": "Vaporeon",
+  "card_type": "pokemon",
+  "natdex_number": 134,
+  "element": "Water",
+  "stage": "Stage 1",
+  "hp": 120,
+  "retreat_cost": 2,
+  "weakness": "Lightning",
+  "flavor": "Its cell composition is similar to water molecules. As a result, it can’t be seen when it melts away into water.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Impound",
+      "cost": [
+        "Water",
+        "Water"
+      ],
+      "damage": 60,
+      "effect": "During your opponent's next turn, the Defending Pokémon can't retreat."
+    }
+  ],
+  "evolves_from": "Eevee",
   "versions": [
     {
       "set": "B3a",

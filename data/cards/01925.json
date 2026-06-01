@@ -1,28 +1,26 @@
 {
   "id": 1925,
-  "name": "Toucannon",
+  "name": "Bisharp",
   "card_type": "pokemon",
-  "natdex_number": 733,
-  "element": "Colorless",
-  "stage": "Stage 2",
-  "hp": 140,
-  "retreat_cost": 2,
-  "weakness": "Lightning",
-  "flavor": "They smack beaks with others of their kind to communicate. The strength and number of hits tell each other how they feel.",
+  "natdex_number": 625,
+  "element": "Darkness",
+  "stage": "Stage 1",
+  "hp": 80,
+  "retreat_cost": 1,
+  "weakness": "Grass",
+  "flavor": "It’s accompanied by a large retinue of Pawniard. Bisharp keeps a keen eye on its minions, ensuring none of them even think of double-crossing it.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Beak Blast",
+      "name": "Dark Cutter",
       "cost": [
-        "Colorless",
-        "Colorless"
+        "Darkness"
       ],
-      "damage": 80,
-      "effect": "Flip a coin. If heads, your opponent's Active Pokémon is now Burned."
+      "damage": 50
     }
   ],
-  "evolves_from": "Trumbeak",
+  "evolves_from": "Pawniard",
   "versions": [
     {
       "set": "B3a",

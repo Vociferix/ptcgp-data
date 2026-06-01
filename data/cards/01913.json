@@ -1,32 +1,28 @@
 {
   "id": 1913,
-  "name": "Staraptor",
+  "name": "Iron Crown",
   "card_type": "pokemon",
-  "natdex_number": 398,
-  "element": "Colorless",
-  "stage": "Stage 2",
-  "hp": 140,
-  "retreat_cost": 1,
-  "weakness": "Lightning",
-  "flavor": "When Staravia evolve into Staraptor, they leave the flock to live alone. They have sturdy wings.",
+  "natdex_number": 1023,
+  "element": "Psychic",
+  "stage": "Basic",
+  "hp": 100,
+  "retreat_cost": 2,
+  "weakness": "Darkness",
+  "flavor": "There was supposedly an incident in which it launched shining blades to cut everything around it to pieces. Little else is known about it.",
   "is_ex": false,
   "is_mega": false,
-  "ability": {
-    "name": "Defensive Whirlwind",
-    "effect": "This Pokémon takes −30 damage from attacks from [F] Pokémon."
-  },
   "attacks": [
     {
-      "name": "Wing Attack",
+      "name": "Enumerating Blade",
       "cost": [
-        "Colorless",
         "Colorless",
         "Colorless"
       ],
-      "damage": 90
+      "damage": 10,
+      "damage_suffix": "+",
+      "effect": "This attack does 20 more damage for each of your opponent's Benched Pokémon."
     }
   ],
-  "evolves_from": "Staravia",
   "versions": [
     {
       "set": "B3a",

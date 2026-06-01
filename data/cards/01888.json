@@ -1,9 +1,28 @@
 {
   "id": 1888,
-  "name": "Hand Scope",
-  "card_type": "trainer",
-  "trainer_kind": "Item",
-  "trainer_effect": "Your opponent reveals their hand.",
+  "name": "Iron Moth",
+  "card_type": "pokemon",
+  "natdex_number": 994,
+  "element": "Fire",
+  "stage": "Basic",
+  "hp": 90,
+  "retreat_cost": 1,
+  "weakness": "Water",
+  "flavor": "No records exist of this species being caught. Data is lacking, but the Pokémon’s traits match up with an object described in an old book.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Thermal Gust",
+      "cost": [
+        "Fire",
+        "Colorless"
+      ],
+      "damage": 10,
+      "damage_suffix": "+",
+      "effect": "Flip 3 coins. If 1 of them is heads, this attack does 20 more damage. If 2 of them are heads, this attack does 50 more damage. If all of them are heads, this attack does 120 more damage."
+    }
+  ],
   "versions": [
     {
       "set": "B3a",

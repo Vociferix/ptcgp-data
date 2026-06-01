@@ -1,26 +1,24 @@
 {
   "id": 1923,
-  "name": "Rayquaza ex",
+  "name": "Sableye",
   "card_type": "pokemon",
-  "natdex_number": 384,
-  "element": "Colorless",
+  "natdex_number": 302,
+  "element": "Darkness",
   "stage": "Basic",
-  "hp": 140,
-  "retreat_cost": 2,
-  "weakness": "Lightning",
-  "is_ex": true,
+  "hp": 60,
+  "retreat_cost": 1,
+  "weakness": "Grass",
+  "flavor": "Materials from gems it has eaten float to the surface of its body and can form an infinite number of patterns among individuals.",
+  "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Draco Meteor",
+      "name": "Jeweled Gift",
       "cost": [
-        "Colorless",
-        "Colorless",
-        "Colorless",
         "Colorless"
       ],
       "damage": 0,
-      "effect": "1 of your opponent's Pokémon is chosen at random 4 times. For each time a Pokémon was chosen, do 40 damage to it."
+      "effect": "Take a random Energy from among [G], [R], [W], [L], [P], [F], [D], and [M] Energy from your Energy Zone and attach it to 1 of your Benched Pokémon."
     }
   ],
   "versions": [

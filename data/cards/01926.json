@@ -1,31 +1,29 @@
 {
   "id": 1926,
-  "name": "Dawn Wings Necrozma",
+  "name": "Kingambit",
   "card_type": "pokemon",
-  "natdex_number": 800,
-  "element": "Psychic",
-  "stage": "Basic",
-  "hp": 110,
-  "retreat_cost": 2,
-  "weakness": "Darkness",
-  "flavor": "Lunala no longer has a will of its own. Now under the control of Necrozma, it continuously expels all of its energy.",
+  "natdex_number": 983,
+  "element": "Darkness",
+  "stage": "Stage 2",
+  "hp": 140,
+  "retreat_cost": 3,
+  "weakness": "Grass",
+  "flavor": "Only a Bisharp that stands above all others in its vast army can evolve into Kingambit.",
   "is_ex": false,
   "is_mega": false,
-  "variants": [
-    "Dawn Wings"
-  ],
   "attacks": [
     {
-      "name": "Psychobilly",
+      "name": "Overlord’s Blade",
       "cost": [
-        "Psychic",
-        "Colorless",
-        "Colorless"
+        "Darkness",
+        "Darkness"
       ],
-      "damage": 100,
-      "effect": "This Pokémon also does 30 damage to itself."
+      "damage": 60,
+      "damage_suffix": "+",
+      "effect": "This attack does 40 more damage for each time your Pokémon have been Knocked Out during this game."
     }
   ],
+  "evolves_from": "Bisharp",
   "versions": [
     {
       "set": "B3a",
