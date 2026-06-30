@@ -1,13 +1,35 @@
 {
   "id": 1960,
-  "name": "X Speed",
-  "card_type": "trainer",
-  "trainer_kind": "Item",
-  "trainer_effect": "During this turn, the Retreat Cost of your Active Pokémon is 1 less.",
+  "name": "Butterfree",
+  "card_type": "pokemon",
+  "natdex_number": 12,
+  "element": "Grass",
+  "stage": "Stage 2",
+  "hp": 130,
+  "retreat_cost": 1,
+  "weakness": "Fire",
+  "flavor": "It collects honey every day. It rubs honey onto the hairs on its legs to carry it back to its nest.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Sunny Wind",
+      "cost": [
+        "Grass"
+      ],
+      "damage": 60,
+      "effect": "Heal 20 damage from this Pokémon."
+    }
+  ],
+  "evolves_from": "Metapod",
   "versions": [
     {
-      "set": "P-A",
-      "number": 2
+      "set": "B3b",
+      "number": 3
+    },
+    {
+      "set": "B3b",
+      "number": 93
     }
   ]
 }

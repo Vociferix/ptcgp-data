@@ -1,34 +1,39 @@
 {
   "id": 1981,
-  "name": "Cresselia ex",
+  "name": "Dedenne ex",
   "card_type": "pokemon",
-  "natdex_number": 488,
-  "element": "Psychic",
+  "natdex_number": 702,
+  "element": "Lightning",
   "stage": "Basic",
-  "hp": 140,
-  "retreat_cost": 2,
-  "weakness": "Darkness",
+  "hp": 120,
+  "retreat_cost": 1,
+  "weakness": "Fighting",
   "is_ex": true,
   "is_mega": false,
-  "ability": {
-    "name": "Lunar Plumage",
-    "effect": "Whenever you attach a [P] Energy from your Energy Zone to this Pokémon, heal 20 damage from this Pokémon."
-  },
   "attacks": [
     {
-      "name": "Psychic Flash",
+      "name": "Dede-Circuit",
       "cost": [
-        "Psychic",
-        "Psychic",
-        "Colorless"
+        "Lightning",
+        "Lightning"
       ],
-      "damage": 80
+      "damage": 40,
+      "damage_suffix": "x",
+      "effect": "This attack does 40 damage for each Pokémon Tool attached to all of your Pokémon."
     }
   ],
   "versions": [
     {
-      "set": "P-A",
-      "number": 37
+      "set": "B3b",
+      "number": 24
+    },
+    {
+      "set": "B3b",
+      "number": 79
+    },
+    {
+      "set": "B3b",
+      "number": 90
     }
   ]
 }

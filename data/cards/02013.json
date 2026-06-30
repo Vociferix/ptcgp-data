@@ -1,32 +1,30 @@
 {
   "id": 2013,
-  "name": "Pikachu",
+  "name": "Teddiursa",
   "card_type": "pokemon",
-  "natdex_number": 25,
-  "element": "Lightning",
+  "natdex_number": 216,
+  "element": "Colorless",
   "stage": "Basic",
   "hp": 60,
   "retreat_cost": 1,
   "weakness": "Fighting",
-  "flavor": "When it is angered, it immediately discharges the energy stored in the pouches in its cheeks.",
+  "flavor": "Its paws are soaked in oodles of honey. When nervous, Teddiursa will lick its paws and soon have a smile back on its face.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Quick Attack",
+      "name": "Charm",
       "cost": [
-        "Lightning",
         "Colorless"
       ],
-      "damage": 20,
-      "damage_suffix": "+",
-      "effect": "Flip a coin. If heads, this attack does 30 more damage."
+      "damage": 0,
+      "effect": "During your opponent's next turn, attacks used by the Defending Pokémon do −20 damage."
     }
   ],
   "versions": [
     {
-      "set": "P-A",
-      "number": 111
+      "set": "B3b",
+      "number": 56
     }
   ]
 }

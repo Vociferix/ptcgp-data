@@ -1,31 +1,36 @@
 {
   "id": 1967,
-  "name": "Lapras ex",
+  "name": "Growlithe",
   "card_type": "pokemon",
-  "natdex_number": 131,
-  "element": "Water",
+  "natdex_number": 58,
+  "element": "Fire",
   "stage": "Basic",
-  "hp": 140,
+  "hp": 80,
   "retreat_cost": 3,
-  "weakness": "Lightning",
-  "is_ex": true,
+  "weakness": "Water",
+  "flavor": "It’s very friendly and faithful to people. It will try to repel enemies by barking and biting.",
+  "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Bubble Drain",
+      "name": "Puppy Pile",
       "cost": [
-        "Water",
-        "Water",
+        "Colorless",
         "Colorless"
       ],
-      "damage": 80,
-      "effect": "Heal 20 damage from this Pokémon."
+      "damage": 20,
+      "damage_suffix": "x",
+      "effect": "Reveal all of your Pokémon in play and in your hand that have the Puppy Pile attack, and this attack does 20 damage for each Pokémon you revealed in this way."
     }
   ],
   "versions": [
     {
-      "set": "P-A",
-      "number": 14
+      "set": "B3b",
+      "number": 10
+    },
+    {
+      "set": "P-B",
+      "number": 77
     }
   ]
 }

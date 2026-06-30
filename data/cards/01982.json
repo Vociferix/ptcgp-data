@@ -1,30 +1,32 @@
 {
   "id": 1982,
-  "name": "Frigibax",
+  "name": "Yamper",
   "card_type": "pokemon",
-  "natdex_number": 996,
-  "element": "Water",
+  "natdex_number": 835,
+  "element": "Lightning",
   "stage": "Basic",
   "hp": 60,
   "retreat_cost": 1,
-  "weakness": "Metal",
-  "flavor": "This Pokémon lives in forests and craggy areas. Using the power of its dorsal fin, it cools the inside of its nest like a refrigerator.",
+  "weakness": "Fighting",
+  "flavor": "This gluttonous Pokémon only assists people with their work because it wants treats. As it runs, it crackles with electricity.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Stiffen",
+      "name": "Puppy Pile",
       "cost": [
-        "Water"
+        "Colorless",
+        "Colorless"
       ],
-      "damage": 0,
-      "effect": "During your opponent's next turn, this Pokémon takes −20 damage from attacks."
+      "damage": 20,
+      "damage_suffix": "x",
+      "effect": "Reveal all of your Pokémon in play and in your hand that have the Puppy Pile attack, and this attack does 20 damage for each Pokémon you revealed in this way."
     }
   ],
   "versions": [
     {
-      "set": "P-B",
-      "number": 37
+      "set": "B3b",
+      "number": 25
     }
   ]
 }

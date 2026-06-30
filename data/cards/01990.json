@@ -1,32 +1,33 @@
 {
   "id": 1990,
-  "name": "Floatzel",
+  "name": "Enamorus",
   "card_type": "pokemon",
-  "natdex_number": 419,
-  "element": "Water",
-  "stage": "Stage 1",
+  "natdex_number": 905,
+  "element": "Psychic",
+  "stage": "Basic",
   "hp": 100,
   "retreat_cost": 1,
-  "weakness": "Lightning",
-  "flavor": "With its flotation sac inflated, it can carry people on its back. It deflates the sac before it dives.",
+  "weakness": "Metal",
+  "flavor": "When it flies to this land from across the sea, the bitter winter comes to an end. According to legend, this Pokémon’s love gives rise to the budding of fresh life across Hisui.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Attack the Wound",
+      "name": "Smitten Strike",
       "cost": [
-        "Water"
+        "Psychic",
+        "Colorless",
+        "Colorless"
       ],
-      "damage": 10,
+      "damage": 60,
       "damage_suffix": "+",
-      "effect": "If your opponent's Active Pokémon has damage on it, this attack does 60 more damage."
+      "effect": "If this Pokémon and your opponent's Active Pokémon have 1 or more of the same type of Energy attached, this attack does 60 more damage."
     }
   ],
-  "evolves_from": "Buizel",
   "versions": [
     {
-      "set": "P-A",
-      "number": 53
+      "set": "B3b",
+      "number": 33
     }
   ]
 }

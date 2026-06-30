@@ -1,30 +1,34 @@
 {
   "id": 1959,
-  "name": "Petilil",
+  "name": "Metapod",
   "card_type": "pokemon",
-  "natdex_number": 548,
+  "natdex_number": 11,
   "element": "Grass",
-  "stage": "Basic",
-  "hp": 50,
-  "retreat_cost": 1,
+  "stage": "Stage 1",
+  "hp": 80,
+  "retreat_cost": 2,
   "weakness": "Fire",
-  "flavor": "If the leaves on its head are pruned with regularity, this Pokémon can be grown into a fine plump shape.",
+  "flavor": "Even though it is encased in a sturdy shell, the body inside is tender. It can’t withstand a harsh attack.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Surprise Attack",
+      "name": "Ram",
       "cost": [
         "Grass"
       ],
-      "damage": 30,
-      "effect": "Flip a coin. If tails, this attack does nothing."
+      "damage": 30
     }
   ],
+  "evolves_from": "Caterpie",
   "versions": [
     {
-      "set": "P-B",
+      "set": "B3b",
       "number": 2
+    },
+    {
+      "set": "B3b",
+      "number": 92
     }
   ]
 }

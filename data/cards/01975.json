@@ -1,30 +1,29 @@
 {
   "id": 1975,
-  "name": "Mudkip",
+  "name": "Luvdisc",
   "card_type": "pokemon",
-  "natdex_number": 258,
+  "natdex_number": 370,
   "element": "Water",
   "stage": "Basic",
-  "hp": 60,
+  "hp": 70,
   "retreat_cost": 1,
   "weakness": "Lightning",
-  "flavor": "When it uses its large tail fin, it picks up speed rapidly in the water. It is strong in spite of its small size.",
+  "flavor": "During the spawning season, countless Luvdisc congregate at coral reefs, turning the waters pink.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Surprise Attack",
+      "name": "Water Gun",
       "cost": [
         "Water"
       ],
-      "damage": 40,
-      "effect": "Flip a coin. If tails, this attack does nothing."
+      "damage": 30
     }
   ],
   "versions": [
     {
-      "set": "P-B",
-      "number": 26
+      "set": "B3b",
+      "number": 18
     }
   ]
 }

@@ -1,31 +1,31 @@
 {
   "id": 1970,
-  "name": "Haunter",
+  "name": "Seaking",
   "card_type": "pokemon",
-  "natdex_number": 93,
-  "element": "Psychic",
+  "natdex_number": 119,
+  "element": "Water",
   "stage": "Stage 1",
-  "hp": 70,
+  "hp": 90,
   "retreat_cost": 1,
-  "weakness": "Darkness",
-  "flavor": "It likes to lurk in the dark and tap shoulders with a gaseous hand. Its touch causes endless shuddering.",
+  "weakness": "Lightning",
+  "flavor": "Using its horn, it bores holes in riverbed boulders, making nests to prevent its eggs from washing away.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Surprise Attack",
+      "name": "Aqua Bullet",
       "cost": [
-        "Psychic"
+        "Water"
       ],
-      "damage": 50,
-      "effect": "Flip a coin. If tails, this attack does nothing."
+      "damage": 30,
+      "effect": "This attack also does 20 damage to 1 of your opponent's Benched Pokémon."
     }
   ],
-  "evolves_from": "Gastly",
+  "evolves_from": "Goldeen",
   "versions": [
     {
-      "set": "P-A",
-      "number": 20
+      "set": "B3b",
+      "number": 13
     }
   ]
 }
