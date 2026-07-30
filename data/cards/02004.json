@@ -1,35 +1,32 @@
 {
   "id": 2004,
-  "name": "Dusk Mane Necrozma",
+  "name": "Toxapex",
   "card_type": "pokemon",
-  "natdex_number": 800,
-  "element": "Metal",
-  "stage": "Basic",
+  "natdex_number": 748,
+  "element": "Darkness",
+  "stage": "Stage 1",
   "hp": 110,
   "retreat_cost": 2,
-  "weakness": "Fire",
-  "flavor": "This is its form while it is devouring the light of Solgaleo. It pounces on foes and then slashes them with the claws on its four limbs and back.",
+  "weakness": "Fighting",
+  "flavor": "Toxapex gets into fierce battles with Bruxish over areas where warm ocean currents flow, but the odds are always against it.",
   "is_ex": false,
   "is_mega": false,
-  "variants": [
-    "Dusk Mane"
-  ],
   "attacks": [
     {
-      "name": "Black Metal",
+      "name": "Severe Poison",
       "cost": [
-        "Metal",
-        "Colorless",
+        "Darkness",
         "Colorless"
       ],
-      "damage": 100,
-      "effect": "Discard a [M] Energy from this Pokémon."
+      "damage": 0,
+      "effect": "Your opponent's Active Pokémon is now Poisoned. Do 40 damage to this Pokémon instead of the usual amount for this Special Condition."
     }
   ],
+  "evolves_from": "Mareanie",
   "versions": [
     {
-      "set": "P-A",
-      "number": 79
+      "set": "B3b",
+      "number": 47
     }
   ]
 }

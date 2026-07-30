@@ -1,30 +1,33 @@
 {
   "id": 2006,
-  "name": "Dragonair",
+  "name": "Hisuian Sliggoo",
   "card_type": "pokemon",
-  "natdex_number": 148,
+  "natdex_number": 705,
   "element": "Dragon",
   "stage": "Stage 1",
   "hp": 100,
-  "retreat_cost": 2,
-  "flavor": "They say that if it emits an aura from its whole body, the weather will begin to change instantly.",
+  "retreat_cost": 3,
+  "flavor": "A creature given to melancholy. I suspect its metallic shell developed as a result of the mucus on its skin reacting with the iron in Hisui’s water.",
   "is_ex": false,
   "is_mega": false,
+  "variants": [
+    "Hisuian"
+  ],
   "attacks": [
     {
-      "name": "Shed Skin",
+      "name": "Hammer In",
       "cost": [
-        "Colorless"
+        "Water",
+        "Metal"
       ],
-      "damage": 0,
-      "effect": "Heal 30 damage from this Pokémon."
+      "damage": 60
     }
   ],
-  "evolves_from": "Dratini",
+  "evolves_from": "Goomy",
   "versions": [
     {
-      "set": "P-A",
-      "number": 88
+      "set": "B3b",
+      "number": 49
     }
   ]
 }

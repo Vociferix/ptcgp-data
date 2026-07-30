@@ -56,8 +56,23 @@ fn gcd(a: i64, b: i64) -> i64 {
     }
 }
 
+// Must match db/src/main.rs: some packs (e.g. "Everyday Wonders") have so
+// many near-coprime rate denominators that their exact LCM doesn't fit in
+// a 64-bit integer, so `lcm` falls back to this fixed denominator instead.
+const APPROX_RATE_DENOMINATOR: i64 = 1_000_000_000_000;
+
 fn lcm(a: i64, b: i64) -> i64 {
-    a / gcd(a, b) * b
+    (a / gcd(a, b))
+        .checked_mul(b)
+        .unwrap_or(APPROX_RATE_DENOMINATOR)
+}
+
+/// Rescale `numerator` (over `old_denom`) to be over `new_denom`, rounding
+/// to the nearest integer. Mirrors `scale_to_denominator` in db/src/main.rs.
+fn scale_to_denominator(numerator: i64, old_denom: i64, new_denom: i64) -> i64 {
+    let scaled = numerator as i128 * new_denom as i128;
+    let half = old_denom as i128 / 2;
+    ((scaled + half) / old_denom as i128) as i64
 }
 
 fn rate_to_integers(rate: &Rate) -> (i64, i64) {
@@ -192,7 +207,7 @@ fn main() -> Result<()> {
 
                 // Verify rate_numerator scaled to the pack's LCM denominator.
                 let (vn, vd) = rate_to_integers(&variant.rate);
-                let expected_rate_num = vn * (expected_pack_denom / vd);
+                let expected_rate_num = scale_to_denominator(vn, vd, expected_pack_denom);
                 if db_rate_num != expected_rate_num {
                     mismatches.push(format!(
                         "{variant_prefix}: rate_numerator mismatch — \
@@ -258,7 +273,7 @@ fn main() -> Result<()> {
                             ] {
                                 let Some(rate) = rate else { continue };
                                 let (rn, rd) = rate_to_integers(rate);
-                                let expected_num = rn * (expected_slot_denom / rd);
+                                let expected_num = scale_to_denominator(rn, rd, expected_slot_denom);
                                 let foil_label = if is_foil == 1 { "foil" } else { "normal" };
                                 match conn.query_row::<i64, _, _>(
                                     "SELECT rpr.rate_numerator \
@@ -302,7 +317,7 @@ fn main() -> Result<()> {
                             }
                         };
                         let (cn, cd) = rate_to_integers(rate);
-                        let expected_num = cn * (expected_slot_denom / cd);
+                        let expected_num = scale_to_denominator(cn, cd, expected_slot_denom);
                         match conn.query_row::<i64, _, _>(
                             "SELECT cpr.rate_numerator \
                              FROM card_pull_rates cpr \

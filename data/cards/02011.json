@@ -1,32 +1,31 @@
 {
   "id": 2011,
-  "name": "Tropius",
+  "name": "Munchlax",
   "card_type": "pokemon",
-  "natdex_number": 357,
-  "element": "Grass",
+  "natdex_number": 446,
+  "element": "Colorless",
   "stage": "Basic",
-  "hp": 100,
+  "hp": 50,
   "retreat_cost": 2,
-  "weakness": "Fire",
-  "flavor": "It lives in tropical jungles. The bunch of fruit around its neck is delicious. The fruit grows twice a year.",
+  "flavor": "When it is voraciously gulping down food, it forgets about the food it has hidden under its fur.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Double Smash",
-      "cost": [
-        "Colorless",
-        "Colorless"
-      ],
-      "damage": 40,
-      "damage_suffix": "x",
-      "effect": "Flip 2 coins. This attack does 40 damage for each heads."
+      "name": "Hungrily Draw",
+      "cost": [],
+      "damage": 10,
+      "effect": "Draw a card."
     }
   ],
   "versions": [
     {
-      "set": "P-A",
-      "number": 102
+      "set": "B3b",
+      "number": 54
+    },
+    {
+      "set": "B3b",
+      "number": 105
     }
   ]
 }

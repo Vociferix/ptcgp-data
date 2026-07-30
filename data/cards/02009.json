@@ -1,30 +1,32 @@
 {
   "id": 2009,
-  "name": "Chinchou",
+  "name": "Wigglytuff",
   "card_type": "pokemon",
-  "natdex_number": 170,
-  "element": "Lightning",
-  "stage": "Basic",
-  "hp": 60,
-  "retreat_cost": 1,
+  "natdex_number": 40,
+  "element": "Colorless",
+  "stage": "Stage 1",
+  "hp": 100,
+  "retreat_cost": 2,
   "weakness": "Fighting",
-  "flavor": "Its antennae, which evolved from a fin, have both positive and negative charges flowing through them.",
+  "flavor": "The rich, fluffy fur that covers its body feels so good that anyone who feels it can’t stop touching it.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Luring Glow",
+      "name": "Expand",
       "cost": [
-        "Lightning"
+        "Colorless",
+        "Colorless"
       ],
-      "damage": 0,
-      "effect": "Flip a coin. If heads, switch in 1 of your opponent's Benched Pokémon to the Active Spot."
+      "damage": 50,
+      "effect": "During your opponent's next turn, this Pokémon takes −20 damage from attacks."
     }
   ],
+  "evolves_from": "Jigglypuff",
   "versions": [
     {
-      "set": "P-A",
-      "number": 95
+      "set": "B3b",
+      "number": 52
     }
   ]
 }

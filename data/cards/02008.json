@@ -1,30 +1,36 @@
 {
   "id": 2008,
-  "name": "Horsea",
+  "name": "Jigglypuff",
   "card_type": "pokemon",
-  "natdex_number": 116,
-  "element": "Water",
+  "natdex_number": 39,
+  "element": "Colorless",
   "stage": "Basic",
   "hp": 60,
   "retreat_cost": 1,
-  "weakness": "Lightning",
-  "flavor": "Horsea makes its home in oceans with gentle currents. If this Pokémon is under attack, it spits out pitch-black ink and escapes.",
+  "weakness": "Fighting",
+  "flavor": "If it inflates to sing a lullaby, it can perform longer and cause sure drowsiness in its audience.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Water Arrow",
+      "name": "Stompy Stomp",
       "cost": [
-        "Water"
+        "Colorless",
+        "Colorless"
       ],
-      "damage": 0,
-      "effect": "This attack does 10 damage to 1 of your opponent's Pokémon."
+      "damage": 30,
+      "damage_suffix": "x",
+      "effect": "Flip 2 coins. This attack does 30 damage for each heads."
     }
   ],
   "versions": [
     {
-      "set": "P-A",
-      "number": 94
+      "set": "B3b",
+      "number": 51
+    },
+    {
+      "set": "B3b",
+      "number": 75
     }
   ]
 }

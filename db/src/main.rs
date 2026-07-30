@@ -202,7 +202,7 @@ struct PackPullRates {
     variants: HashMap<String, Option<PackVariantRates>>,
 }
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 struct Rate {
     numerator: Decimal,
     denominator: Decimal,
@@ -1269,8 +1269,32 @@ fn gcd(a: i64, b: i64) -> i64 {
     }
 }
 
+// Some packs (e.g. "Everyday Wonders") have so many near-coprime rate
+// denominators that their exact LCM doesn't fit in a 64-bit integer. When
+// that happens, `lcm` falls back to this fixed denominator instead. It's
+// far larger than any source denominator we see (8-digit decimal scales at
+// most), so rounding numerators to it is an effectively lossless
+// approximation.
+const APPROX_RATE_DENOMINATOR: i64 = 1_000_000_000_000;
+
 fn lcm(a: i64, b: i64) -> i64 {
-    a / gcd(a, b) * b
+    (a / gcd(a, b))
+        .checked_mul(b)
+        .unwrap_or(APPROX_RATE_DENOMINATOR)
+}
+
+/// Rescale `numerator` (over `old_denom`) to be over `new_denom`, rounding
+/// to the nearest integer.
+///
+/// When `new_denom` is an exact multiple of `old_denom` (the common case),
+/// this is exact. When it isn't — i.e. `new_denom` came from the
+/// approximate fallback in `lcm` — this gives the closest representable
+/// approximation instead of silently truncating (or zeroing out) via
+/// integer division.
+fn scale_to_denominator(numerator: i64, old_denom: i64, new_denom: i64) -> i64 {
+    let scaled = numerator as i128 * new_denom as i128;
+    let half = old_denom as i128 / 2;
+    ((scaled + half) / old_denom as i128) as i64
 }
 
 /// Convert a `Rate` to an `(numerator, denominator)` integer pair.
@@ -1416,7 +1440,7 @@ fn insert_pull_rates(
 
                 // Scale variant numerator to the pack's LCM denominator.
                 let (vn, vd) = rate_to_integers(&variant.rate);
-                let rate_num = vn * (pack_denom / vd);
+                let rate_num = scale_to_denominator(vn, vd, pack_denom);
                 tx.execute(
                     "INSERT OR IGNORE INTO pack_variants \
                      (kind_id, pack_id, rate_numerator) VALUES (?1, ?2, ?3)",
@@ -1473,7 +1497,7 @@ fn insert_pull_rates(
                                     ] {
                                         let Some(rate) = rate else { continue };
                                         let (rn, rd) = rate_to_integers(rate);
-                                        let scaled_num = rn * (slot_denom / rd);
+                                        let scaled_num = scale_to_denominator(rn, rd, slot_denom);
                                         tx.execute(
                                             "INSERT OR IGNORE INTO rarity_pull_rates \
                                              (slot_id, rarity_id, is_foil, rate_numerator) \
@@ -1519,7 +1543,7 @@ fn insert_pull_rates(
                             }
                         };
                         let (cn, cd) = rate_to_integers(rate);
-                        let scaled_num = cn * (slot_denom / cd);
+                        let scaled_num = scale_to_denominator(cn, cd, slot_denom);
                         tx.execute(
                             "INSERT OR IGNORE INTO card_pull_rates \
                              (card_version_id, slot_id, rate_numerator) VALUES (?1, ?2, ?3)",

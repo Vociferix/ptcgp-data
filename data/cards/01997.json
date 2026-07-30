@@ -1,36 +1,32 @@
 {
   "id": 1997,
-  "name": "Rayquaza ex",
+  "name": "Palossand",
   "card_type": "pokemon",
-  "natdex_number": 384,
-  "element": "Colorless",
-  "stage": "Basic",
-  "hp": 140,
-  "retreat_cost": 2,
-  "weakness": "Lightning",
-  "is_ex": true,
+  "natdex_number": 770,
+  "element": "Fighting",
+  "stage": "Stage 1",
+  "hp": 130,
+  "retreat_cost": 3,
+  "weakness": "Grass",
+  "flavor": "From the hollows in its arms, it fires the bones of its victims, which are all dried up after being drained of their vitality.",
+  "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Draco Meteor",
+      "name": "Ambush",
       "cost": [
-        "Colorless",
-        "Colorless",
-        "Colorless",
-        "Colorless"
+        "Fighting"
       ],
-      "damage": 0,
-      "effect": "1 of your opponent's Pokémon is chosen at random 4 times. For each time a Pokémon was chosen, do 40 damage to it."
+      "damage": 30,
+      "damage_suffix": "+",
+      "effect": "Flip a coin. If heads, this attack does 30 more damage."
     }
   ],
+  "evolves_from": "Sandygast",
   "versions": [
     {
-      "set": "P-A",
-      "number": 64
-    },
-    {
-      "set": "P-A",
-      "number": 65
+      "set": "B3b",
+      "number": 40
     }
   ]
 }

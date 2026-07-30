@@ -1,33 +1,32 @@
 {
   "id": 1995,
-  "name": "Dwebble",
+  "name": "Rockruff",
   "card_type": "pokemon",
-  "natdex_number": 557,
+  "natdex_number": 744,
   "element": "Fighting",
   "stage": "Basic",
-  "hp": 70,
-  "retreat_cost": 2,
+  "hp": 60,
+  "retreat_cost": 1,
   "weakness": "Grass",
-  "flavor": "It first tries to find a rock to live in, but if there are no suitable rocks to be found, Dwebble may move in to the ports of a Hippowdon.",
+  "flavor": "This Pokémon travels in a pack with others until it grows up. When its mood turns sour, it starts striking the ground with the rocks on its neck.",
   "is_ex": false,
   "is_mega": false,
-  "ability": {
-    "name": "Shell Armor",
-    "effect": "This Pokémon takes −10 damage from attacks."
-  },
   "attacks": [
     {
-      "name": "Stampede",
+      "name": "Puppy Pile",
       "cost": [
-        "Fighting"
+        "Colorless",
+        "Colorless"
       ],
-      "damage": 10
+      "damage": 20,
+      "damage_suffix": "x",
+      "effect": "Reveal all of your Pokémon in play and in your hand that have the Puppy Pile attack, and this attack does 20 damage for each Pokémon you revealed in this way."
     }
   ],
   "versions": [
     {
-      "set": "P-B",
-      "number": 59
+      "set": "B3b",
+      "number": 38
     }
   ]
 }

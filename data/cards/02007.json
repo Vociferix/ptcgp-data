@@ -1,31 +1,38 @@
 {
   "id": 2007,
-  "name": "Audino",
+  "name": "Hisuian Goodra",
   "card_type": "pokemon",
-  "natdex_number": 531,
-  "element": "Colorless",
-  "stage": "Basic",
-  "hp": 100,
-  "retreat_cost": 2,
-  "weakness": "Fighting",
-  "flavor": "This Pokémon has a kind heart. By touching with its feelers, Audino can gauge other creatures’ feelings and physical conditions.",
+  "natdex_number": 706,
+  "element": "Dragon",
+  "stage": "Stage 2",
+  "hp": 150,
+  "retreat_cost": 3,
+  "flavor": "Able to freely control the hardness of its metallic shell. It loathes solitude and is extremely clingy—it will fume and run riot if those dearest to it ever leave its side.",
   "is_ex": false,
   "is_mega": false,
+  "variants": [
+    "Hisuian"
+  ],
+  "ability": {
+    "name": "Securely Sheltered",
+    "effect": "If any damage is done to this Pokémon by attacks, flip a coin. If heads, this Pokémon takes −80 damage from that attack."
+  },
   "attacks": [
     {
-      "name": "Drain Slap",
+      "name": "Heavy Impact",
       "cost": [
-        "Colorless",
+        "Water",
+        "Metal",
         "Colorless"
       ],
-      "damage": 40,
-      "effect": "Heal 10 damage from this Pokémon."
+      "damage": 120
     }
   ],
+  "evolves_from": "Hisuian Sliggoo",
   "versions": [
     {
-      "set": "P-A",
-      "number": 89
+      "set": "B3b",
+      "number": 50
     }
   ]
 }

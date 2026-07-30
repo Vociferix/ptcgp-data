@@ -1,31 +1,33 @@
 {
   "id": 1994,
-  "name": "Tepig",
+  "name": "Quagsire",
   "card_type": "pokemon",
-  "natdex_number": 498,
-  "element": "Fire",
-  "stage": "Basic",
-  "hp": 60,
-  "retreat_cost": 1,
-  "weakness": "Water",
-  "flavor": "This Pokémon is a ravenous glutton. It uses its excellent sense of smell to find food, then cooks it to a crisp before eating.",
+  "natdex_number": 195,
+  "element": "Fighting",
+  "stage": "Stage 1",
+  "hp": 120,
+  "retreat_cost": 3,
+  "weakness": "Grass",
+  "flavor": "Its body is always slimy. It often bangs its head on the river bottom as it swims but seems not to care.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Firebreathing",
+      "name": "Amnesia",
       "cost": [
-        "Fire"
+        "Fighting",
+        "Fighting",
+        "Colorless"
       ],
-      "damage": 10,
-      "damage_suffix": "+",
-      "effect": "Flip a coin. If heads, this attack does 30 more damage."
+      "damage": 60,
+      "effect": "1 of your opponent's Active Pokémon's attacks is chosen at random. During your opponent's next turn, that Pokémon can't use the chosen attack."
     }
   ],
+  "evolves_from": "Wooper",
   "versions": [
     {
-      "set": "P-B",
-      "number": 58
+      "set": "B3b",
+      "number": 37
     }
   ]
 }

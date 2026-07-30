@@ -1,32 +1,44 @@
 {
   "id": 1972,
-  "name": "Hawlucha",
+  "name": "Milotic ex",
   "card_type": "pokemon",
-  "natdex_number": 701,
-  "element": "Fighting",
-  "stage": "Basic",
-  "hp": 70,
-  "retreat_cost": 1,
+  "natdex_number": 350,
+  "element": "Water",
+  "stage": "Stage 1",
+  "hp": 140,
+  "retreat_cost": 2,
   "weakness": "Lightning",
-  "flavor": "Hawlucha live quietly without flocking together. They fight constantly with their natural enemies: noisy groups of Primeape.",
-  "is_ex": false,
+  "is_ex": true,
   "is_mega": false,
+  "ability": {
+    "name": "Aqua Charge",
+    "effect": "Once during your turn, you may take a [W] Energy from your Energy Zone and attach it to this Pokémon."
+  },
   "attacks": [
     {
-      "name": "Aerial Ace",
+      "name": "Water Pulse",
       "cost": [
-        "Colorless",
-        "Colorless"
+        "Water",
+        "Water",
+        "Water"
       ],
-      "damage": 40,
-      "damage_suffix": "+",
-      "effect": "Flip a coin. If heads, this attack does 30 more damage."
+      "damage": 80,
+      "effect": "Your opponent's Active Pokémon is now Asleep."
     }
   ],
+  "evolves_from": "Feebas",
   "versions": [
     {
-      "set": "P-B",
-      "number": 22
+      "set": "B3b",
+      "number": 15
+    },
+    {
+      "set": "B3b",
+      "number": 78
+    },
+    {
+      "set": "B3b",
+      "number": 86
     }
   ]
 }

@@ -1,30 +1,36 @@
 {
   "id": 1980,
-  "name": "Smoliv",
+  "name": "Emolga",
   "card_type": "pokemon",
-  "natdex_number": 928,
-  "element": "Grass",
+  "natdex_number": 587,
+  "element": "Lightning",
   "stage": "Basic",
-  "hp": 60,
+  "hp": 70,
   "retreat_cost": 1,
-  "weakness": "Fire",
-  "flavor": "This Pokémon converts nutrients into oil, which it stores in the fruit on its head. It can easily go a whole week without eating or drinking.",
+  "weakness": "Lightning",
+  "flavor": "This Pokémon absolutely loves sweet berries. Sometimes it stuffs its cheeks full of so much food that it can’t fly properly.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Nutrients",
+      "name": "Windup Thunder",
       "cost": [
-        "Grass"
+        "Lightning",
+        "Lightning"
       ],
-      "damage": 0,
-      "effect": "Heal 20 damage from 1 of your Pokémon."
+      "damage": 30,
+      "damage_suffix": "x",
+      "effect": "This attack does 30 damage for each Pokémon Tool attached to all of your Pokémon."
     }
   ],
   "versions": [
     {
+      "set": "B3b",
+      "number": 23
+    },
+    {
       "set": "P-B",
-      "number": 34
+      "number": 78
     }
   ]
 }
