@@ -196,17 +196,32 @@ fn write_reference_data(raw: &Value) -> Result<()> {
 
     let pack_variant_names = build_pack_variant_names();
     output::write_pack_variant_names(&pack_variant_names)?;
-    info!(count = pack_variant_names.len(), "pack_variant_names.json written");
+    info!(
+        count = pack_variant_names.len(),
+        "pack_variant_names.json written"
+    );
 
     Ok(())
 }
 
 fn build_pack_variant_names() -> Vec<PackVariantName> {
     vec![
-        PackVariantName { code: "normal".into(), name: "Regular Pack".into() },
-        PackVariantName { code: "rare".into(), name: "Rare Pack".into() },
-        PackVariantName { code: "plus1".into(), name: "Regular Pack +1".into() },
-        PackVariantName { code: "themed".into(), name: "Themed Rare Pack".into() },
+        PackVariantName {
+            code: "normal".into(),
+            name: "Regular Pack".into(),
+        },
+        PackVariantName {
+            code: "rare".into(),
+            name: "Rare Pack".into(),
+        },
+        PackVariantName {
+            code: "plus1".into(),
+            name: "Regular Pack +1".into(),
+        },
+        PackVariantName {
+            code: "themed".into(),
+            name: "Themed Rare Pack".into(),
+        },
     ]
 }
 

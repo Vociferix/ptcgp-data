@@ -928,8 +928,7 @@ pub fn fix_card_rates_from_rarity(
                     let Ok(rd): Result<i64, _> = total.denominator.try_into() else {
                         continue;
                     };
-                    let nf_count =
-                        nonfoil_count_by_rarity.get(rarity).copied().unwrap_or(0) as i64;
+                    let nf_count = nonfoil_count_by_rarity.get(rarity).copied().unwrap_or(0) as i64;
                     if nf_count == 0 {
                         continue;
                     }
