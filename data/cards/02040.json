@@ -1,32 +1,36 @@
 {
   "id": 2040,
-  "name": "Onix",
+  "name": "Accelgor",
   "card_type": "pokemon",
-  "natdex_number": 95,
-  "element": "Fighting",
-  "stage": "Basic",
-  "hp": 100,
-  "retreat_cost": 3,
-  "weakness": "Grass",
-  "flavor": "It rapidly bores through the ground at 50 mph by squirming and twisting its massive, rugged body.",
+  "natdex_number": 617,
+  "element": "Grass",
+  "stage": "Stage 1",
+  "hp": 80,
+  "retreat_cost": 1,
+  "weakness": "Fire",
+  "flavor": "Discarding its shell made it nimble. To keep itself from dehydrating, it wraps its body in bands of membrane.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Tail Smash",
+      "name": "Deck and Cover",
       "cost": [
-        "Colorless",
         "Colorless",
         "Colorless"
       ],
-      "damage": 90,
-      "effect": "Flip a coin. If tails, this attack does nothing."
+      "damage": 50,
+      "effect": "Your opponent's Active Pokémon is now Poisoned and Paralyzed. Shuffle this Pokémon and all attached cards into your deck."
     }
   ],
+  "evolves_from": "Shelmet",
   "versions": [
     {
-      "set": "P-B",
-      "number": 21
+      "set": "B4",
+      "number": 14
+    },
+    {
+      "set": "B4",
+      "number": 159
     }
   ]
 }

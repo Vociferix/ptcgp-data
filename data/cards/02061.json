@@ -1,32 +1,38 @@
 {
   "id": 2061,
-  "name": "Mega Heracross ex",
+  "name": "Mega Sharpedo ex",
   "card_type": "pokemon",
-  "natdex_number": 214,
-  "element": "Grass",
-  "stage": "Basic",
-  "hp": 180,
-  "retreat_cost": 3,
-  "weakness": "Fire",
+  "natdex_number": 319,
+  "element": "Water",
+  "stage": "Stage 1",
+  "hp": 190,
+  "retreat_cost": 0,
+  "weakness": "Lightning",
   "is_ex": true,
   "is_mega": true,
   "attacks": [
     {
-      "name": "Dynamic Horn",
+      "name": "Turbo Shark",
       "cost": [
-        "Grass",
-        "Grass",
-        "Grass",
-        "Colorless"
+        "Water"
       ],
-      "damage": 170,
-      "effect": "Flip a coin. If tails, this Pokémon also does 60 damage to itself."
+      "damage": 70,
+      "effect": "Take a [W] Energy from your Energy Zone and attach it to 1 of your Benched [W] Pokémon."
     }
   ],
+  "evolves_from": "Carvanha",
   "versions": [
     {
-      "set": "P-B",
-      "number": 56
+      "set": "B4",
+      "number": 35
+    },
+    {
+      "set": "B4",
+      "number": 182
+    },
+    {
+      "set": "B4",
+      "number": 196
     }
   ]
 }

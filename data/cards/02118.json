@@ -1,0 +1,32 @@
+{
+  "id": 2118,
+  "name": "Muk",
+  "card_type": "pokemon",
+  "natdex_number": 89,
+  "element": "Darkness",
+  "stage": "Stage 1",
+  "hp": 130,
+  "retreat_cost": 3,
+  "weakness": "Fighting",
+  "flavor": "It’s so stinky! Muk’s body contains toxic elements, and any plant will wilt when it passes by.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Ambush",
+      "cost": [
+        "Darkness"
+      ],
+      "damage": 30,
+      "damage_suffix": "+",
+      "effect": "Flip a coin. If heads, this attack does 30 more damage."
+    }
+  ],
+  "evolves_from": "Grimer",
+  "versions": [
+    {
+      "set": "B4",
+      "number": 92
+    }
+  ]
+}

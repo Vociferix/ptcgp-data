@@ -1,33 +1,30 @@
 {
   "id": 2064,
-  "name": "Dwebble",
+  "name": "Spheal",
   "card_type": "pokemon",
-  "natdex_number": 557,
-  "element": "Fighting",
+  "natdex_number": 363,
+  "element": "Water",
   "stage": "Basic",
-  "hp": 70,
-  "retreat_cost": 2,
-  "weakness": "Grass",
-  "flavor": "It first tries to find a rock to live in, but if there are no suitable rocks to be found, Dwebble may move in to the ports of a Hippowdon.",
+  "hp": 60,
+  "retreat_cost": 1,
+  "weakness": "Metal",
+  "flavor": "As it drifts among the waves, Spheal probes the sea. As soon as it spots prey, it informs the Walrein in its herd.",
   "is_ex": false,
   "is_mega": false,
-  "ability": {
-    "name": "Shell Armor",
-    "effect": "This Pokémon takes −10 damage from attacks."
-  },
   "attacks": [
     {
-      "name": "Stampede",
+      "name": "Rollout",
       "cost": [
-        "Fighting"
+        "Water",
+        "Colorless"
       ],
-      "damage": 10
+      "damage": 30
     }
   ],
   "versions": [
     {
-      "set": "P-B",
-      "number": 59
+      "set": "B4",
+      "number": 38
     }
   ]
 }

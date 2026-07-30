@@ -1,32 +1,32 @@
 {
   "id": 2085,
-  "name": "Raichu ex",
+  "name": "Thundurus",
   "card_type": "pokemon",
-  "natdex_number": 26,
+  "natdex_number": 642,
   "element": "Lightning",
-  "stage": "Stage 1",
-  "hp": 140,
+  "stage": "Basic",
+  "hp": 100,
   "retreat_cost": 1,
   "weakness": "Fighting",
-  "is_ex": true,
+  "flavor": "As it flies around, it shoots lightning all over the place and causes forest fires. It is therefore disliked.",
+  "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Volt Tackle",
+      "name": "Disaster Volt",
       "cost": [
         "Lightning",
-        "Lightning",
-        "Lightning"
+        "Colorless",
+        "Colorless"
       ],
-      "damage": 130,
-      "effect": "This Pokémon also does 30 damage to itself."
+      "damage": 100,
+      "effect": "Discard a [L] Energy from this Pokémon."
     }
   ],
-  "evolves_from": "Pikachu",
   "versions": [
     {
-      "set": "P-A",
-      "number": 112
+      "set": "B4",
+      "number": 59
     }
   ]
 }

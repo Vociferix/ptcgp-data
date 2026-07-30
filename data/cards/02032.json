@@ -1,17 +1,35 @@
 {
   "id": 2032,
-  "name": "Pokédex",
-  "card_type": "trainer",
-  "trainer_kind": "Item",
-  "trainer_effect": "Look at the top 3 cards of your deck.",
+  "name": "Lileep",
+  "card_type": "pokemon",
+  "natdex_number": 345,
+  "element": "Grass",
+  "stage": "Stage 1",
+  "hp": 90,
+  "retreat_cost": 2,
+  "weakness": "Fire",
+  "flavor": "Lileep clings to rocks on the seabed. When prey comes close, this Pokémon entangles it with petallike tentacles.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Blot",
+      "cost": [
+        "Grass"
+      ],
+      "damage": 40,
+      "effect": "Heal 10 damage from this Pokémon."
+    }
+  ],
+  "evolves_from": "Root Fossil",
   "versions": [
     {
-      "set": "P-A",
-      "number": 4
+      "set": "B4",
+      "number": 6
     },
     {
-      "set": "P-A",
-      "number": 8
+      "set": "B4",
+      "number": 157
     }
   ]
 }

@@ -1,0 +1,33 @@
+{
+  "id": 2231,
+  "name": "Mega Houndoom ex",
+  "card_type": "pokemon",
+  "natdex_number": 229,
+  "element": "Fire",
+  "stage": "Stage 1",
+  "hp": 190,
+  "retreat_cost": 2,
+  "weakness": "Water",
+  "is_ex": true,
+  "is_mega": true,
+  "attacks": [
+    {
+      "name": "Grimhound Flare",
+      "cost": [
+        "Fire",
+        "Fire",
+        "Colorless"
+      ],
+      "damage": 80,
+      "damage_suffix": "x",
+      "effect": "Flip 3 coins. This attack does 80 damage for each heads."
+    }
+  ],
+  "evolves_from": "Houndour",
+  "versions": [
+    {
+      "set": "P-B",
+      "number": 80
+    }
+  ]
+}

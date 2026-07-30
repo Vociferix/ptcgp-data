@@ -1,0 +1,33 @@
+{
+  "id": 2128,
+  "name": "Mandibuzz",
+  "card_type": "pokemon",
+  "natdex_number": 630,
+  "element": "Darkness",
+  "stage": "Stage 1",
+  "hp": 110,
+  "retreat_cost": 2,
+  "weakness": "Lightning",
+  "flavor": "Watching from the sky, they attack weakened prey on the ground. They have a habit of decorating themselves with bones.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Bone Rush",
+      "cost": [
+        "Darkness",
+        "Colorless"
+      ],
+      "damage": 60,
+      "damage_suffix": "x",
+      "effect": "Flip a coin until you get tails. This attack does 60 damage for each heads."
+    }
+  ],
+  "evolves_from": "Vullaby",
+  "versions": [
+    {
+      "set": "B4",
+      "number": 102
+    }
+  ]
+}

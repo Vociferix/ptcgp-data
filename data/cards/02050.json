@@ -1,34 +1,30 @@
 {
   "id": 2050,
-  "name": "Cresselia ex",
+  "name": "Cyndaquil",
   "card_type": "pokemon",
-  "natdex_number": 488,
-  "element": "Psychic",
+  "natdex_number": 155,
+  "element": "Fire",
   "stage": "Basic",
-  "hp": 140,
-  "retreat_cost": 2,
-  "weakness": "Darkness",
-  "is_ex": true,
+  "hp": 60,
+  "retreat_cost": 1,
+  "weakness": "Water",
+  "flavor": "The fire that spouts from its back burns hottest when it is angry. The flaring flames intimidate foes.",
+  "is_ex": false,
   "is_mega": false,
-  "ability": {
-    "name": "Lunar Plumage",
-    "effect": "Whenever you attach a [P] Energy from your Energy Zone to this Pokémon, heal 20 damage from this Pokémon."
-  },
   "attacks": [
     {
-      "name": "Psychic Flash",
+      "name": "Singe",
       "cost": [
-        "Psychic",
-        "Psychic",
-        "Colorless"
+        "Fire"
       ],
-      "damage": 80
+      "damage": 0,
+      "effect": "Your opponent's Active Pokémon is now Burned."
     }
   ],
   "versions": [
     {
-      "set": "P-A",
-      "number": 37
+      "set": "B4",
+      "number": 24
     }
   ]
 }

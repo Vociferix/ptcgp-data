@@ -1,30 +1,32 @@
 {
   "id": 2054,
-  "name": "Varoom",
+  "name": "Houndoom",
   "card_type": "pokemon",
-  "natdex_number": 965,
-  "element": "Metal",
-  "stage": "Basic",
-  "hp": 60,
+  "natdex_number": 229,
+  "element": "Fire",
+  "stage": "Stage 1",
+  "hp": 100,
   "retreat_cost": 1,
-  "weakness": "Fire",
-  "flavor": "The steel section is Varoom’s actual body. This Pokémon clings to rocks and converts the minerals within into energy to fuel its activities.",
+  "weakness": "Water",
+  "flavor": "Upon hearing its eerie howls, other Pokémon get the shivers and head straight back to their nests.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Poison Gas",
+      "name": "Crunch",
       "cost": [
-        "Metal"
+        "Fire",
+        "Fire"
       ],
-      "damage": 0,
-      "effect": "Your opponent's Active Pokémon is now Poisoned."
+      "damage": 60,
+      "effect": "Flip a coin. If heads, discard a random Energy from your opponent's Active Pokémon."
     }
   ],
+  "evolves_from": "Houndour",
   "versions": [
     {
-      "set": "P-B",
-      "number": 44
+      "set": "B4",
+      "number": 28
     }
   ]
 }

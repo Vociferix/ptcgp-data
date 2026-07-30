@@ -1,30 +1,34 @@
 {
   "id": 2079,
-  "name": "Horsea",
+  "name": "Luxray",
   "card_type": "pokemon",
-  "natdex_number": 116,
-  "element": "Water",
-  "stage": "Basic",
-  "hp": 60,
+  "natdex_number": 405,
+  "element": "Lightning",
+  "stage": "Stage 2",
+  "hp": 140,
   "retreat_cost": 1,
-  "weakness": "Lightning",
-  "flavor": "Horsea makes its home in oceans with gentle currents. If this Pokémon is under attack, it spits out pitch-black ink and escapes.",
+  "weakness": "Fighting",
+  "flavor": "Luxray’s ability to see through objects comes in handy when it’s scouting for danger.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Water Arrow",
+      "name": "Revenge Blast",
       "cost": [
-        "Water"
+        "Lightning",
+        "Lightning",
+        "Colorless"
       ],
-      "damage": 0,
-      "effect": "This attack does 10 damage to 1 of your opponent's Pokémon."
+      "damage": 80,
+      "damage_suffix": "+",
+      "effect": "This attack does 50 more damage for each point your opponent has gotten."
     }
   ],
+  "evolves_from": "Luxio",
   "versions": [
     {
-      "set": "P-A",
-      "number": 94
+      "set": "B4",
+      "number": 53
     }
   ]
 }

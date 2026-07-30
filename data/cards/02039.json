@@ -1,31 +1,29 @@
 {
   "id": 2039,
-  "name": "Haunter",
+  "name": "Shelmet",
   "card_type": "pokemon",
-  "natdex_number": 93,
-  "element": "Psychic",
-  "stage": "Stage 1",
+  "natdex_number": 616,
+  "element": "Grass",
+  "stage": "Basic",
   "hp": 70,
-  "retreat_cost": 1,
-  "weakness": "Darkness",
-  "flavor": "It likes to lurk in the dark and tap shoulders with a gaseous hand. Its touch causes endless shuddering.",
+  "retreat_cost": 3,
+  "weakness": "Fire",
+  "flavor": "It has a strange physiology that responds to electricity. When together with Karrablast, Shelmet evolves for some reason.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Surprise Attack",
+      "name": "Seashell Attack",
       "cost": [
-        "Psychic"
+        "Colorless"
       ],
-      "damage": 50,
-      "effect": "Flip a coin. If tails, this attack does nothing."
+      "damage": 20
     }
   ],
-  "evolves_from": "Gastly",
   "versions": [
     {
-      "set": "P-A",
-      "number": 20
+      "set": "B4",
+      "number": 13
     }
   ]
 }

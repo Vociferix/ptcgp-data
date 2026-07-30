@@ -1,30 +1,40 @@
 {
   "id": 2037,
-  "name": "Swablu",
+  "name": "Vespiquen ex",
   "card_type": "pokemon",
-  "natdex_number": 333,
-  "element": "Colorless",
-  "stage": "Basic",
-  "hp": 50,
-  "retreat_cost": 1,
-  "weakness": "Lightning",
-  "flavor": "It can’t relax if it or its surroundings are not clean. It wipes off dirt with its wings.",
-  "is_ex": false,
+  "natdex_number": 416,
+  "element": "Grass",
+  "stage": "Stage 1",
+  "hp": 140,
+  "retreat_cost": 2,
+  "weakness": "Fire",
+  "is_ex": true,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Find a Friend",
+      "name": "Chase Order",
       "cost": [
-        "Colorless"
+        "Grass",
+        "Grass"
       ],
-      "damage": 0,
-      "effect": "Put a random Pokémon from your deck into your hand."
+      "damage": 70,
+      "damage_suffix": "+",
+      "effect": "You may discard 1 of your Benched Basic [G] Pokémon. If you do, this attack does 70 more damage."
     }
   ],
+  "evolves_from": "Combee",
   "versions": [
     {
-      "set": "P-B",
-      "number": 17
+      "set": "B4",
+      "number": 11
+    },
+    {
+      "set": "B4",
+      "number": 180
+    },
+    {
+      "set": "B4",
+      "number": 194
     }
   ]
 }

@@ -1,32 +1,30 @@
 {
   "id": 2058,
-  "name": "Zygarde",
+  "name": "Staryu",
   "card_type": "pokemon",
-  "natdex_number": 718,
-  "element": "Fighting",
+  "natdex_number": 120,
+  "element": "Water",
   "stage": "Basic",
-  "hp": 120,
-  "retreat_cost": 2,
-  "weakness": "Grass",
-  "flavor": "Some say it can change to an even more powerful form when battling those who threaten the ecosystem.",
+  "hp": 50,
+  "retreat_cost": 1,
+  "weakness": "Lightning",
+  "flavor": "Fish Pokémon nibble at it, but Staryu isn’t bothered. Its body regenerates quickly, even if part of it is completely torn off.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Cell Storm",
+      "name": "Swift",
       "cost": [
-        "Fighting",
-        "Fighting",
-        "Colorless"
+        "Water"
       ],
-      "damage": 60,
-      "effect": "Heal 20 damage from this Pokémon."
+      "damage": 20,
+      "effect": "This attack's damage isn't affected by Weakness or by any effects on your opponent's Active Pokémon."
     }
   ],
   "versions": [
     {
-      "set": "P-B",
-      "number": 52
+      "set": "B4",
+      "number": 32
     }
   ]
 }

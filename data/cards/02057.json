@@ -1,29 +1,32 @@
 {
   "id": 2057,
-  "name": "Zygarde",
+  "name": "Golduck",
   "card_type": "pokemon",
-  "natdex_number": 718,
-  "element": "Fighting",
-  "stage": "Basic",
-  "hp": 80,
+  "natdex_number": 55,
+  "element": "Water",
+  "stage": "Stage 1",
+  "hp": 110,
   "retreat_cost": 1,
-  "weakness": "Grass",
-  "flavor": "Born when around 10% of Zygarde’s cells have been gathered from all over, this form is skilled in close-range combat.",
+  "weakness": "Lightning",
+  "flavor": "It swims gracefully along on the quiet, slow- moving rivers and lakes of which it is so fond.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Bite",
+      "name": "Surf",
       "cost": [
-        "Fighting"
+        "Water",
+        "Water",
+        "Colorless"
       ],
-      "damage": 30
+      "damage": 80
     }
   ],
+  "evolves_from": "Psyduck",
   "versions": [
     {
-      "set": "P-B",
-      "number": 51
+      "set": "B4",
+      "number": 31
     }
   ]
 }

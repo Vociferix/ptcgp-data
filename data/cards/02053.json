@@ -1,30 +1,31 @@
 {
   "id": 2053,
-  "name": "Electrike",
+  "name": "Houndour",
   "card_type": "pokemon",
-  "natdex_number": 309,
-  "element": "Lightning",
+  "natdex_number": 228,
+  "element": "Fire",
   "stage": "Basic",
   "hp": 60,
   "retreat_cost": 1,
-  "weakness": "Fighting",
-  "flavor": "It stores electricity in its fur. It gives off sparks from all over its body in seasons when the air is dry.",
+  "weakness": "Water",
+  "flavor": "It uses different kinds of cries for communicating with others of its kind and for pursuing its prey.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Reckless Charge",
+      "name": "Sharp Claws",
       "cost": [
-        "Lightning"
+        "Fire"
       ],
-      "damage": 30,
-      "effect": "This Pokémon also does 10 damage to itself."
+      "damage": 10,
+      "damage_suffix": "+",
+      "effect": "Flip a coin. If heads, this attack does 20 more damage."
     }
   ],
   "versions": [
     {
-      "set": "P-B",
-      "number": 43
+      "set": "B4",
+      "number": 27
     }
   ]
 }

@@ -1,33 +1,40 @@
 {
   "id": 2070,
-  "name": "Alolan Grimer",
+  "name": "Samurott",
   "card_type": "pokemon",
-  "natdex_number": 88,
-  "element": "Darkness",
-  "stage": "Basic",
-  "hp": 70,
+  "natdex_number": 503,
+  "element": "Water",
+  "stage": "Stage 2",
+  "hp": 150,
   "retreat_cost": 2,
-  "weakness": "Fighting",
-  "flavor": "There are a hundred or so of them living in Alola’s waste-disposal site. They’re all hard workers who eat a lot of trash.",
+  "weakness": "Lightning",
+  "flavor": "Samurott leads its group strictly. Those who do not follow its rules receive a merciless thrashing.",
   "is_ex": false,
   "is_mega": false,
-  "variants": [
-    "Alolan"
-  ],
+  "ability": {
+    "name": "Stance",
+    "effect": "Once during your turn, when you play this Pokémon from your hand to evolve 1 of your Pokémon, you may prevent all damage from—and effects of—attacks from your opponent's Pokémon done to this Pokémon until the end of your opponent's next turn."
+  },
   "attacks": [
     {
-      "name": "Poison Gas",
+      "name": "Pike",
       "cost": [
-        "Darkness"
+        "Water",
+        "Water"
       ],
-      "damage": 0,
-      "effect": "Your opponent's Active Pokémon is now Poisoned."
+      "damage": 60,
+      "effect": "This attack also does 20 damage to 1 of your opponent's Benched Pokémon."
     }
   ],
+  "evolves_from": "Dewott",
   "versions": [
     {
-      "set": "P-A",
-      "number": 72
+      "set": "B4",
+      "number": 44
+    },
+    {
+      "set": "B4",
+      "number": 163
     }
   ]
 }

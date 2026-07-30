@@ -1,33 +1,39 @@
 {
   "id": 2081,
-  "name": "Blissey ex",
+  "name": "Rotom ex",
   "card_type": "pokemon",
-  "natdex_number": 242,
-  "element": "Colorless",
-  "stage": "Stage 1",
-  "hp": 180,
-  "retreat_cost": 3,
+  "natdex_number": 479,
+  "element": "Lightning",
+  "stage": "Basic",
+  "hp": 120,
+  "retreat_cost": 1,
   "weakness": "Fighting",
   "is_ex": true,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Happy Punch",
+      "name": "Junk Spark",
       "cost": [
-        "Colorless",
-        "Colorless",
-        "Colorless",
-        "Colorless"
+        "Lightning",
+        "Lightning"
       ],
-      "damage": 100,
-      "effect": "Flip a coin. If heads, heal 60 damage from this Pokémon."
+      "damage": 30,
+      "damage_suffix": "+",
+      "effect": "This attack does 10 more damage for each Item card in your discard pile."
     }
   ],
-  "evolves_from": "Chansey",
   "versions": [
     {
-      "set": "P-A",
-      "number": 98
+      "set": "B4",
+      "number": 55
+    },
+    {
+      "set": "B4",
+      "number": 184
+    },
+    {
+      "set": "B4",
+      "number": 202
     }
   ]
 }

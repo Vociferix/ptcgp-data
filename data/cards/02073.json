@@ -1,34 +1,32 @@
 {
   "id": 2073,
-  "name": "Quagsire",
+  "name": "Araquanid",
   "card_type": "pokemon",
-  "natdex_number": 195,
-  "element": "Fighting",
+  "natdex_number": 752,
+  "element": "Water",
   "stage": "Stage 1",
-  "hp": 120,
-  "retreat_cost": 3,
-  "weakness": "Grass",
-  "flavor": "Due to its relaxed and carefree attitude, it often bumps its head on riverbed boulders and boat hulls as it swims.",
+  "hp": 100,
+  "retreat_cost": 2,
+  "weakness": "Lightning",
+  "flavor": "It launches sticky water bubbles. Foes who lose consciousness while trapped inside these bubbles will get torn apart by Araquanid’s gnashing jaws.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Energy Press",
+      "name": "Corner",
       "cost": [
-        "Fighting",
-        "Colorless",
+        "Water",
         "Colorless"
       ],
-      "damage": 40,
-      "damage_suffix": "+",
-      "effect": "This attack does 30 more damage for each Energy attached to your opponent's Active Pokémon."
+      "damage": 60,
+      "effect": "During your opponent's next turn, the Defending Pokémon can't retreat."
     }
   ],
-  "evolves_from": "Wooper",
+  "evolves_from": "Dewpider",
   "versions": [
     {
-      "set": "P-B",
-      "number": 75
+      "set": "B4",
+      "number": 47
     }
   ]
 }

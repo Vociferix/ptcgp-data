@@ -1,0 +1,40 @@
+{
+  "id": 2148,
+  "name": "Noivern",
+  "card_type": "pokemon",
+  "natdex_number": 715,
+  "element": "Dragon",
+  "stage": "Stage 1",
+  "hp": 100,
+  "retreat_cost": 1,
+  "flavor": "In the dark, even Hydreigon are terrified of this Pokémon. But in the light, Noivern is the one that avoids battle.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Draco Meteor",
+      "cost": [
+        "Psychic",
+        "Darkness",
+        "Darkness"
+      ],
+      "damage": 0,
+      "effect": "1 of your opponent's Pokémon is chosen at random 3 times. For each time a Pokémon was chosen, do 60 damage to it."
+    }
+  ],
+  "evolves_from": "Noibat",
+  "versions": [
+    {
+      "set": "B4",
+      "number": 122
+    },
+    {
+      "set": "B4",
+      "number": 176
+    },
+    {
+      "set": "P-B",
+      "number": 83
+    }
+  ]
+}

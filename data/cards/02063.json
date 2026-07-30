@@ -1,31 +1,41 @@
 {
   "id": 2063,
-  "name": "Tepig",
+  "name": "Wailord ex",
   "card_type": "pokemon",
-  "natdex_number": 498,
-  "element": "Fire",
-  "stage": "Basic",
-  "hp": 60,
-  "retreat_cost": 1,
-  "weakness": "Water",
-  "flavor": "This Pokémon is a ravenous glutton. It uses its excellent sense of smell to find food, then cooks it to a crisp before eating.",
-  "is_ex": false,
+  "natdex_number": 321,
+  "element": "Water",
+  "stage": "Stage 1",
+  "hp": 250,
+  "retreat_cost": 4,
+  "weakness": "Lightning",
+  "is_ex": true,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Firebreathing",
+      "name": "Wondrous Waves",
       "cost": [
-        "Fire"
+        "Water",
+        "Water",
+        "Water",
+        "Water"
       ],
-      "damage": 10,
-      "damage_suffix": "+",
-      "effect": "Flip a coin. If heads, this attack does 30 more damage."
+      "damage": 100,
+      "effect": "This Pokémon recovers from all Special Conditions."
     }
   ],
+  "evolves_from": "Wailmer",
   "versions": [
     {
-      "set": "P-B",
-      "number": 58
+      "set": "B4",
+      "number": 37
+    },
+    {
+      "set": "B4",
+      "number": 183
+    },
+    {
+      "set": "B4",
+      "number": 197
     }
   ]
 }

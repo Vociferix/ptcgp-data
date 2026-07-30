@@ -1,30 +1,34 @@
 {
   "id": 2046,
-  "name": "Ralts",
+  "name": "Ponyta",
   "card_type": "pokemon",
-  "natdex_number": 280,
-  "element": "Psychic",
+  "natdex_number": 77,
+  "element": "Fire",
   "stage": "Basic",
   "hp": 60,
   "retreat_cost": 1,
-  "weakness": "Darkness",
-  "flavor": "It is highly attuned to the emotions of people and Pokémon. It hides if it senses hostility.",
+  "weakness": "Water",
+  "flavor": "If you’ve been accepted by Ponyta, its burning mane is mysteriously no longer hot to the touch.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Draining Kiss",
+      "name": "Stoke",
       "cost": [
-        "Psychic"
+        "Fire"
       ],
-      "damage": 10,
-      "effect": "Heal 10 damage from this Pokémon."
+      "damage": 0,
+      "effect": "Take a [R] Energy from your Energy Zone and attach it to this Pokémon."
     }
   ],
   "versions": [
     {
-      "set": "P-B",
-      "number": 28
+      "set": "B4",
+      "number": 20
+    },
+    {
+      "set": "B4",
+      "number": 160
     }
   ]
 }

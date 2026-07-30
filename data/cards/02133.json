@@ -1,0 +1,33 @@
+{
+  "id": 2133,
+  "name": "Metang",
+  "card_type": "pokemon",
+  "natdex_number": 375,
+  "element": "Metal",
+  "stage": "Stage 1",
+  "hp": 100,
+  "retreat_cost": 3,
+  "weakness": "Fire",
+  "flavor": "It adores magnetic minerals, so it pursues Nosepass at speeds exceeding 60 mph.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Bullet Punch",
+      "cost": [
+        "Metal",
+        "Colorless"
+      ],
+      "damage": 30,
+      "damage_suffix": "+",
+      "effect": "Flip 2 coins. This attack does 20 more damage for each heads."
+    }
+  ],
+  "evolves_from": "Beldum",
+  "versions": [
+    {
+      "set": "B4",
+      "number": 107
+    }
+  ]
+}

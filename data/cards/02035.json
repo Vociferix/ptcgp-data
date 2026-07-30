@@ -1,31 +1,34 @@
 {
   "id": 2035,
-  "name": "Lapras ex",
+  "name": "Kricketune",
   "card_type": "pokemon",
-  "natdex_number": 131,
-  "element": "Water",
-  "stage": "Basic",
-  "hp": 140,
-  "retreat_cost": 3,
-  "weakness": "Lightning",
-  "is_ex": true,
+  "natdex_number": 402,
+  "element": "Grass",
+  "stage": "Stage 1",
+  "hp": 90,
+  "retreat_cost": 1,
+  "weakness": "Fire",
+  "flavor": "There is a village that hosts a contest based on the amazingly variable cries of this Pokémon.",
+  "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Bubble Drain",
+      "name": "Bug Buzz",
       "cost": [
-        "Water",
-        "Water",
-        "Colorless"
+        "Grass"
       ],
-      "damage": 80,
-      "effect": "Heal 20 damage from this Pokémon."
+      "damage": 50
     }
   ],
+  "evolves_from": "Kricketot",
   "versions": [
     {
-      "set": "P-A",
-      "number": 14
+      "set": "B4",
+      "number": 9
+    },
+    {
+      "set": "B4",
+      "number": 158
     }
   ]
 }

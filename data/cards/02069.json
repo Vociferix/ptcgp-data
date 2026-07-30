@@ -1,30 +1,32 @@
 {
   "id": 2069,
-  "name": "Pawniard",
+  "name": "Dewott",
   "card_type": "pokemon",
-  "natdex_number": 624,
-  "element": "Darkness",
-  "stage": "Basic",
-  "hp": 60,
+  "natdex_number": 502,
+  "element": "Water",
+  "stage": "Stage 1",
+  "hp": 80,
   "retreat_cost": 1,
-  "weakness": "Grass",
-  "flavor": "Any chips in its blades would prove fatal for it. After each battle, it diligently maintains its blades using its favorite sharpening stone.",
+  "weakness": "Lightning",
+  "flavor": "Dewott has a studious and stern personality. It masters the use of its scalchops through dedicated, repeated training.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Call for Family",
+      "name": "Razor Shell",
       "cost": [
-        "Darkness"
+        "Water"
       ],
-      "damage": 0,
-      "effect": "Put 1 random Basic Pokémon from your deck onto your Bench."
+      "damage": 20,
+      "damage_suffix": "+",
+      "effect": "Flip a coin. If heads, this attack does 30 more damage."
     }
   ],
+  "evolves_from": "Oshawott",
   "versions": [
     {
-      "set": "P-B",
-      "number": 67
+      "set": "B4",
+      "number": 43
     }
   ]
 }

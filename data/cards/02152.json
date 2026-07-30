@@ -1,0 +1,32 @@
+{
+  "id": 2152,
+  "name": "Dipplin",
+  "card_type": "pokemon",
+  "natdex_number": 1011,
+  "element": "Dragon",
+  "stage": "Stage 1",
+  "hp": 80,
+  "retreat_cost": 1,
+  "flavor": "The head sticking out belongs to the fore-wyrm, while the tail belongs to the core-wyrm. The two share one apple and help each other out.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Double Hit",
+      "cost": [
+        "Grass",
+        "Fire"
+      ],
+      "damage": 60,
+      "damage_suffix": "x",
+      "effect": "Flip 2 coins. This attack does 60 damage for each heads."
+    }
+  ],
+  "evolves_from": "Applin",
+  "versions": [
+    {
+      "set": "B4",
+      "number": 126
+    }
+  ]
+}

@@ -1,31 +1,29 @@
 {
   "id": 2068,
-  "name": "Ceruledge ex",
+  "name": "Oshawott",
   "card_type": "pokemon",
-  "natdex_number": 937,
-  "element": "Psychic",
-  "stage": "Stage 1",
-  "hp": 150,
-  "retreat_cost": 2,
-  "weakness": "Darkness",
-  "is_ex": true,
+  "natdex_number": 501,
+  "element": "Water",
+  "stage": "Basic",
+  "hp": 60,
+  "retreat_cost": 1,
+  "weakness": "Lightning",
+  "flavor": "It’s said that Oshawott learned to maintain its scalchop with riverbed stones by mimicking humans it saw using whetstones.",
+  "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Shimmering Slash",
+      "name": "Water Gun",
       "cost": [
-        "Psychic",
-        "Colorless"
+        "Water"
       ],
-      "damage": 80,
-      "effect": "Discard a random Energy from among the Energy attached to all Pokémon (both yours and your opponent's)."
+      "damage": 20
     }
   ],
-  "evolves_from": "Charcadet",
   "versions": [
     {
-      "set": "P-B",
-      "number": 66
+      "set": "B4",
+      "number": 42
     }
   ]
 }

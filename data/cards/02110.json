@@ -1,0 +1,41 @@
+{
+  "id": 2110,
+  "name": "Mega Gallade ex",
+  "card_type": "pokemon",
+  "natdex_number": 475,
+  "element": "Fighting",
+  "stage": "Stage 2",
+  "hp": 220,
+  "retreat_cost": 2,
+  "weakness": "Psychic",
+  "is_ex": true,
+  "is_mega": true,
+  "attacks": [
+    {
+      "name": "Resonating Blade",
+      "cost": [
+        "Fighting",
+        "Colorless",
+        "Colorless"
+      ],
+      "damage": 100,
+      "damage_suffix": "+",
+      "effect": "If you played a Supporter card from your hand during this turn, this attack does 50 more damage."
+    }
+  ],
+  "evolves_from": "Kirlia",
+  "versions": [
+    {
+      "set": "B4",
+      "number": 84
+    },
+    {
+      "set": "B4",
+      "number": 185
+    },
+    {
+      "set": "B4",
+      "number": 198
+    }
+  ]
+}

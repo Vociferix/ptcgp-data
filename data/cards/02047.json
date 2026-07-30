@@ -1,33 +1,32 @@
 {
   "id": 2047,
-  "name": "Mega Medicham ex",
+  "name": "Rapidash",
   "card_type": "pokemon",
-  "natdex_number": 308,
-  "element": "Fighting",
+  "natdex_number": 78,
+  "element": "Fire",
   "stage": "Stage 1",
-  "hp": 180,
+  "hp": 110,
   "retreat_cost": 1,
-  "weakness": "Psychic",
-  "is_ex": true,
-  "is_mega": true,
+  "weakness": "Water",
+  "flavor": "The fastest runner becomes the leader, and it decides the herd’s pace and direction of travel.",
+  "is_ex": false,
+  "is_mega": false,
   "attacks": [
     {
-      "name": "Chakra Fist",
+      "name": "Heat Blast",
       "cost": [
-        "Fighting",
-        "Colorless",
+        "Fire",
+        "Fire",
         "Colorless"
       ],
-      "damage": 100,
-      "damage_suffix": "+",
-      "effect": "If this Pokémon has any [P] Energy attached, this attack does 40 more damage. This attack's damage isn't affected by any effects on your opponent's Active Pokémon."
+      "damage": 80
     }
   ],
-  "evolves_from": "Meditite",
+  "evolves_from": "Ponyta",
   "versions": [
     {
-      "set": "P-B",
-      "number": 29
+      "set": "B4",
+      "number": 21
     }
   ]
 }

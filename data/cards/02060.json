@@ -1,32 +1,29 @@
 {
   "id": 2060,
-  "name": "Floatzel",
+  "name": "Carvanha",
   "card_type": "pokemon",
-  "natdex_number": 419,
+  "natdex_number": 318,
   "element": "Water",
-  "stage": "Stage 1",
-  "hp": 100,
+  "stage": "Basic",
+  "hp": 50,
   "retreat_cost": 1,
   "weakness": "Lightning",
-  "flavor": "With its flotation sac inflated, it can carry people on its back. It deflates the sac before it dives.",
+  "flavor": "These Pokémon have sharp fangs and powerful jaws. Sailors avoid Carvanha dens at all costs.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Attack the Wound",
+      "name": "Sharp Fang",
       "cost": [
         "Water"
       ],
-      "damage": 10,
-      "damage_suffix": "+",
-      "effect": "If your opponent's Active Pokémon has damage on it, this attack does 60 more damage."
+      "damage": 30
     }
   ],
-  "evolves_from": "Buizel",
   "versions": [
     {
-      "set": "P-A",
-      "number": 53
+      "set": "B4",
+      "number": 34
     }
   ]
 }

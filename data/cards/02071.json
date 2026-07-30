@@ -1,30 +1,31 @@
 {
   "id": 2071,
-  "name": "Feebas",
+  "name": "Alomomola",
   "card_type": "pokemon",
-  "natdex_number": 349,
+  "natdex_number": 594,
   "element": "Water",
   "stage": "Basic",
-  "hp": 30,
-  "retreat_cost": 1,
+  "hp": 100,
+  "retreat_cost": 2,
   "weakness": "Lightning",
-  "flavor": "It is the shabbiest Pokémon of all. It forms schools and lives at the bottom of rivers that teem with plant life.",
+  "flavor": "They float upon the open sea. Many water Pokémon gather in the area around Alomomola.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Hide",
+      "name": "Mineral Pump",
       "cost": [
+        "Water",
         "Water"
       ],
-      "damage": 0,
-      "effect": "Flip a coin. If heads, during your opponent's next turn, prevent all damage from—and effects of—attacks done to this Pokémon."
+      "damage": 40,
+      "effect": "Heal 10 damage from each of your Benched Pokémon."
     }
   ],
   "versions": [
     {
-      "set": "P-B",
-      "number": 72
+      "set": "B4",
+      "number": 45
     }
   ]
 }
