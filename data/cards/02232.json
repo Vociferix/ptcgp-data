@@ -1,42 +1,29 @@
 {
   "id": 2232,
-  "name": "Ultra Necrozma ex",
+  "name": "Carvanha",
   "card_type": "pokemon",
-  "natdex_number": 800,
-  "element": "Dragon",
+  "natdex_number": 318,
+  "element": "Water",
   "stage": "Basic",
-  "hp": 150,
-  "retreat_cost": 2,
-  "is_ex": true,
+  "hp": 50,
+  "retreat_cost": 1,
+  "weakness": "Lightning",
+  "flavor": "These Pokémon have sharp fangs and powerful jaws. Sailors avoid Carvanha dens at all costs.",
+  "is_ex": false,
   "is_mega": false,
-  "variants": [
-    "Ultra"
-  ],
   "attacks": [
     {
-      "name": "Photon Claw",
+      "name": "Aqua Jet",
       "cost": [
-        "Colorless",
-        "Colorless",
-        "Colorless"
+        "Water"
       ],
-      "damage": 60
-    },
-    {
-      "name": "Shoegaze",
-      "cost": [
-        "Psychic",
-        "Psychic",
-        "Metal",
-        "Metal"
-      ],
-      "damage": 120,
-      "effect": "Discard the top 5 cards of each player's deck."
+      "damage": 10,
+      "effect": "This attack also does 10 damage to 1 of your opponent's Benched Pokémon."
     }
   ],
   "versions": [
     {
-      "set": "P-A",
+      "set": "P-B",
       "number": 81
     }
   ]

@@ -27,6 +27,16 @@ pub async fn scrape_card_numbers(client: &Client, set_code: &str) -> Result<Vec<
     parse_card_numbers(&html)
 }
 
+/// Scrape the pack names Limitless lists for a set.
+///
+/// Multi-pack sets render a `div.pack-selection` with one button per pack, e.g.
+/// "Mewtwo pack", alongside "All cards" and "Shared" entries that are not packs.
+/// Single-pack sets have no selector at all, so this returns an empty list.
+pub async fn scrape_set_packs(client: &Client, set_code: &str) -> Result<Vec<String>> {
+    let html = client.get_text(&format!("{BASE}/cards/{set_code}")).await?;
+    Ok(parse_set_packs(&html))
+}
+
 pub async fn scrape_card(
     client: &Client,
     set_code: &str,
@@ -124,6 +134,26 @@ fn parse_card_numbers(html: &str) -> Result<Vec<u32>> {
     numbers.sort_unstable();
     numbers.dedup();
     Ok(numbers)
+}
+
+fn parse_set_packs(html: &str) -> Vec<String> {
+    let doc = Html::parse_document(html);
+    let btn_sel = sel!("div.pack-selection button[data-value]");
+
+    doc.select(&btn_sel)
+        // "" is the "All cards" button and "0" is the "Shared" pseudo-pack.
+        .filter(|el| !matches!(el.value().attr("data-value"), None | Some("") | Some("0")))
+        .map(|el| {
+            let label = el
+                .text()
+                .collect::<String>()
+                .split_whitespace()
+                .collect::<Vec<_>>()
+                .join(" ");
+            label.strip_suffix(" pack").unwrap_or(&label).to_string()
+        })
+        .filter(|s| !s.is_empty())
+        .collect()
 }
 
 // ── Individual card parser ───────────────────────────────────────────────────

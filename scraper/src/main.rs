@@ -225,24 +225,102 @@ fn build_pack_variant_names() -> Vec<PackVariantName> {
     ]
 }
 
+/// Resolve RaenonX pack IDs to the pack names Limitless uses.
+///
+/// Limitless is authoritative for the wording. A multi-pack set lists its packs on
+/// its set page; a single-pack set has no pack selector to read, so the pack takes
+/// the set's own name. RaenonX supplies the pack IDs and — for multi-pack sets only
+/// — the name used to line an ID up with its Limitless label, since RaenonX orders
+/// packs by their in-game order and Limitless alphabetically.
 async fn fetch_pack_names(client: &client::Client, raw: &Value) -> HashMap<String, String> {
-    let named_packs = raenonx::parse_named_pack_ids(raw);
+    let named_packs: HashSet<String> = raenonx::parse_named_pack_ids(raw).into_iter().collect();
+
+    let set_names: HashMap<String, String> = match limitless::scrape_sets(client).await {
+        Ok(sets) => sets.into_iter().map(|s| (s.code, s.name)).collect(),
+        Err(e) => {
+            warn!("failed to scrape set index — pack names unresolved: {e}");
+            return HashMap::new();
+        }
+    };
+
     let mut pack_names = HashMap::new();
-    for pack_id in &named_packs {
-        let url = format!("{}/{}", raenonx::PACK_PAGE_BASE, pack_id);
-        match client.get_text(&url).await {
-            Ok(html) => {
-                if let Some(name) = raenonx::parse_pack_name_from_title(&html) {
-                    pack_names.insert(pack_id.clone(), name);
-                } else {
-                    warn!(pack = pack_id, "could not parse pack name from title");
+
+    for (set_code, pack_ids) in raenonx::parse_expansion_packs(raw) {
+        // Promo packs are named "Vol N" downstream and never appear here.
+        let pack_ids: Vec<String> = pack_ids
+            .into_iter()
+            .filter(|id| named_packs.contains(id))
+            .collect();
+
+        if let [pack_id] = pack_ids.as_slice() {
+            match set_names.get(&set_code) {
+                Some(name) => {
+                    pack_names.insert(pack_id.clone(), name.clone());
+                }
+                None => {
+                    warn!(set = %set_code, "set not listed on Limitless — pack name unresolved")
                 }
             }
-            Err(e) => warn!(pack = pack_id, "failed to fetch pack page: {e}"),
+            continue;
+        }
+        if pack_ids.is_empty() {
+            continue;
+        }
+
+        let labels = match limitless::scrape_set_packs(client, &set_code).await {
+            Ok(labels) if !labels.is_empty() => labels,
+            Ok(_) => {
+                warn!(set = %set_code, "Limitless lists no packs for a multi-pack set");
+                continue;
+            }
+            Err(e) => {
+                warn!(set = %set_code, "failed to fetch set page: {e}");
+                continue;
+            }
+        };
+
+        for pack_id in &pack_ids {
+            let Some(raenonx_name) = fetch_raenonx_pack_name(client, pack_id).await else {
+                continue;
+            };
+            match labels
+                .iter()
+                .find(|l| l.eq_ignore_ascii_case(&raenonx_name))
+            {
+                Some(label) => {
+                    pack_names.insert(pack_id.clone(), label.clone());
+                }
+                None => {
+                    warn!(
+                        pack = %pack_id,
+                        name = %raenonx_name,
+                        "no matching Limitless pack label — falling back to the RaenonX name"
+                    );
+                    pack_names.insert(pack_id.clone(), raenonx_name);
+                }
+            }
         }
     }
+
     info!(count = pack_names.len(), "pack names resolved");
     pack_names
+}
+
+async fn fetch_raenonx_pack_name(client: &client::Client, pack_id: &str) -> Option<String> {
+    let url = format!("{}/{}", raenonx::PACK_PAGE_BASE, pack_id);
+    match client.get_text(&url).await {
+        Ok(html) => match raenonx::parse_pack_name_from_title(&html) {
+            Some(name) => Some(name),
+            None => {
+                warn!(pack = pack_id, "could not parse pack name from title");
+                None
+            }
+        },
+        Err(e) => {
+            warn!(pack = pack_id, "failed to fetch pack page: {e}");
+            None
+        }
+    }
 }
 
 async fn cmd_sets(client: &client::Client) -> Result<()> {

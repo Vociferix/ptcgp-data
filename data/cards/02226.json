@@ -1,29 +1,32 @@
 {
   "id": 2226,
-  "name": "Feebas",
+  "name": "Alolan Grimer",
   "card_type": "pokemon",
-  "natdex_number": 349,
-  "element": "Water",
+  "natdex_number": 88,
+  "element": "Darkness",
   "stage": "Basic",
-  "hp": 30,
-  "retreat_cost": 1,
-  "weakness": "Lightning",
-  "flavor": "It is the shabbiest Pokémon of all. It forms schools and lives at the bottom of rivers that teem with plant life.",
+  "hp": 70,
+  "retreat_cost": 2,
+  "weakness": "Fighting",
+  "flavor": "There are a hundred or so of them living in Alola’s waste-disposal site. They’re all hard workers who eat a lot of trash.",
   "is_ex": false,
   "is_mega": false,
+  "variants": [
+    "Alolan"
+  ],
   "attacks": [
     {
-      "name": "Hide",
+      "name": "Poison Gas",
       "cost": [
-        "Water"
+        "Darkness"
       ],
       "damage": 0,
-      "effect": "Flip a coin. If heads, during your opponent's next turn, prevent all damage from—and effects of—attacks done to this Pokémon."
+      "effect": "Your opponent's Active Pokémon is now Poisoned."
     }
   ],
   "versions": [
     {
-      "set": "P-B",
+      "set": "P-A",
       "number": 72
     }
   ]

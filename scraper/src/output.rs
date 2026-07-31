@@ -26,8 +26,20 @@ fn pull_rates_dir(set_code: &str) -> PathBuf {
     data_dir().join("pull_rates").join(set_code)
 }
 
+/// Filesystem-safe slug for a pack subtitle: lowercased, with every run of
+/// non-alphanumeric characters collapsed to a single underscore
+/// ("Deluxe Pack: ex" → `deluxe_pack_ex`). Hyphens are kept as-is, since they
+/// are part of the name rather than a separator ("Ho-Oh" → `ho-oh`).
 fn pack_slug(subtitle: &str) -> String {
-    subtitle.to_lowercase().replace(' ', "_")
+    let mut slug = String::with_capacity(subtitle.len());
+    for c in subtitle.to_lowercase().chars() {
+        if c.is_alphanumeric() || c == '-' {
+            slug.push(c);
+        } else if !slug.ends_with('_') {
+            slug.push('_');
+        }
+    }
+    slug.trim_matches('_').to_string()
 }
 
 // ── Dir setup ─────────────────────────────────────────────────────────────────
