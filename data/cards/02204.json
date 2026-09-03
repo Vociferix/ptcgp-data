@@ -1,30 +1,30 @@
 {
   "id": 2204,
-  "name": "Smoliv",
+  "name": "Zebstrika",
   "card_type": "pokemon",
-  "natdex_number": 928,
-  "element": "Grass",
-  "stage": "Basic",
-  "hp": 60,
+  "natdex_number": 523,
+  "element": "Lightning",
+  "stage": "Stage 1",
+  "hp": 90,
   "retreat_cost": 1,
-  "weakness": "Fire",
-  "flavor": "This Pokémon converts nutrients into oil, which it stores in the fruit on its head. It can easily go a whole week without eating or drinking.",
+  "weakness": "Fighting",
+  "flavor": "Once the herd hears thunder, it chases after the storm clouds so that the Blitzle in the group can use the lightning to charge up.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Nutrients",
+      "name": "Zap Kick",
       "cost": [
-        "Grass"
+        "Lightning"
       ],
-      "damage": 0,
-      "effect": "Heal 20 damage from 1 of your Pokémon."
+      "damage": 50
     }
   ],
+  "evolves_from": "Blitzle",
   "versions": [
     {
-      "set": "P-B",
-      "number": 34
+      "set": "B4a",
+      "number": 23
     }
   ]
 }

@@ -1,30 +1,47 @@
 {
   "id": 2207,
-  "name": "Misdreavus",
+  "name": "Team Rocket’s Slowking ex",
   "card_type": "pokemon",
-  "natdex_number": 200,
+  "natdex_number": 199,
   "element": "Psychic",
-  "stage": "Basic",
-  "hp": 60,
-  "retreat_cost": 1,
+  "stage": "Stage 1",
+  "hp": 130,
+  "retreat_cost": 3,
   "weakness": "Darkness",
-  "flavor": "This Pokémon startles people in the middle of the night. It gathers fear as its energy.",
-  "is_ex": false,
+  "is_ex": true,
   "is_mega": false,
+  "variants": [
+    "Team Rocket’s"
+  ],
+  "ability": {
+    "name": "Evil Inspiration",
+    "effect": "Once during your turn, if this Pokémon is in the Active Spot, you may draw a card."
+  },
   "attacks": [
     {
-      "name": "Confuse Ray",
+      "name": "Hand Kinesis",
       "cost": [
-        "Psychic"
+        "Psychic",
+        "Colorless"
       ],
-      "damage": 0,
-      "effect": "Your opponent's Active Pokémon is now Confused."
+      "damage": 20,
+      "damage_suffix": "x",
+      "effect": "This attack does 20 damage for each card in your hand."
     }
   ],
+  "evolves_from": "Team Rocket’s Slowpoke",
   "versions": [
     {
-      "set": "P-A",
-      "number": 38
+      "set": "B4a",
+      "number": 26
+    },
+    {
+      "set": "B4a",
+      "number": 82
+    },
+    {
+      "set": "B4a",
+      "number": 91
     }
   ]
 }

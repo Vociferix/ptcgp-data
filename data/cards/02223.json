@@ -1,31 +1,33 @@
 {
   "id": 2223,
-  "name": "Ceruledge ex",
+  "name": "Team Rocket’s Koffing",
   "card_type": "pokemon",
-  "natdex_number": 937,
-  "element": "Psychic",
-  "stage": "Stage 1",
-  "hp": 150,
-  "retreat_cost": 2,
-  "weakness": "Darkness",
-  "is_ex": true,
+  "natdex_number": 109,
+  "element": "Darkness",
+  "stage": "Basic",
+  "hp": 60,
+  "retreat_cost": 1,
+  "weakness": "Fighting",
+  "flavor": "The poisonous gases it contains are a little bit lighter than air. That’s why it’s always slightly airborne.",
+  "is_ex": false,
   "is_mega": false,
+  "variants": [
+    "Team Rocket’s"
+  ],
   "attacks": [
     {
-      "name": "Shimmering Slash",
+      "name": "Reverse Thrust",
       "cost": [
-        "Psychic",
-        "Colorless"
+        "Darkness"
       ],
-      "damage": 80,
-      "effect": "Discard a random Energy from among the Energy attached to all Pokémon (both yours and your opponent's)."
+      "damage": 10,
+      "effect": "Switch this Pokémon with 1 of your Benched Pokémon."
     }
   ],
-  "evolves_from": "Charcadet",
   "versions": [
     {
-      "set": "P-B",
-      "number": 66
+      "set": "B4a",
+      "number": 42
     }
   ]
 }

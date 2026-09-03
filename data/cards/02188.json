@@ -1,13 +1,51 @@
 {
   "id": 2188,
-  "name": "Red Card",
-  "card_type": "trainer",
-  "trainer_kind": "Item",
-  "trainer_effect": "Your opponent shuffles their hand into their deck and draws 3 cards.",
+  "name": "Team Rocket’s Moltres ex",
+  "card_type": "pokemon",
+  "natdex_number": 146,
+  "element": "Fire",
+  "stage": "Basic",
+  "hp": 130,
+  "retreat_cost": 2,
+  "weakness": "Water",
+  "is_ex": true,
+  "is_mega": false,
+  "variants": [
+    "Team Rocket’s"
+  ],
+  "attacks": [
+    {
+      "name": "Heat Charged",
+      "cost": [
+        "Fire"
+      ],
+      "damage": 0,
+      "effect": "Flip 3 coins. For each heads, produce a [R] Energy from your Energy Zone and attach it to this Pokémon."
+    },
+    {
+      "name": "Netherwing",
+      "cost": [
+        "Fire",
+        "Fire",
+        "Fire",
+        "Colorless"
+      ],
+      "damage": 130,
+      "effect": "Discard a [R] Energy from this Pokémon."
+    }
+  ],
   "versions": [
     {
-      "set": "P-A",
-      "number": 6
+      "set": "B4a",
+      "number": 7
+    },
+    {
+      "set": "B4a",
+      "number": 79
+    },
+    {
+      "set": "B4a",
+      "number": 88
     }
   ]
 }

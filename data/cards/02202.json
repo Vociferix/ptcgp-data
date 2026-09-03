@@ -1,33 +1,50 @@
 {
   "id": 2202,
-  "name": "Mega Medicham ex",
+  "name": "Team Rocket’s Zapdos ex",
   "card_type": "pokemon",
-  "natdex_number": 308,
-  "element": "Fighting",
-  "stage": "Stage 1",
-  "hp": 180,
+  "natdex_number": 145,
+  "element": "Lightning",
+  "stage": "Basic",
+  "hp": 120,
   "retreat_cost": 1,
-  "weakness": "Psychic",
+  "weakness": "Fighting",
   "is_ex": true,
-  "is_mega": true,
+  "is_mega": false,
+  "variants": [
+    "Team Rocket’s"
+  ],
   "attacks": [
     {
-      "name": "Chakra Fist",
+      "name": "Electro Ball",
       "cost": [
-        "Fighting",
-        "Colorless",
+        "Lightning",
         "Colorless"
       ],
-      "damage": 100,
-      "damage_suffix": "+",
-      "effect": "If this Pokémon has any [P] Energy attached, this attack does 40 more damage. This attack's damage isn't affected by any effects on your opponent's Active Pokémon."
+      "damage": 40
+    },
+    {
+      "name": "Thunderclaw",
+      "cost": [
+        "Lightning",
+        "Lightning",
+        "Colorless"
+      ],
+      "damage": 90,
+      "effect": "This attack also does 50 damage to 1 of your opponent’s Benched Pokémon that has damage on it."
     }
   ],
-  "evolves_from": "Meditite",
   "versions": [
     {
-      "set": "P-B",
-      "number": 29
+      "set": "B4a",
+      "number": 21
+    },
+    {
+      "set": "B4a",
+      "number": 81
+    },
+    {
+      "set": "B4a",
+      "number": 90
     }
   ]
 }

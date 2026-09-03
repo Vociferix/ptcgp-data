@@ -12,8 +12,8 @@ use anyhow::Result;
 use clap::{Parser, Subcommand};
 use futures::stream::{self, StreamExt};
 use models::{
-    Ability, AbstractCard, CardEntry, CardSource, CardVersion, ElementInfo, LimitlessCardData,
-    PackVariantName, RarityInfo, SetSummary, VersionRef,
+    canonicalize_apostrophes, Ability, AbstractCard, CardEntry, CardSource, CardVersion,
+    ElementInfo, LimitlessCardData, PackVariantName, RarityInfo, SetSummary, VersionRef,
 };
 use serde_json::Value;
 use tracing::{error, info, warn};
@@ -96,6 +96,9 @@ enum Command {
         /// Log constraint violations as warnings instead of failing
         #[arg(long)]
         lenient: bool,
+        /// Omit cards Limitless has no page for yet (ignored with --set)
+        #[arg(long)]
+        skip_incomplete: bool,
     },
 
     /// Fetch pull rate data from RaenonX for each regular pack
@@ -104,6 +107,9 @@ enum Command {
         pack: Option<String>,
         #[arg(long)]
         force: bool,
+        /// Omit cards with no card_version file (see `cards --skip-incomplete`)
+        #[arg(long)]
+        skip_incomplete: bool,
     },
 
     /// Fetch all Pokémon species names and national dex numbers from PokéAPI
@@ -116,6 +122,9 @@ enum Command {
         /// Log constraint violations as warnings instead of failing
         #[arg(long)]
         lenient: bool,
+        /// Omit cards Limitless has no page for yet
+        #[arg(long)]
+        skip_incomplete: bool,
     },
 }
 
@@ -141,11 +150,18 @@ async fn main() -> Result<()> {
             set,
             force,
             lenient,
-        } => cmd_cards(&client, set.as_deref(), force, lenient).await?,
-        Command::PullRates { pack, force } => {
-            cmd_pull_rates(&client, pack.as_deref(), force).await?
-        }
-        Command::All { force, lenient } => {
+            skip_incomplete,
+        } => cmd_cards(&client, set.as_deref(), force, lenient, skip_incomplete).await?,
+        Command::PullRates {
+            pack,
+            force,
+            skip_incomplete,
+        } => cmd_pull_rates(&client, pack.as_deref(), force, skip_incomplete).await?,
+        Command::All {
+            force,
+            lenient,
+            skip_incomplete,
+        } => {
             let raw = raenonx::fetch_global_master(&client).await?;
             write_reference_data(&raw)?;
             let pack_names = fetch_pack_names(&client, &raw).await;
@@ -161,8 +177,17 @@ async fn main() -> Result<()> {
             )
             .await?;
             cmd_base_pokemon(&client).await?;
-            run_cards(&client, &raw, &pack_names, None, force, lenient).await?;
-            run_pull_rates(&client, &raw, &pack_names, None, force).await?;
+            run_cards(
+                &client,
+                &raw,
+                &pack_names,
+                None,
+                force,
+                lenient,
+                skip_incomplete,
+            )
+            .await?;
+            run_pull_rates(&client, &raw, &pack_names, None, force, skip_incomplete).await?;
         }
     }
 
@@ -399,10 +424,20 @@ async fn cmd_cards(
     filter_set: Option<&str>,
     force: bool,
     lenient: bool,
+    skip_incomplete: bool,
 ) -> Result<()> {
     let raw = raenonx::fetch_global_master(client).await?;
     let pack_names = fetch_pack_names(client, &raw).await;
-    run_cards(client, &raw, &pack_names, filter_set, force, lenient).await
+    run_cards(
+        client,
+        &raw,
+        &pack_names,
+        filter_set,
+        force,
+        lenient,
+        skip_incomplete,
+    )
+    .await
 }
 
 async fn run_cards(
@@ -412,18 +447,17 @@ async fn run_cards(
     filter_set: Option<&str>,
     force: bool,
     lenient: bool,
+    skip_incomplete: bool,
 ) -> Result<()> {
     let mut violations = Violations::new(lenient);
-    let card_entries = raenonx::parse_card_entries(raw)?;
+    let mut card_entries = raenonx::parse_card_entries(raw)?;
     let promo_subtitles = raenonx::parse_promo_pack_subtitles(raw);
 
     let pokemon_map: HashMap<String, u32> = if output::base_pokemon_exists() {
         output::load_base_pokemon()
             .unwrap_or_default()
             .into_iter()
-            // Normalize curly apostrophe (U+2019) to straight (U+0027) so that
-            // "Farfetch’d" from PokeAPI matches "Farfetch'd" from Limitless.
-            .map(|bp| (bp.name.replace('\u{2019}', "'"), bp.natdex_number))
+            .map(|bp| (canonicalize_apostrophes(&bp.name), bp.natdex_number))
             .collect()
     } else {
         warn!("base_pokemon.json not found — run `base-pokemon` first for natdex numbers");
@@ -457,6 +491,69 @@ async fn run_cards(
     // Build pack_id → set code mapping (used to scope source.pack IDs to the card's own set)
     let pack_expansion = raenonx::parse_pack_expansion(raw);
 
+    // Filter sets to scrape
+    let sets_to_scrape: Vec<&SetSummary> = all_sets
+        .iter()
+        .filter(|s| filter_set.is_none_or(|f| s.code == f))
+        .collect();
+
+    if sets_to_scrape.is_empty() {
+        anyhow::bail!("no matching sets found");
+    }
+
+    // ── Card number lists from Limitless ──────────────────────────────────────
+    //
+    // Fetched before grouping because --skip-incomplete drops versions from the
+    // entries, and abstract IDs are assigned from whatever groups survive.
+    let mut set_numbers: HashMap<String, Vec<u32>> = HashMap::new();
+    for set in &sets_to_scrape {
+        match limitless::scrape_card_numbers(client, &set.code).await {
+            Ok(numbers) => {
+                set_numbers.insert(set.code.clone(), numbers);
+            }
+            Err(e) => error!(set = set.code, "failed to get card numbers: {e}"),
+        }
+    }
+
+    // RaenonX lists cards Limitless has not published a page for yet (e.g. P-B 87+
+    // at the time of writing). Their versions have no card_version file, so an
+    // abstract card referencing one dangles. Drop those versions, and any card
+    // left with none.
+    //
+    // Dropping a card renumbers the abstract IDs that card_versions embed, so this
+    // half of --skip-incomplete needs a full run; the reverse gap (a Limitless page
+    // RaenonX has no entry for) is handled in the fetch loop and is always safe.
+    if skip_incomplete {
+        if filter_set.is_some() {
+            warn!("--skip-incomplete: skipping cards RaenonX has no entry for, but dropping versions Limitless lacks needs a full run, not --set");
+        } else {
+            let available: HashSet<(String, u32)> = set_numbers
+                .iter()
+                .flat_map(|(set, nums)| nums.iter().map(|n| (set.clone(), *n)))
+                .collect();
+            let mut dropped_versions = 0usize;
+            for entry in &mut card_entries {
+                entry.collection_nums.retain(|(set, num)| {
+                    // A set whose list failed to fetch is left alone — a missing
+                    // list is not evidence that its cards are missing.
+                    let keep =
+                        !set_numbers.contains_key(set) || available.contains(&(set.clone(), *num));
+                    if !keep {
+                        dropped_versions += 1;
+                    }
+                    keep
+                });
+            }
+            let before = card_entries.len();
+            card_entries.retain(|e| !e.collection_nums.is_empty());
+            info!(
+                versions = dropped_versions,
+                cards = before - card_entries.len(),
+                "dropped versions Limitless has no page for"
+            );
+        }
+    }
+
     // Build abstract card groups (regardless of set filter, since abstracts span sets)
     let groups = build_abstract_groups(&card_entries, &release_dates);
 
@@ -484,33 +581,27 @@ async fn run_cards(
         HashSet::new()
     };
 
-    // Filter sets to scrape
-    let sets_to_scrape: Vec<&SetSummary> = all_sets
-        .iter()
-        .filter(|s| filter_set.is_none_or(|f| s.code == f))
-        .collect();
-
-    if sets_to_scrape.is_empty() {
-        anyhow::bail!("no matching sets found");
-    }
-
     // ── Fetch cards from Limitless ────────────────────────────────────────────
 
     let mut all_card_data: HashMap<(String, u32), LimitlessCardData> = HashMap::new();
 
     for set in &sets_to_scrape {
-        let numbers = match limitless::scrape_card_numbers(client, &set.code).await {
-            Ok(n) => n,
-            Err(e) => {
-                error!(set = set.code, "failed to get card numbers: {e}");
-                continue;
-            }
+        let Some(numbers) = set_numbers.get(&set.code) else {
+            continue;
         };
 
         let to_fetch: Vec<u32> = numbers
-            .into_iter()
+            .iter()
+            .copied()
             .filter(|&n| {
                 let key = (set.code.clone(), n);
+                // The reverse gap: Limitless publishes a page RaenonX has no entry
+                // for. There is no abstract card to hang the version on, so it is
+                // dropped either way — but by default that is reported as a
+                // violation, which fails a strict run.
+                if skip_incomplete && !version_to_abstract.contains_key(&key) {
+                    return false;
+                }
                 let need_version = force || !output::card_version_file_exists(&set.code, n);
                 let need_abstract_data = canonicals_needing_data.contains(&key);
                 need_version || need_abstract_data
@@ -644,6 +735,12 @@ async fn run_cards(
             }
         }
 
+        match output::remove_abstract_cards_above(groups.len() as u32) {
+            Ok(0) => {}
+            Ok(n) => info!(removed = n, "stale abstract cards deleted"),
+            Err(e) => error!("stale abstract card cleanup failed: {e}"),
+        }
+
         info!(
             written,
             updated,
@@ -719,10 +816,19 @@ async fn cmd_pull_rates(
     client: &Arc<client::Client>,
     filter_pack: Option<&str>,
     force: bool,
+    skip_incomplete: bool,
 ) -> Result<()> {
     let raw = raenonx::fetch_global_master(client).await?;
     let pack_names = fetch_pack_names(client, &raw).await;
-    run_pull_rates(client, &raw, &pack_names, filter_pack, force).await
+    run_pull_rates(
+        client,
+        &raw,
+        &pack_names,
+        filter_pack,
+        force,
+        skip_incomplete,
+    )
+    .await
 }
 
 async fn run_pull_rates(
@@ -731,6 +837,7 @@ async fn run_pull_rates(
     pack_names: &HashMap<String, String>,
     filter_pack: Option<&str>,
     force: bool,
+    skip_incomplete: bool,
 ) -> Result<()> {
     let regular_packs = raenonx::parse_regular_packs(raw);
     let pack_expansion = raenonx::parse_pack_expansion(raw);
@@ -744,7 +851,15 @@ async fn run_pull_rates(
     let mut card_id_to_rarity: HashMap<String, String> = HashMap::new();
     let mut card_id_to_is_foil: HashMap<String, bool> = HashMap::new();
     for entry in &card_entries {
-        card_id_to_versions.insert(entry.card_id.clone(), entry.collection_nums.clone());
+        // `cards --skip-incomplete` drops versions with no card_version file; a
+        // pull rate naming one would point at a card that was never written.
+        let versions: Vec<(String, u32)> = entry
+            .collection_nums
+            .iter()
+            .filter(|(set, num)| !skip_incomplete || output::card_version_file_exists(set, *num))
+            .cloned()
+            .collect();
+        card_id_to_versions.insert(entry.card_id.clone(), versions);
         card_id_to_rarity.insert(entry.card_id.clone(), entry.rarity.clone());
         card_id_to_is_foil.insert(entry.card_id.clone(), entry.is_foil);
     }
@@ -1208,10 +1323,17 @@ fn remap_pull_rate_card_ids(
             .iter()
             .filter_map(|(raenonx_id, slots)| {
                 let versions = card_id_to_versions.get(raenonx_id)?;
-                let (_ver_set, ver_num) = versions
-                    .iter()
-                    .find(|(s, _)| *s == set_code)
-                    .or_else(|| versions.first())?;
+                // The key is a card number within this pack's set, so only a
+                // version from that set can supply it. Borrowing another set's
+                // number would point the rate at an unrelated card.
+                let (_, ver_num) = versions.iter().find(|(s, _)| *s == set_code).or_else(|| {
+                    warn!(
+                        set = set_code,
+                        card = raenonx_id,
+                        "pull rate card has no version in this set — dropped"
+                    );
+                    None
+                })?;
                 Some((format!("{ver_num:03}"), slots.clone()))
             })
             .collect();
@@ -1341,7 +1463,7 @@ fn collect_card_names() -> Result<HashSet<String>> {
         if path.extension().is_some_and(|e| e == "json") {
             if let Ok(text) = std::fs::read_to_string(&path) {
                 if let Ok(card) = serde_json::from_str::<AbstractCard>(&text) {
-                    names.insert(card.name);
+                    names.insert(canonicalize_apostrophes(&card.name));
                 }
             }
         }
@@ -1421,7 +1543,9 @@ fn validate_pokemon_card(
         }
     }
     if let Some(from) = &card.evolves_from {
-        if !known_card_names.is_empty() && !known_card_names.contains(from) {
+        if !known_card_names.is_empty()
+            && !known_card_names.contains(&canonicalize_apostrophes(from))
+        {
             v.add(format!(
                 "pokemon {name}: evolves_from '{from}' is not a known card name"
             ));

@@ -1,35 +1,34 @@
 {
   "id": 2230,
-  "name": "Dusk Mane Necrozma",
+  "name": "Team Rocket’s Tinkatuff",
   "card_type": "pokemon",
-  "natdex_number": 800,
+  "natdex_number": 958,
   "element": "Metal",
-  "stage": "Basic",
-  "hp": 110,
+  "stage": "Stage 1",
+  "hp": 80,
   "retreat_cost": 2,
   "weakness": "Fire",
-  "flavor": "This is its form while it is devouring the light of Solgaleo. It pounces on foes and then slashes them with the claws on its four limbs and back.",
+  "flavor": "These Pokémon make their homes in piles of scrap metal. They test the strength of each other’s hammers by smashing them together.",
   "is_ex": false,
   "is_mega": false,
   "variants": [
-    "Dusk Mane"
+    "Team Rocket’s"
   ],
   "attacks": [
     {
-      "name": "Black Metal",
+      "name": "Corkscrew Punch",
       "cost": [
         "Metal",
-        "Colorless",
         "Colorless"
       ],
-      "damage": 100,
-      "effect": "Discard a [M] Energy from this Pokémon."
+      "damage": 50
     }
   ],
+  "evolves_from": "Team Rocket’s Tinkatink",
   "versions": [
     {
-      "set": "P-A",
-      "number": 79
+      "set": "B4a",
+      "number": 49
     }
   ]
 }

@@ -1,32 +1,32 @@
 {
   "id": 2189,
-  "name": "Mega Pidgeot ex",
+  "name": "Team Rocket’s Houndour",
   "card_type": "pokemon",
-  "natdex_number": 18,
-  "element": "Colorless",
-  "stage": "Stage 2",
-  "hp": 210,
-  "retreat_cost": 2,
-  "weakness": "Lightning",
-  "is_ex": true,
-  "is_mega": true,
+  "natdex_number": 228,
+  "element": "Fire",
+  "stage": "Basic",
+  "hp": 60,
+  "retreat_cost": 1,
+  "weakness": "Water",
+  "flavor": "It uses different kinds of cries for communicating with others of its kind and for pursuing its prey.",
+  "is_ex": false,
+  "is_mega": false,
+  "variants": [
+    "Team Rocket’s"
+  ],
   "attacks": [
     {
-      "name": "Giant Twister",
+      "name": "Live Coal",
       "cost": [
-        "Colorless",
-        "Colorless",
-        "Colorless"
+        "Fire"
       ],
-      "damage": 100,
-      "effect": "Flip 3 coins. For each heads, discard a random Energy from your opponent's Active Pokémon. If all of them are tails, this attack does nothing."
+      "damage": 20
     }
   ],
-  "evolves_from": "Pidgeotto",
   "versions": [
     {
-      "set": "P-B",
-      "number": 6
+      "set": "B4a",
+      "number": 8
     }
   ]
 }

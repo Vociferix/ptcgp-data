@@ -1,32 +1,31 @@
 {
   "id": 2213,
-  "name": "Zygarde",
+  "name": "Meowstic",
   "card_type": "pokemon",
-  "natdex_number": 718,
-  "element": "Fighting",
-  "stage": "Basic",
-  "hp": 120,
-  "retreat_cost": 2,
-  "weakness": "Grass",
-  "flavor": "Some say it can change to an even more powerful form when battling those who threaten the ecosystem.",
+  "natdex_number": 678,
+  "element": "Psychic",
+  "stage": "Stage 1",
+  "hp": 90,
+  "retreat_cost": 1,
+  "weakness": "Darkness",
+  "flavor": "When they sense danger, they exert their psychic power at its maximum output. They have no regard for their opponents.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Cell Storm",
+      "name": "Super Psy Bolt",
       "cost": [
-        "Fighting",
-        "Fighting",
-        "Colorless"
+        "Psychic",
+        "Psychic"
       ],
-      "damage": 60,
-      "effect": "Heal 20 damage from this Pokémon."
+      "damage": 70
     }
   ],
+  "evolves_from": "Espurr",
   "versions": [
     {
-      "set": "P-B",
-      "number": 52
+      "set": "B4a",
+      "number": 32
     }
   ]
 }

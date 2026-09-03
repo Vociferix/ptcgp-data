@@ -1,31 +1,32 @@
 {
   "id": 2210,
-  "name": "Nosepass",
+  "name": "Team Rocket’s Mr. Mime",
   "card_type": "pokemon",
-  "natdex_number": 299,
-  "element": "Fighting",
+  "natdex_number": 122,
+  "element": "Psychic",
   "stage": "Basic",
   "hp": 60,
   "retreat_cost": 1,
-  "weakness": "Grass",
-  "flavor": "It moves less than an inch a year, but when it’s in a jam, it will spin and drill down into the ground in a split second.",
+  "weakness": "Darkness",
+  "flavor": "It’s known for its top-notch pantomime skills. It protects itself from all sorts of attacks by emitting auras from its fingers to create walls.",
   "is_ex": false,
   "is_mega": false,
+  "variants": [
+    "Team Rocket’s"
+  ],
   "attacks": [
     {
-      "name": "Iron Defense",
+      "name": "Slap Push",
       "cost": [
-        "Colorless",
-        "Colorless"
+        "Psychic"
       ],
-      "damage": 0,
-      "effect": "Flip a coin. If heads, during your opponent's next turn, prevent all damage done to this Pokémon by attacks."
+      "damage": 40
     }
   ],
   "versions": [
     {
-      "set": "P-A",
-      "number": 45
+      "set": "B4a",
+      "number": 29
     }
   ]
 }

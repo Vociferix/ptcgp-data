@@ -1,32 +1,31 @@
 {
   "id": 2197,
-  "name": "Hawlucha",
+  "name": "Pelipper",
   "card_type": "pokemon",
-  "natdex_number": 701,
-  "element": "Fighting",
-  "stage": "Basic",
-  "hp": 70,
-  "retreat_cost": 1,
+  "natdex_number": 279,
+  "element": "Water",
+  "stage": "Stage 1",
+  "hp": 110,
+  "retreat_cost": 2,
   "weakness": "Lightning",
-  "flavor": "Hawlucha live quietly without flocking together. They fight constantly with their natural enemies: noisy groups of Primeape.",
+  "flavor": "It protects its young in its beak. It bobs on waves, resting on them on days when the waters are calm.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Aerial Ace",
+      "name": "Wing Attack",
       "cost": [
         "Colorless",
         "Colorless"
       ],
-      "damage": 40,
-      "damage_suffix": "+",
-      "effect": "Flip a coin. If heads, this attack does 30 more damage."
+      "damage": 60
     }
   ],
+  "evolves_from": "Wingull",
   "versions": [
     {
-      "set": "P-B",
-      "number": 22
+      "set": "B4a",
+      "number": 16
     }
   ]
 }

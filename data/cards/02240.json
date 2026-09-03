@@ -1,32 +1,45 @@
 {
   "id": 2240,
-  "name": "Tropius",
+  "name": "Team Rocket’s Raticate ex",
   "card_type": "pokemon",
-  "natdex_number": 357,
-  "element": "Grass",
-  "stage": "Basic",
-  "hp": 100,
-  "retreat_cost": 2,
-  "weakness": "Fire",
-  "flavor": "It lives in tropical jungles. The bunch of fruit around its neck is delicious. The fruit grows twice a year.",
-  "is_ex": false,
+  "natdex_number": 20,
+  "element": "Colorless",
+  "stage": "Stage 1",
+  "hp": 120,
+  "retreat_cost": 0,
+  "weakness": "Fighting",
+  "is_ex": true,
   "is_mega": false,
+  "variants": [
+    "Team Rocket’s"
+  ],
+  "ability": {
+    "name": "Thieving Incisors",
+    "effect": "Once during your turn, when you play this Pokémon from your hand to evolve 1 of your Pokémon, you may move a random Energy from your opponent’s Active Pokémon to this Pokémon."
+  },
   "attacks": [
     {
-      "name": "Double Smash",
+      "name": "Boost Dash",
       "cost": [
         "Colorless",
         "Colorless"
       ],
-      "damage": 40,
-      "damage_suffix": "x",
-      "effect": "Flip 2 coins. This attack does 40 damage for each heads."
+      "damage": 70
     }
   ],
+  "evolves_from": "Team Rocket’s Rattata",
   "versions": [
     {
-      "set": "P-A",
-      "number": 102
+      "set": "B4a",
+      "number": 59
+    },
+    {
+      "set": "B4a",
+      "number": 84
+    },
+    {
+      "set": "B4a",
+      "number": 93
     }
   ]
 }

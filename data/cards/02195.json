@@ -1,32 +1,50 @@
 {
   "id": 2195,
-  "name": "Onix",
+  "name": "Team Rocket’s Articuno ex",
   "card_type": "pokemon",
-  "natdex_number": 95,
-  "element": "Fighting",
+  "natdex_number": 144,
+  "element": "Water",
   "stage": "Basic",
-  "hp": 100,
-  "retreat_cost": 3,
-  "weakness": "Grass",
-  "flavor": "It rapidly bores through the ground at 50 mph by squirming and twisting its massive, rugged body.",
-  "is_ex": false,
+  "hp": 130,
+  "retreat_cost": 2,
+  "weakness": "Metal",
+  "is_ex": true,
   "is_mega": false,
+  "variants": [
+    "Team Rocket’s"
+  ],
   "attacks": [
     {
-      "name": "Tail Smash",
+      "name": "Ice Wing",
       "cost": [
-        "Colorless",
-        "Colorless",
+        "Water",
         "Colorless"
       ],
-      "damage": 90,
-      "effect": "Flip a coin. If tails, this attack does nothing."
+      "damage": 40
+    },
+    {
+      "name": "Hailstorm",
+      "cost": [
+        "Water",
+        "Water",
+        "Colorless"
+      ],
+      "damage": 130,
+      "effect": "This attack also does 20 damage to each of your Benched Pokémon."
     }
   ],
   "versions": [
     {
-      "set": "P-B",
-      "number": 21
+      "set": "B4a",
+      "number": 14
+    },
+    {
+      "set": "B4a",
+      "number": 80
+    },
+    {
+      "set": "B4a",
+      "number": 89
     }
   ]
 }

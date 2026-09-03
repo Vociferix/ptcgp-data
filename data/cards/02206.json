@@ -1,30 +1,33 @@
 {
   "id": 2206,
-  "name": "Frigibax",
+  "name": "Team Rocket’s Slowpoke",
   "card_type": "pokemon",
-  "natdex_number": 996,
-  "element": "Water",
+  "natdex_number": 79,
+  "element": "Psychic",
   "stage": "Basic",
-  "hp": 60,
-  "retreat_cost": 1,
-  "weakness": "Metal",
-  "flavor": "This Pokémon lives in forests and craggy areas. Using the power of its dorsal fin, it cools the inside of its nest like a refrigerator.",
+  "hp": 80,
+  "retreat_cost": 2,
+  "weakness": "Darkness",
+  "flavor": "It is always vacantly lost in thought, but no one knows what it is thinking about. It is good at fishing with its tail.",
   "is_ex": false,
   "is_mega": false,
+  "variants": [
+    "Team Rocket’s"
+  ],
   "attacks": [
     {
-      "name": "Stiffen",
+      "name": "Scavenge",
       "cost": [
-        "Water"
+        "Psychic"
       ],
       "damage": 0,
-      "effect": "During your opponent's next turn, this Pokémon takes −20 damage from attacks."
+      "effect": "Put a random Item card from your discard pile into your hand."
     }
   ],
   "versions": [
     {
-      "set": "P-B",
-      "number": 37
+      "set": "B4a",
+      "number": 25
     }
   ]
 }

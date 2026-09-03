@@ -1,34 +1,32 @@
 {
   "id": 2228,
-  "name": "Quagsire",
+  "name": "Copperajah",
   "card_type": "pokemon",
-  "natdex_number": 195,
-  "element": "Fighting",
+  "natdex_number": 879,
+  "element": "Metal",
   "stage": "Stage 1",
-  "hp": 120,
-  "retreat_cost": 3,
-  "weakness": "Grass",
-  "flavor": "Due to its relaxed and carefree attitude, it often bumps its head on riverbed boulders and boat hulls as it swims.",
+  "hp": 160,
+  "retreat_cost": 4,
+  "weakness": "Fire",
+  "flavor": "Copperajah are prideful, cantankerous Pokémon. Specimens with vibrant green skin command the respect of others of their kind.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Energy Press",
+      "name": "Heavy Impact",
       "cost": [
-        "Fighting",
-        "Colorless",
+        "Metal",
+        "Metal",
         "Colorless"
       ],
-      "damage": 40,
-      "damage_suffix": "+",
-      "effect": "This attack does 30 more damage for each Energy attached to your opponent's Active Pokémon."
+      "damage": 80
     }
   ],
-  "evolves_from": "Wooper",
+  "evolves_from": "Cufant",
   "versions": [
     {
-      "set": "P-B",
-      "number": 75
+      "set": "B4a",
+      "number": 47
     }
   ]
 }

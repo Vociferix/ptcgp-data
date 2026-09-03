@@ -3,6 +3,33 @@ use std::collections::HashMap;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
+// ── Text normalization ───────────────────────────────────────────────────────
+
+/// The apostrophe the game uses (U+2019 RIGHT SINGLE QUOTATION MARK).
+pub const APOSTROPHE: char = '\u{2019}';
+
+/// Rewrite every apostrophe-like character to `APOSTROPHE`.
+///
+/// Sources — and even a single source — disagree on which apostrophe they use:
+/// Limitless emits ASCII `'` in the `card-text-name` span of "Team Rocket's Arbok"
+/// but U+2019 in the evolves-from link to "Team Rocket’s Ekans". Names are joined
+/// across sources (evolves_from → card name, card name → PokeAPI species, RaenonX
+/// pack name → Limitless pack label), so they must be canonicalized before being
+/// compared or used as lookup keys. Prose gets the same treatment so that a card
+/// named inside another card's effect text matches the card's own name.
+pub fn canonicalize_apostrophes(text: &str) -> String {
+    text.chars().map(canonical_apostrophe).collect()
+}
+
+/// Character-level form of [`canonicalize_apostrophes`], for callers already
+/// walking a string character by character.
+pub fn canonical_apostrophe(c: char) -> char {
+    match c {
+        '\'' | '`' | '\u{00B4}' | '\u{02BC}' | '\u{2018}' | '\u{2032}' => APOSTROPHE,
+        other => other,
+    }
+}
+
 // ── Set metadata ──────────────────────────────────────────────────────────────
 
 /// Availability window for a set — null for promo sets.

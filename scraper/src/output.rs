@@ -108,6 +108,34 @@ pub fn write_abstract_card(card: &AbstractCard) -> Result<()> {
     write_json(&abstract_cards_dir().join(filename), card)
 }
 
+/// Delete data/cards files whose ID exceeds `max_id`.
+///
+/// Abstract IDs are assigned contiguously from 1, so when a run produces fewer
+/// cards than the last one, the surplus files are stale. They have to go: the
+/// validation pass and `collect_card_names` read the whole directory, so a
+/// leftover would keep reporting violations for a card that no longer exists.
+pub fn remove_abstract_cards_above(max_id: u32) -> Result<usize> {
+    let dir = abstract_cards_dir();
+    if !dir.exists() {
+        return Ok(0);
+    }
+    let mut removed = 0;
+    for entry in std::fs::read_dir(&dir)? {
+        let path = entry?.path();
+        if path.extension().is_some_and(|e| e == "json") {
+            let id = path
+                .file_stem()
+                .and_then(|s| s.to_str())
+                .and_then(|s| s.parse::<u32>().ok());
+            if id.is_some_and(|id| id > max_id) {
+                std::fs::remove_file(&path)?;
+                removed += 1;
+            }
+        }
+    }
+    Ok(removed)
+}
+
 /// Write data/pull_rates/{SET}/{subtitle_slug}.json
 pub fn write_pull_rates(rates: &PackPullRates) -> Result<()> {
     ensure_pull_rates_dir(&rates.set)?;

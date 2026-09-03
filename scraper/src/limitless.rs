@@ -3,7 +3,10 @@ use scraper::{Html, Selector};
 use tracing::warn;
 
 use crate::client::Client;
-use crate::models::{Ability, Attack, Availability, LimitlessCardData, SetSummary};
+use crate::models::{
+    canonical_apostrophe, canonicalize_apostrophes, Ability, Attack, Availability,
+    LimitlessCardData, SetSummary,
+};
 
 const BASE: &str = "https://pocket.limitlesstcg.com";
 
@@ -77,11 +80,13 @@ fn parse_sets_index(html: &str) -> Result<Vec<SetSummary>> {
             .unwrap_or_else(|| set_code.clone());
 
         let link_text = link.text().collect::<String>();
-        let name = link_text
-            .replace(&code, "")
-            .split_whitespace()
-            .collect::<Vec<_>>()
-            .join(" ");
+        let name = canonicalize_apostrophes(
+            &link_text
+                .replace(&code, "")
+                .split_whitespace()
+                .collect::<Vec<_>>()
+                .join(" "),
+        );
 
         let tds: Vec<_> = row.select(&td_sel).collect();
 
@@ -144,12 +149,13 @@ fn parse_set_packs(html: &str) -> Vec<String> {
         // "" is the "All cards" button and "0" is the "Shared" pseudo-pack.
         .filter(|el| !matches!(el.value().attr("data-value"), None | Some("") | Some("0")))
         .map(|el| {
-            let label = el
-                .text()
-                .collect::<String>()
-                .split_whitespace()
-                .collect::<Vec<_>>()
-                .join(" ");
+            let label = canonicalize_apostrophes(
+                &el.text()
+                    .collect::<String>()
+                    .split_whitespace()
+                    .collect::<Vec<_>>()
+                    .join(" "),
+            );
             label.strip_suffix(" pack").unwrap_or(&label).to_string()
         })
         .filter(|s| !s.is_empty())
@@ -158,21 +164,25 @@ fn parse_set_packs(html: &str) -> Vec<String> {
 
 // ── Individual card parser ───────────────────────────────────────────────────
 
-/// Insert spaces at lowercase→uppercase boundaries.
+/// Normalize a string scraped from Limitless: insert spaces at lowercase→uppercase
+/// boundaries, then canonicalize apostrophes.
 ///
 /// Limitless occasionally publishes card text with a word separator missing,
 /// e.g. "Teal MaskOgerpon" or "GalarianZigzagoon" in B4. A lowercase→uppercase
 /// transition is never legitimate within a card's text, so splitting there
 /// recovers the intended wording. Runs of capitals ("HP", "ex") and
 /// digit→capital boundaries ("90HP") are left alone.
-fn fix_missing_spaces(text: &str) -> String {
+///
+/// Limitless is inconsistent about apostrophes even within one page, so every
+/// string it yields is canonicalized here rather than at each use site.
+fn clean_text(text: &str) -> String {
     let mut out = String::with_capacity(text.len() + 1);
     let mut prev_lower = false;
     for c in text.chars() {
         if prev_lower && c.is_uppercase() {
             out.push(' ');
         }
-        out.push(c);
+        out.push(canonical_apostrophe(c));
         prev_lower = c.is_lowercase();
     }
     out
@@ -185,21 +195,21 @@ fn parse_card(html: &str, set_code: &str) -> Result<LimitlessCardData> {
     let name = doc
         .select(&name_sel)
         .next()
-        .map(|e| fix_missing_spaces(e.text().collect::<String>().trim()))
+        .map(|e| clean_text(e.text().collect::<String>().trim()))
         .unwrap_or_default();
 
     let title_sel = sel!("p.card-text-title");
     let title_text = doc
         .select(&title_sel)
         .next()
-        .map(|e| fix_missing_spaces(&e.text().collect::<String>()))
+        .map(|e| clean_text(&e.text().collect::<String>()))
         .unwrap_or_default();
 
     let type_sel = sel!("p.card-text-type");
     let type_text = doc
         .select(&type_sel)
         .next()
-        .map(|e| fix_missing_spaces(&e.text().collect::<String>()))
+        .map(|e| clean_text(&e.text().collect::<String>()))
         .unwrap_or_default();
 
     let (card_type, stage, trainer_kind) = parse_type_line(type_text.trim());
@@ -223,7 +233,7 @@ fn parse_card(html: &str, set_code: &str) -> Result<LimitlessCardData> {
     let flavor = doc
         .select(&flavor_sel)
         .next()
-        .map(|e| fix_missing_spaces(e.text().collect::<String>().trim()))
+        .map(|e| clean_text(e.text().collect::<String>().trim()))
         .filter(|s| !s.is_empty());
 
     let promo_label_sel = sel!("div.prints-current-details span:not(.text-lg)");
@@ -426,7 +436,7 @@ fn render_card_text(el: scraper::ElementRef) -> String {
             out.push_str(text);
         }
     }
-    fix_missing_spaces(&out.split_whitespace().collect::<Vec<_>>().join(" "))
+    clean_text(&out.split_whitespace().collect::<Vec<_>>().join(" "))
 }
 
 fn parse_attack(el: scraper::ElementRef) -> Option<Attack> {
@@ -453,7 +463,7 @@ fn parse_attack(el: scraper::ElementRef) -> Option<Attack> {
         .next()
         .map(|s| s.text().collect::<String>())
         .unwrap_or_default();
-    let info_text = fix_missing_spaces(&info.text().collect::<String>());
+    let info_text = clean_text(&info.text().collect::<String>());
     let name_dmg = match info_text.find(&symbol_text) {
         Some(pos) => info_text[pos + symbol_text.len()..].trim(),
         None => info_text.trim(),
@@ -481,7 +491,7 @@ fn parse_attack(el: scraper::ElementRef) -> Option<Attack> {
     let effect = el
         .select(&effect_sel)
         .next()
-        .map(|e| fix_missing_spaces(e.text().collect::<String>().trim()))
+        .map(|e| clean_text(e.text().collect::<String>().trim()))
         .filter(|s| !s.is_empty());
 
     Some(Attack {
@@ -501,7 +511,7 @@ fn parse_ability(el: scraper::ElementRef) -> Option<Ability> {
         .select(&info_sel)
         .next()
         .map(|e| {
-            let text = fix_missing_spaces(&e.text().collect::<String>());
+            let text = clean_text(&e.text().collect::<String>());
             text.split(':').nth(1).unwrap_or(&text).trim().to_string()
         })
         .filter(|s| !s.is_empty())?;
@@ -622,19 +632,22 @@ fn parse_series(code: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::fix_missing_spaces;
+    use super::clean_text;
 
     #[test]
     fn splits_only_at_lowercase_uppercase_boundaries() {
-        assert_eq!(fix_missing_spaces("Teal MaskOgerpon"), "Teal Mask Ogerpon");
-        assert_eq!(
-            fix_missing_spaces("GalarianZigzagoon"),
-            "Galarian Zigzagoon"
-        );
-        assert_eq!(fix_missing_spaces("Mega Venusaur ex"), "Mega Venusaur ex");
-        assert_eq!(
-            fix_missing_spaces("Ho-Oh - Fire - 90 HP"),
-            "Ho-Oh - Fire - 90 HP"
-        );
+        assert_eq!(clean_text("Teal MaskOgerpon"), "Teal Mask Ogerpon");
+        assert_eq!(clean_text("GalarianZigzagoon"), "Galarian Zigzagoon");
+        assert_eq!(clean_text("Mega Venusaur ex"), "Mega Venusaur ex");
+        assert_eq!(clean_text("Ho-Oh - Fire - 90 HP"), "Ho-Oh - Fire - 90 HP");
+    }
+
+    #[test]
+    fn canonicalizes_apostrophes() {
+        assert_eq!(clean_text("Team Rocket's Arbok"), "Team Rocket’s Arbok");
+        assert_eq!(clean_text("Team Rocket’s Arbok"), "Team Rocket’s Arbok");
+        assert_eq!(clean_text("Farfetch`d"), "Farfetch’d");
+        // Apostrophes must not suppress the missing-space fix around them.
+        assert_eq!(clean_text("Rocket'sArbok"), "Rocket’s Arbok");
     }
 }

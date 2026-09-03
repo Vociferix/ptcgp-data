@@ -1,36 +1,31 @@
 {
   "id": 2214,
-  "name": "Zygarde ex",
+  "name": "Oranguru",
   "card_type": "pokemon",
-  "natdex_number": 718,
-  "element": "Fighting",
+  "natdex_number": 765,
+  "element": "Psychic",
   "stage": "Basic",
-  "hp": 170,
-  "retreat_cost": 4,
-  "weakness": "Grass",
-  "is_ex": true,
+  "hp": 100,
+  "retreat_cost": 2,
+  "weakness": "Darkness",
+  "flavor": "This Pokémon lives quietly in the depths of the forest. The purple, cape-like fur gets longer and longer as Oranguru ages.",
+  "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Land Laser",
+      "name": "Punch and Draw",
       "cost": [
-        "Fighting",
-        "Fighting",
-        "Fighting"
+        "Psychic",
+        "Colorless"
       ],
-      "damage": 100,
-      "damage_suffix": "x",
-      "effect": "Flip 2 coins. This attack does 100 damage for each heads."
+      "damage": 40,
+      "effect": "Draw a card."
     }
   ],
   "versions": [
     {
-      "set": "P-B",
-      "number": 53
-    },
-    {
-      "set": "P-B",
-      "number": 55
+      "set": "B4a",
+      "number": 33
     }
   ]
 }

@@ -1,36 +1,33 @@
 {
   "id": 2221,
-  "name": "Rayquaza ex",
+  "name": "Team Rocket’s Grimer",
   "card_type": "pokemon",
-  "natdex_number": 384,
-  "element": "Colorless",
+  "natdex_number": 88,
+  "element": "Darkness",
   "stage": "Basic",
-  "hp": 140,
+  "hp": 60,
   "retreat_cost": 2,
-  "weakness": "Lightning",
-  "is_ex": true,
+  "weakness": "Fighting",
+  "flavor": "When two of these Pokémon’s bodies are combined together, new poisons are created.",
+  "is_ex": false,
   "is_mega": false,
+  "variants": [
+    "Team Rocket’s"
+  ],
   "attacks": [
     {
-      "name": "Draco Meteor",
+      "name": "Sludge",
       "cost": [
-        "Colorless",
-        "Colorless",
-        "Colorless",
-        "Colorless"
+        "Darkness"
       ],
-      "damage": 0,
-      "effect": "1 of your opponent's Pokémon is chosen at random 4 times. For each time a Pokémon was chosen, do 40 damage to it."
+      "damage": 20,
+      "effect": "Your opponent’s Active Pokémon is now Poisoned."
     }
   ],
   "versions": [
     {
-      "set": "P-A",
-      "number": 64
-    },
-    {
-      "set": "P-A",
-      "number": 65
+      "set": "B4a",
+      "number": 40
     }
   ]
 }

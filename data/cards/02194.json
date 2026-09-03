@@ -1,31 +1,35 @@
 {
   "id": 2194,
-  "name": "Haunter",
+  "name": "Team Rocket’s Lapras",
   "card_type": "pokemon",
-  "natdex_number": 93,
-  "element": "Psychic",
-  "stage": "Stage 1",
-  "hp": 70,
+  "natdex_number": 131,
+  "element": "Water",
+  "stage": "Basic",
+  "hp": 90,
   "retreat_cost": 1,
-  "weakness": "Darkness",
-  "flavor": "It likes to lurk in the dark and tap shoulders with a gaseous hand. Its touch causes endless shuddering.",
+  "weakness": "Lightning",
+  "flavor": "Able to understand human speech and very intelligent, it loves to swim in the sea with people on its back.",
   "is_ex": false,
   "is_mega": false,
+  "variants": [
+    "Team Rocket’s"
+  ],
   "attacks": [
     {
-      "name": "Surprise Attack",
+      "name": "Ruthless Whirlpool",
       "cost": [
-        "Psychic"
+        "Water",
+        "Colorless"
       ],
-      "damage": 50,
-      "effect": "Flip a coin. If tails, this attack does nothing."
+      "damage": 40,
+      "damage_suffix": "+",
+      "effect": "If this Pokémon has more Energy attached than your opponent’s Active Pokémon, this attack does 40 more damage."
     }
   ],
-  "evolves_from": "Gastly",
   "versions": [
     {
-      "set": "P-A",
-      "number": 20
+      "set": "B4a",
+      "number": 13
     }
   ]
 }

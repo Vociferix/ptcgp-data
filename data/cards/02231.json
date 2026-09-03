@@ -1,33 +1,40 @@
 {
   "id": 2231,
-  "name": "Mega Houndoom ex",
+  "name": "Team Rocket’s Tinkaton",
   "card_type": "pokemon",
-  "natdex_number": 229,
-  "element": "Fire",
-  "stage": "Stage 1",
-  "hp": 190,
+  "natdex_number": 959,
+  "element": "Metal",
+  "stage": "Stage 2",
+  "hp": 140,
   "retreat_cost": 2,
-  "weakness": "Water",
-  "is_ex": true,
-  "is_mega": true,
+  "weakness": "Fire",
+  "flavor": "The hammer tops 220 pounds, yet it gets swung around easily by Tinkaton as it steals whatever it pleases and carries its plunder back home.",
+  "is_ex": false,
+  "is_mega": false,
+  "variants": [
+    "Team Rocket’s"
+  ],
   "attacks": [
     {
-      "name": "Grimhound Flare",
+      "name": "Pile-Driving Hammer",
       "cost": [
-        "Fire",
-        "Fire",
+        "Metal",
+        "Metal",
         "Colorless"
       ],
       "damage": 80,
-      "damage_suffix": "x",
-      "effect": "Flip 3 coins. This attack does 80 damage for each heads."
+      "effect": "During your opponent’s next turn, attacks used by the Defending Pokémon cost 2 [C] more, and its Retreat Cost is 2 [C] more."
     }
   ],
-  "evolves_from": "Houndour",
+  "evolves_from": "Team Rocket’s Tinkatuff",
   "versions": [
     {
-      "set": "P-B",
-      "number": 80
+      "set": "B4a",
+      "number": 50
+    },
+    {
+      "set": "B4a",
+      "number": 75
     }
   ]
 }

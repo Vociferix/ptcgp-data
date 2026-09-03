@@ -1,13 +1,38 @@
 {
   "id": 2186,
-  "name": "Hand Scope",
-  "card_type": "trainer",
-  "trainer_kind": "Item",
-  "trainer_effect": "Your opponent reveals their hand.",
+  "name": "Serperior",
+  "card_type": "pokemon",
+  "natdex_number": 497,
+  "element": "Grass",
+  "stage": "Stage 2",
+  "hp": 100,
+  "retreat_cost": 2,
+  "weakness": "Fire",
+  "flavor": "An intimidating gaze and majestic appearance have caused this Pokémon to be known as the Lord of the Forest.",
+  "is_ex": false,
+  "is_mega": false,
+  "ability": {
+    "name": "Regal Bloom",
+    "effect": "This Pokémon gets +30 HP for each [G] Energy attached to it."
+  },
+  "attacks": [
+    {
+      "name": "Flog",
+      "cost": [
+        "Colorless",
+        "Colorless",
+        "Colorless"
+      ],
+      "damage": 60,
+      "damage_suffix": "+",
+      "effect": "Flip a coin. If heads, this attack does 60 more damage."
+    }
+  ],
+  "evolves_from": "Servine",
   "versions": [
     {
-      "set": "P-A",
-      "number": 3
+      "set": "B4a",
+      "number": 5
     }
   ]
 }

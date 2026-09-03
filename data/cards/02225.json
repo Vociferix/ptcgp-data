@@ -1,30 +1,35 @@
 {
   "id": 2225,
-  "name": "Feebas",
+  "name": "Team Rocket’s Sneasel",
   "card_type": "pokemon",
-  "natdex_number": 349,
-  "element": "Water",
+  "natdex_number": 215,
+  "element": "Darkness",
   "stage": "Basic",
-  "hp": 30,
+  "hp": 60,
   "retreat_cost": 1,
-  "weakness": "Lightning",
-  "flavor": "It is the shabbiest Pokémon of all. It forms schools and lives at the bottom of rivers that teem with plant life.",
+  "weakness": "Grass",
+  "flavor": "This is a smart and sneaky Pokémon. A pair may work together to steal eggs by having one lure the parents away.",
   "is_ex": false,
   "is_mega": false,
+  "variants": [
+    "Team Rocket’s"
+  ],
   "attacks": [
     {
-      "name": "Hide",
+      "name": "Group Beatdown",
       "cost": [
-        "Water"
+        "Darkness",
+        "Colorless"
       ],
-      "damage": 0,
-      "effect": "Flip a coin. If heads, during your opponent's next turn, prevent all damage from—and effects of—attacks done to this Pokémon."
+      "damage": 30,
+      "damage_suffix": "x",
+      "effect": "Flip a coin for each Pokémon you have in play. This attack does 30 damage for each heads."
     }
   ],
   "versions": [
     {
-      "set": "P-B",
-      "number": 72
+      "set": "B4a",
+      "number": 44
     }
   ]
 }

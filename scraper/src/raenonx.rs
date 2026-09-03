@@ -273,7 +273,7 @@ pub fn parse_pack_name_from_title(html: &str) -> Option<String> {
     if name.is_empty() {
         None
     } else {
-        Some(name.to_string())
+        Some(crate::models::canonicalize_apostrophes(name))
     }
 }
 

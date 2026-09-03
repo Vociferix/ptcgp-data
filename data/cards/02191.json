@@ -1,31 +1,29 @@
 {
   "id": 2191,
-  "name": "Lapras ex",
+  "name": "Fennekin",
   "card_type": "pokemon",
-  "natdex_number": 131,
-  "element": "Water",
+  "natdex_number": 653,
+  "element": "Fire",
   "stage": "Basic",
-  "hp": 140,
-  "retreat_cost": 3,
-  "weakness": "Lightning",
-  "is_ex": true,
+  "hp": 60,
+  "retreat_cost": 1,
+  "weakness": "Water",
+  "flavor": "Twigs make for Fennekin’s snacks. When it nibbles on twigs, it finds the courage to face strong foes.",
+  "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Bubble Drain",
+      "name": "Scratch",
       "cost": [
-        "Water",
-        "Water",
         "Colorless"
       ],
-      "damage": 80,
-      "effect": "Heal 20 damage from this Pokémon."
+      "damage": 10
     }
   ],
   "versions": [
     {
-      "set": "P-A",
-      "number": 14
+      "set": "B4a",
+      "number": 10
     }
   ]
 }

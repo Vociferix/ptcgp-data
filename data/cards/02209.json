@@ -1,30 +1,39 @@
 {
   "id": 2209,
-  "name": "Varoom",
+  "name": "Team Rocket’s Hypno",
   "card_type": "pokemon",
-  "natdex_number": 965,
-  "element": "Metal",
-  "stage": "Basic",
-  "hp": 60,
-  "retreat_cost": 1,
-  "weakness": "Fire",
-  "flavor": "The steel section is Varoom’s actual body. This Pokémon clings to rocks and converts the minerals within into energy to fuel its activities.",
+  "natdex_number": 97,
+  "element": "Psychic",
+  "stage": "Stage 1",
+  "hp": 90,
+  "retreat_cost": 2,
+  "weakness": "Darkness",
+  "flavor": "Always holding a pendulum that it swings at a steady rhythm, it causes drowsiness in anyone nearby.",
   "is_ex": false,
   "is_mega": false,
+  "variants": [
+    "Team Rocket’s"
+  ],
   "attacks": [
     {
-      "name": "Poison Gas",
+      "name": "Entrap",
       "cost": [
-        "Metal"
+        "Psychic",
+        "Psychic"
       ],
       "damage": 0,
-      "effect": "Your opponent's Active Pokémon is now Poisoned."
+      "effect": "Switch in 1 of your opponent’s Benched Pokémon to the Active Spot. If you do, this attack does 50 damage to the new Active Pokémon."
     }
   ],
+  "evolves_from": "Team Rocket’s Drowzee",
   "versions": [
     {
-      "set": "P-B",
-      "number": 44
+      "set": "B4a",
+      "number": 28
+    },
+    {
+      "set": "B4a",
+      "number": 74
     }
   ]
 }

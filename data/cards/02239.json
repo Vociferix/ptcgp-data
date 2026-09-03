@@ -1,33 +1,34 @@
 {
   "id": 2239,
-  "name": "Blissey ex",
+  "name": "Team Rocket’s Rattata",
   "card_type": "pokemon",
-  "natdex_number": 242,
+  "natdex_number": 19,
   "element": "Colorless",
-  "stage": "Stage 1",
-  "hp": 180,
-  "retreat_cost": 3,
+  "stage": "Basic",
+  "hp": 40,
+  "retreat_cost": 1,
   "weakness": "Fighting",
-  "is_ex": true,
+  "flavor": "With their strong capacity for survival, they can live in dirty places without concern. Left unchecked, their numbers multiply rapidly.",
+  "is_ex": false,
   "is_mega": false,
+  "variants": [
+    "Team Rocket’s"
+  ],
   "attacks": [
     {
-      "name": "Happy Punch",
+      "name": "Ambush",
       "cost": [
-        "Colorless",
-        "Colorless",
-        "Colorless",
         "Colorless"
       ],
-      "damage": 100,
-      "effect": "Flip a coin. If heads, heal 60 damage from this Pokémon."
+      "damage": 20,
+      "damage_suffix": "+",
+      "effect": "Flip a coin. If heads, this attack does 20 more damage."
     }
   ],
-  "evolves_from": "Chansey",
   "versions": [
     {
-      "set": "P-A",
-      "number": 98
+      "set": "B4a",
+      "number": 58
     }
   ]
 }

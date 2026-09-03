@@ -1,30 +1,33 @@
 {
   "id": 2217,
-  "name": "Ekans",
+  "name": "Marowak",
   "card_type": "pokemon",
-  "natdex_number": 23,
-  "element": "Darkness",
-  "stage": "Basic",
-  "hp": 60,
-  "retreat_cost": 1,
-  "weakness": "Fighting",
-  "flavor": "By dislocating its jaw, it can swallow prey larger than itself. After a meal, it curls up and rests.",
+  "natdex_number": 105,
+  "element": "Fighting",
+  "stage": "Stage 1",
+  "hp": 110,
+  "retreat_cost": 2,
+  "weakness": "Grass",
+  "flavor": "When this Pokémon evolved, the skull of its mother fused to it. Marowak’s temperament also turned vicious at the same time.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Poison Sting",
+      "name": "Punish",
       "cost": [
-        "Darkness"
+        "Fighting",
+        "Colorless"
       ],
-      "damage": 0,
-      "effect": "Your opponent's Active Pokémon is now Poisoned."
+      "damage": 50,
+      "damage_suffix": "+",
+      "effect": "If your opponent’s Active Pokémon has “Team Rocket” in its name, this attack does 70 more damage."
     }
   ],
+  "evolves_from": "Cubone",
   "versions": [
     {
-      "set": "P-A",
-      "number": 56
+      "set": "B4a",
+      "number": 36
     }
   ]
 }

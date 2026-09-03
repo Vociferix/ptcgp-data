@@ -273,7 +273,8 @@ fn main() -> Result<()> {
                             ] {
                                 let Some(rate) = rate else { continue };
                                 let (rn, rd) = rate_to_integers(rate);
-                                let expected_num = scale_to_denominator(rn, rd, expected_slot_denom);
+                                let expected_num =
+                                    scale_to_denominator(rn, rd, expected_slot_denom);
                                 let foil_label = if is_foil == 1 { "foil" } else { "normal" };
                                 match conn.query_row::<i64, _, _>(
                                     "SELECT rpr.rate_numerator \

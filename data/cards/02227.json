@@ -1,32 +1,30 @@
 {
   "id": 2227,
-  "name": "Toucannon",
+  "name": "Cufant",
   "card_type": "pokemon",
-  "natdex_number": 733,
-  "element": "Colorless",
-  "stage": "Stage 2",
-  "hp": 140,
-  "retreat_cost": 2,
-  "weakness": "Lightning",
-  "flavor": "They smack beaks with others of their kind to communicate. The strength and number of hits tell each other how they feel.",
+  "natdex_number": 878,
+  "element": "Metal",
+  "stage": "Basic",
+  "hp": 90,
+  "retreat_cost": 3,
+  "weakness": "Fire",
+  "flavor": "Cufant can lift loads weighing five tons. In the mornings, it heads into caves with its herd, in search of the ore on which these Pokémon feed.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Beak Blast",
+      "name": "Rollout",
       "cost": [
-        "Colorless",
+        "Metal",
         "Colorless"
       ],
-      "damage": 80,
-      "effect": "Flip a coin. If heads, your opponent's Active Pokémon is now Burned."
+      "damage": 40
     }
   ],
-  "evolves_from": "Trumbeak",
   "versions": [
     {
-      "set": "P-A",
-      "number": 73
+      "set": "B4a",
+      "number": 46
     }
   ]
 }

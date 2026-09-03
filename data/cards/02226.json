@@ -1,33 +1,31 @@
 {
   "id": 2226,
-  "name": "Alolan Grimer",
+  "name": "Togedemaru",
   "card_type": "pokemon",
-  "natdex_number": 88,
-  "element": "Darkness",
+  "natdex_number": 777,
+  "element": "Metal",
   "stage": "Basic",
   "hp": 70,
-  "retreat_cost": 2,
-  "weakness": "Fighting",
-  "flavor": "There are a hundred or so of them living in Alola’s waste-disposal site. They’re all hard workers who eat a lot of trash.",
+  "retreat_cost": 1,
+  "weakness": "Fire",
+  "flavor": "When it’s in trouble, it curls up into a ball, makes its fur spikes stand on end, and then discharges electricity indiscriminately.",
   "is_ex": false,
   "is_mega": false,
-  "variants": [
-    "Alolan"
-  ],
   "attacks": [
     {
-      "name": "Poison Gas",
+      "name": "Tumbling Attack",
       "cost": [
-        "Darkness"
+        "Metal"
       ],
-      "damage": 0,
-      "effect": "Your opponent's Active Pokémon is now Poisoned."
+      "damage": 20,
+      "damage_suffix": "+",
+      "effect": "Flip a coin. If heads, this attack does 30 more damage."
     }
   ],
   "versions": [
     {
-      "set": "P-A",
-      "number": 72
+      "set": "B4a",
+      "number": 45
     }
   ]
 }

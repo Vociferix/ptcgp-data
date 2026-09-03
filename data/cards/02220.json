@@ -1,34 +1,37 @@
 {
   "id": 2220,
-  "name": "Rayquaza",
+  "name": "Team Rocket’s Arbok",
   "card_type": "pokemon",
-  "natdex_number": 384,
-  "element": "Colorless",
-  "stage": "Basic",
+  "natdex_number": 24,
+  "element": "Darkness",
+  "stage": "Stage 1",
   "hp": 100,
-  "retreat_cost": 1,
-  "weakness": "Lightning",
-  "flavor": "It lives in the ozone layer far above the clouds and cannot be seen from the ground.",
+  "retreat_cost": 2,
+  "weakness": "Fighting",
+  "flavor": "This Pokémon is very tenacious. Once it targets its prey, it won’t give up the chase, no matter how far the prey goes.",
   "is_ex": false,
   "is_mega": false,
+  "variants": [
+    "Team Rocket’s"
+  ],
   "attacks": [
     {
-      "name": "Spiral Rush",
+      "name": "Shadow Seeker",
       "cost": [
-        "Colorless",
-        "Colorless",
-        "Colorless",
+        "Darkness",
+        "Darkness",
         "Colorless"
       ],
       "damage": 70,
       "damage_suffix": "+",
-      "effect": "Flip a coin until you get tails. This attack does 30 more damage for each heads."
+      "effect": "This attack does 10 more damage for each Energy in your opponent’s Active Pokémon’s Retreat Cost."
     }
   ],
+  "evolves_from": "Team Rocket’s Ekans",
   "versions": [
     {
-      "set": "P-A",
-      "number": 63
+      "set": "B4a",
+      "number": 39
     }
   ]
 }

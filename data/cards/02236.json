@@ -1,31 +1,29 @@
 {
   "id": 2236,
-  "name": "Audino",
+  "name": "Duraludon",
   "card_type": "pokemon",
-  "natdex_number": 531,
-  "element": "Colorless",
+  "natdex_number": 884,
+  "element": "Dragon",
   "stage": "Basic",
   "hp": 100,
   "retreat_cost": 2,
-  "weakness": "Fighting",
-  "flavor": "This Pokémon has a kind heart. By touching with its feelers, Audino can gauge other creatures’ feelings and physical conditions.",
+  "flavor": "Its metal body is durable but prone to retaining heat. It vents this heat from the slits in its tail.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Drain Slap",
+      "name": "Power Beam",
       "cost": [
-        "Colorless",
-        "Colorless"
+        "Fighting",
+        "Metal"
       ],
-      "damage": 40,
-      "effect": "Heal 10 damage from this Pokémon."
+      "damage": 50
     }
   ],
   "versions": [
     {
-      "set": "P-A",
-      "number": 89
+      "set": "B4a",
+      "number": 55
     }
   ]
 }
