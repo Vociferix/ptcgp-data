@@ -15,6 +15,7 @@ use models::{
     canonicalize_apostrophes, Ability, AbstractCard, CardEntry, CardSource, CardVersion,
     ElementInfo, LimitlessCardData, PackVariantName, RarityInfo, SetSummary, VersionRef,
 };
+use rust_decimal::Decimal;
 use serde_json::Value;
 use tracing::{error, info, warn};
 
@@ -121,6 +122,13 @@ enum Command {
     /// Fetch all Pokémon species names and national dex numbers from PokéAPI
     BasePokemon,
 
+    /// Check everything in data/ for internal consistency (no network)
+    Validate {
+        /// Log constraint violations as warnings instead of failing
+        #[arg(long)]
+        lenient: bool,
+    },
+
     /// Run the complete pipeline: global-master → sets → base-pokemon → cards → pull-rates
     All {
         #[arg(long)]
@@ -163,6 +171,7 @@ async fn main() -> Result<()> {
             force,
             skip_incomplete,
         } => cmd_pull_rates(&client, pack.as_deref(), force, skip_incomplete).await?,
+        Command::Validate { lenient } => cmd_validate(lenient)?,
         Command::All {
             force,
             lenient,
@@ -1540,6 +1549,587 @@ where
         Some(items.into_iter().map(key).collect())
     })()
     .unwrap_or_default()
+}
+
+/// How far a sum of rates may drift from 1 before it counts as an error.
+///
+/// Rates are reconstructed from RaenonX's rounded percentages, so a slot can miss
+/// exactly 1 by a hair (B3b "Everyday Wonders" slot 4 is off by ~1.3e-9). Anything
+/// larger than this is a real discrepancy, not an artifact of the source rounding.
+const RATE_SUM_TOLERANCE: Decimal = Decimal::from_parts(1, 0, 0, false, 6);
+
+fn rate_value(r: &models::Rate) -> Option<Decimal> {
+    r.numerator.checked_div(r.denominator)
+}
+
+/// Exact fraction equality by cross-multiplication, so two spellings of the same
+/// value (1/2 and 500/1000) compare equal without a division rounding step.
+fn rates_equal(a: &models::Rate, b: &models::Rate) -> bool {
+    match (
+        a.numerator.checked_mul(b.denominator),
+        b.numerator.checked_mul(a.denominator),
+    ) {
+        (Some(x), Some(y)) => x == y,
+        _ => false,
+    }
+}
+
+/// Sum a set of rates, reporting a violation if any one of them is unrepresentable.
+fn sum_rates<'a>(rates: impl IntoIterator<Item = &'a models::Rate>) -> Option<Decimal> {
+    let mut total = Decimal::ZERO;
+    for r in rates {
+        total = total.checked_add(rate_value(r)?)?;
+    }
+    Some(total)
+}
+
+fn check_sums_to_one(v: &mut Violations, total: Option<Decimal>, what: &str) {
+    match total {
+        Some(t) if (t - Decimal::ONE).abs() <= RATE_SUM_TOLERANCE => {}
+        Some(t) => v.add(format!("{what}: rates sum to {t}, expected 1")),
+        None => v.add(format!("{what}: rate could not be evaluated")),
+    }
+}
+
+/// Offline consistency check over everything in data/.
+///
+/// This is the cross-file half of validation: the per-card rules run during
+/// `cards`, but they cannot see whether a card version points at a card that
+/// exists, or whether a pull rate names a card that was ever written. Those
+/// links only break when two commands disagree, so they are checked here over
+/// the finished data rather than mid-scrape.
+fn cmd_validate(lenient: bool) -> Result<()> {
+    let mut v = Violations::new(lenient);
+    let data = output::data_dir();
+    if !data.exists() {
+        anyhow::bail!("{} not found — nothing to validate", data.display());
+    }
+
+    let known_elements = load_known_set::<ElementInfo, _>(&data.join("elements.json"), |e| e.name);
+    let known_rarities = load_known_set::<RarityInfo, _>(&data.join("rarities.json"), |r| r.code);
+    let known_sources =
+        load_known_set::<CardSource, _>(&data.join("card_sources.json"), |s| s.code);
+    let known_variant_codes =
+        load_known_set::<PackVariantName, _>(&data.join("pack_variant_names.json"), |p| p.code);
+    for (file, set) in [
+        ("elements.json", &known_elements),
+        ("rarities.json", &known_rarities),
+        ("card_sources.json", &known_sources),
+        ("pack_variant_names.json", &known_variant_codes),
+    ] {
+        if set.is_empty() {
+            v.add(format!(
+                "{file} missing or empty — run `global-master` first"
+            ));
+        }
+    }
+
+    let sets: Vec<SetSummary> = match std::fs::read_to_string(data.join("sets.json"))
+        .ok()
+        .and_then(|t| serde_json::from_str(&t).ok())
+    {
+        Some(s) => s,
+        None => {
+            v.add("sets.json missing or unparseable — run `sets` first");
+            Vec::new()
+        }
+    };
+    let set_is_promo: HashMap<String, bool> =
+        sets.iter().map(|s| (s.code.clone(), s.is_promo)).collect();
+    let set_packs: HashMap<String, HashSet<String>> = sets
+        .iter()
+        .map(|s| (s.code.clone(), s.packs.iter().cloned().collect()))
+        .collect();
+    let all_known_packs: HashSet<String> = set_packs.values().flatten().cloned().collect();
+    let release_dates: HashMap<String, String> = sets
+        .iter()
+        .filter_map(|s| {
+            s.availability
+                .as_ref()
+                .map(|a| (s.code.clone(), a.start.clone()))
+        })
+        .collect();
+    let known_natdex: HashSet<u32> = output::load_base_pokemon()
+        .unwrap_or_default()
+        .into_iter()
+        .map(|bp| bp.natdex_number)
+        .collect();
+
+    // ── Abstract cards ────────────────────────────────────────────────────────
+    let mut cards: Vec<AbstractCard> = Vec::new();
+    for (path, parsed) in output::load_all_abstract_cards()? {
+        match parsed {
+            Ok(card) => cards.push(card),
+            Err(e) => v.add(format!("{}: parse error: {e}", path.display())),
+        }
+    }
+    if cards.is_empty() {
+        v.add("data/cards/ is empty — run `cards` first");
+    }
+
+    let known_card_names: HashSet<String> = cards
+        .iter()
+        .map(|c| canonicalize_apostrophes(&c.name))
+        .collect();
+    let base_pokemon_loaded = !known_natdex.is_empty();
+
+    let mut seen_ids: HashMap<u32, String> = HashMap::new();
+    for card in &cards {
+        validate_abstract_card(
+            &mut v,
+            card,
+            &known_elements,
+            &known_card_names,
+            base_pokemon_loaded,
+        );
+        if let Some(prev) = seen_ids.insert(card.id, card.name.clone()) {
+            v.add(format!(
+                "card {:05}: duplicate ID, also used by '{prev}'",
+                card.id
+            ));
+        }
+        if let Some(n) = card.natdex_number {
+            if base_pokemon_loaded && !known_natdex.contains(&n) {
+                v.add(format!(
+                    "card {:05} ({}): natdex {n} not in base_pokemon.json",
+                    card.id, card.name
+                ));
+            }
+        }
+        let mut seen_refs: HashSet<(&str, u32)> = HashSet::new();
+        for ver in &card.versions {
+            if !output::card_version_file_exists(&ver.set, ver.number) {
+                v.add(format!(
+                    "card {:05} ({}): version {}/{:03} has no card_version file",
+                    card.id, card.name, ver.set, ver.number
+                ));
+            }
+            if !seen_refs.insert((ver.set.as_str(), ver.number)) {
+                v.add(format!(
+                    "card {:05} ({}): version {}/{:03} listed more than once",
+                    card.id, card.name, ver.set, ver.number
+                ));
+            }
+        }
+        // Versions run oldest first, so the canonical printing is versions[0].
+        let ordering: Vec<(&str, u32)> = card
+            .versions
+            .iter()
+            .map(|r| {
+                (
+                    release_dates
+                        .get(&r.set)
+                        .map(String::as_str)
+                        .unwrap_or("9999-99-99"),
+                    r.number,
+                )
+            })
+            .collect();
+        if ordering.windows(2).any(|w| w[0] > w[1]) {
+            v.add(format!(
+                "card {:05} ({}): versions are not ordered by release date then number",
+                card.id, card.name
+            ));
+        }
+    }
+
+    // ── Card versions ─────────────────────────────────────────────────────────
+    let mut all_versions: HashMap<(String, u32), CardVersion> = HashMap::new();
+    for set in &sets {
+        match output::load_card_versions(&set.code) {
+            Ok(versions) => {
+                for version in versions {
+                    all_versions.insert((version.set.clone(), version.number), version);
+                }
+            }
+            Err(e) => v.add(format!("{}: failed to load card versions: {e}", set.code)),
+        }
+    }
+
+    // Which versions each card claims, for the reverse direction of the link check.
+    let card_version_refs: HashMap<u32, HashSet<(String, u32)>> = cards
+        .iter()
+        .map(|c| {
+            (
+                c.id,
+                c.versions
+                    .iter()
+                    .map(|r| (r.set.clone(), r.number))
+                    .collect(),
+            )
+        })
+        .collect();
+
+    let mut versions_by_set: HashMap<String, HashSet<u32>> = HashMap::new();
+    for (key, version) in &all_versions {
+        validate_card_version(
+            &mut v,
+            version,
+            &known_rarities,
+            &set_is_promo,
+            &set_packs,
+            &all_known_packs,
+        );
+        let loc = format!("{}/{:03}", version.set, version.number);
+        versions_by_set
+            .entry(version.set.clone())
+            .or_default()
+            .insert(version.number);
+
+        if !known_sources.is_empty() && !known_sources.contains(&version.source) {
+            v.add(format!("{loc}: unknown card source '{}'", version.source));
+        }
+
+        // Version → card, and the card must name it back. A one-way link means the
+        // two files disagree about which card this printing belongs to.
+        match card_version_refs.get(&version.card_id) {
+            None => v.add(format!(
+                "{loc}: card_id {:05} does not exist in data/cards",
+                version.card_id
+            )),
+            Some(refs) if !refs.contains(key) => v.add(format!(
+                "{loc}: card {:05} does not list this version",
+                version.card_id
+            )),
+            Some(_) => {}
+        }
+
+        if version.is_promo != set_is_promo.get(&version.set).copied().unwrap_or(false) {
+            v.add(format!(
+                "{loc}: is_promo={} but set '{}' is_promo={}",
+                version.is_promo,
+                version.set,
+                set_is_promo.get(&version.set).copied().unwrap_or(false)
+            ));
+        }
+
+        if version.is_reprint && version.duplicates.is_empty() {
+            v.add(format!("{loc}: is_reprint but has no duplicates"));
+        }
+
+        // Verified against the full data set: IM and UR are the only rarities with
+        // no tradable version, and every non-promo untradable version is one of them.
+        const UNTRADABLE_RARITIES: &[&str] = &["IM", "UR"];
+        let expect_tradable =
+            !version.is_promo && !UNTRADABLE_RARITIES.contains(&version.rarity.as_str());
+        if version.is_tradable != expect_tradable {
+            v.add(format!(
+                "{loc}: is_tradable={} for a {}{} card, expected {expect_tradable}",
+                version.is_tradable,
+                version.rarity,
+                if version.is_promo { " promo" } else { "" }
+            ));
+        }
+
+        // `packs` lists where a version drops, so it is populated exactly when the
+        // version comes from a pack.
+        match (version.source == "Pack", version.packs.is_empty()) {
+            (true, true) => v.add(format!("{loc}: source is Pack but packs is empty")),
+            (false, false) => v.add(format!(
+                "{loc}: source is '{}' but packs is not empty",
+                version.source
+            )),
+            _ => {}
+        }
+
+        for dup in &version.duplicates {
+            let other_key = (dup.set.clone(), dup.number);
+            let dloc = format!("{}/{:03}", dup.set, dup.number);
+            if other_key == *key {
+                v.add(format!("{loc}: lists itself as a duplicate"));
+                continue;
+            }
+            let Some(other) = all_versions.get(&other_key) else {
+                v.add(format!("{loc}: duplicate {dloc} does not exist"));
+                continue;
+            };
+            if !other
+                .duplicates
+                .iter()
+                .any(|d| (d.set.as_str(), d.number) == (key.0.as_str(), key.1))
+            {
+                v.add(format!("{loc}: duplicate {dloc} does not link back"));
+            }
+            if other.card_id != version.card_id {
+                v.add(format!(
+                    "{loc}: duplicate {dloc} belongs to card {:05}, not {:05}",
+                    other.card_id, version.card_id
+                ));
+            }
+            // Duplicates are the same physical card, so the identifying fields must agree.
+            for (field, a, b) in [
+                ("rarity", version.rarity.clone(), other.rarity.clone()),
+                (
+                    "illustrator",
+                    version.illustrator.clone().unwrap_or_default(),
+                    other.illustrator.clone().unwrap_or_default(),
+                ),
+                (
+                    "is_promo",
+                    version.is_promo.to_string(),
+                    other.is_promo.to_string(),
+                ),
+                (
+                    "is_foil",
+                    version.is_foil.to_string(),
+                    other.is_foil.to_string(),
+                ),
+            ] {
+                if a != b {
+                    v.add(format!(
+                        "{loc}: duplicate {dloc} differs in {field} ({a} vs {b})"
+                    ));
+                }
+            }
+        }
+    }
+
+    // Exactly one member of each duplicate group is the original; the rest are reprints.
+    let mut seen_group: HashSet<(String, u32)> = HashSet::new();
+    for (key, version) in &all_versions {
+        if version.duplicates.is_empty() || seen_group.contains(key) {
+            continue;
+        }
+        let mut group: Vec<(String, u32)> = vec![key.clone()];
+        group.extend(version.duplicates.iter().map(|d| (d.set.clone(), d.number)));
+        seen_group.extend(group.iter().cloned());
+        let originals = group
+            .iter()
+            .filter(|k| all_versions.get(*k).is_some_and(|x| !x.is_reprint))
+            .count();
+        if originals != 1 {
+            let mut names: Vec<String> = group.iter().map(|(s, n)| format!("{s}/{n:03}")).collect();
+            names.sort();
+            v.add(format!(
+                "duplicate group [{}]: {originals} versions are not reprints, expected exactly 1",
+                names.join(", ")
+            ));
+            continue;
+        }
+
+        // The original is the earliest printing. Promo sets carry no release date,
+        // so a group involving one cannot be ordered — skip rather than guess.
+        // (No duplicate group involves a promo set today.)
+        let dated: Vec<(&str, &(String, u32))> = group
+            .iter()
+            .filter_map(|k| Some((release_dates.get(&k.0)?.as_str(), k)))
+            .collect();
+        if dated.len() != group.len() || dated.len() < 2 {
+            continue;
+        }
+        let original = group
+            .iter()
+            .find(|k| all_versions.get(*k).is_some_and(|x| !x.is_reprint));
+        let earliest = dated.iter().min_by_key(|(d, k)| (*d, k.1));
+        if let (Some(orig), Some((_, first))) = (original, earliest) {
+            if orig != *first {
+                v.add(format!(
+                    "{}/{:03} is the original, but {}/{:03} was released earlier",
+                    orig.0, orig.1, first.0, first.1
+                ));
+            }
+        }
+    }
+
+    // ── Packs declared by sets vs pull rate files ─────────────────────────────
+    let rate_packs: HashSet<(String, String)> = output::load_all_pull_rates()?
+        .into_iter()
+        .filter_map(|(_, _, r)| r.ok().map(|r| (r.set, r.subtitle)))
+        .collect();
+    for (code, packs) in &set_packs {
+        for pack in packs {
+            if !rate_packs.contains(&(code.clone(), pack.clone())) {
+                v.add(format!(
+                    "{code}: pack '{pack}' is declared in sets.json but has no pull rate file"
+                ));
+            }
+        }
+    }
+    for (set, subtitle) in &rate_packs {
+        if !set_packs
+            .get(set)
+            .is_some_and(|packs| packs.contains(subtitle))
+        {
+            v.add(format!(
+                "pull_rates/{set}: pack '{subtitle}' is not declared in sets.json"
+            ));
+        }
+    }
+
+    // ── Declared card counts vs versions on disk ──────────────────────────────
+    for set in &sets {
+        if let Some(expected) = set.card_count {
+            let actual = versions_by_set.get(&set.code).map_or(0, HashSet::len) as u32;
+            if actual != expected {
+                v.add(format!(
+                    "{}: sets.json says {expected} cards but {actual} card_version files exist",
+                    set.code
+                ));
+            }
+        }
+    }
+
+    // ── Pull rates ────────────────────────────────────────────────────────────
+    for (dir_set, path, parsed) in output::load_all_pull_rates()? {
+        let rates = match parsed {
+            Ok(r) => r,
+            Err(e) => {
+                v.add(format!("{}: parse error: {e}", path.display()));
+                continue;
+            }
+        };
+        let loc = format!("pull_rates/{dir_set}/{}", rates.subtitle);
+        if rates.set != dir_set {
+            v.add(format!(
+                "{loc}: set field '{}' does not match its directory",
+                rates.set
+            ));
+        }
+        if !set_is_promo.contains_key(&dir_set) {
+            v.add(format!("{loc}: set '{dir_set}' is not in sets.json"));
+        }
+        // One pack is opened per attempt, so the variants partition that certainty.
+        check_sums_to_one(
+            &mut v,
+            sum_rates(rates.variants.values().map(|x| &x.rate)),
+            &format!("{loc}: pack variants"),
+        );
+
+        for (code, variant) in &rates.variants {
+            if !known_variant_codes.is_empty() && !known_variant_codes.contains(code) {
+                v.add(format!("{loc}: unknown pack variant code '{code}'"));
+            }
+            if variant.rarity_rates_by_slot.len() != variant.slot_count as usize {
+                v.add(format!(
+                    "{loc}: {code} has {} rarity slots but slot_count is {}",
+                    variant.rarity_rates_by_slot.len(),
+                    variant.slot_count
+                ));
+            }
+
+            for (slot_idx, slot) in variant.rarity_rates_by_slot.iter().enumerate() {
+                for rarity in slot.keys() {
+                    if !known_rarities.is_empty() && !known_rarities.contains(rarity) {
+                        v.add(format!("{loc}: unknown rarity '{rarity}' in {code} rates"));
+                    }
+                }
+                // Every slot yields exactly one card, so its rarities partition it.
+                check_sums_to_one(
+                    &mut v,
+                    sum_rates(
+                        slot.values()
+                            .flat_map(|r| [r.normal.as_ref(), r.foil.as_ref()])
+                            .flatten(),
+                    ),
+                    &format!("{loc}: {code} slot {slot_idx} rarities"),
+                );
+            }
+
+            for (card_key, slots) in &variant.card_rates {
+                if slots.len() != variant.slot_count as usize {
+                    v.add(format!(
+                        "{loc}: {code} card {card_key} has {} slot entries but slot_count is {}",
+                        slots.len(),
+                        variant.slot_count
+                    ));
+                }
+                let Ok(number) = card_key.parse::<u32>() else {
+                    v.add(format!(
+                        "{loc}: invalid card key '{card_key}' in {code} rates"
+                    ));
+                    continue;
+                };
+                if !versions_by_set
+                    .get(&dir_set)
+                    .is_some_and(|nums| nums.contains(&number))
+                {
+                    v.add(format!(
+                        "{loc}: {code} rates name card {number:03}, which has no card_version in {dir_set}"
+                    ));
+                }
+            }
+
+            for slot_idx in 0..variant.slot_count as usize {
+                let in_slot: Vec<(&String, &models::Rate)> = variant
+                    .card_rates
+                    .iter()
+                    .filter_map(|(k, slots)| Some((k, slots.get(slot_idx)?.as_ref()?)))
+                    .collect();
+                if in_slot.is_empty() {
+                    continue;
+                }
+                // The cards in a slot partition it too, so they sum to 1 as well.
+                check_sums_to_one(
+                    &mut v,
+                    sum_rates(in_slot.iter().map(|(_, r)| *r)),
+                    &format!("{loc}: {code} slot {slot_idx} cards"),
+                );
+
+                // Within a slot, every card of the same rarity and finish is equally
+                // likely — the rarity's rate is split evenly across its members.
+                let mut by_rarity: BTreeMap<(String, bool), Vec<(&String, &models::Rate)>> =
+                    BTreeMap::new();
+                for (key, rate) in &in_slot {
+                    let Ok(number) = key.parse::<u32>() else {
+                        continue;
+                    };
+                    let Some(ver) = all_versions.get(&(dir_set.clone(), number)) else {
+                        continue;
+                    };
+                    by_rarity
+                        .entry((ver.rarity.clone(), ver.is_foil))
+                        .or_default()
+                        .push((key, rate));
+                }
+                for ((rarity, is_foil), members) in &by_rarity {
+                    let finish = if *is_foil { "foil" } else { "normal" };
+                    if let Some(((first_key, first), (odd_key, odd))) =
+                        members.split_first().and_then(|(f, rest)| {
+                            rest.iter()
+                                .find(|(_, r)| !rates_equal(r, f.1))
+                                .map(|o| (*f, *o))
+                        })
+                    {
+                        v.add(format!(
+                            "{loc}: {code} slot {slot_idx} {rarity} ({finish}) cards differ — \
+                             {first_key} is {}/{} but {odd_key} is {}/{}",
+                            first.numerator, first.denominator, odd.numerator, odd.denominator
+                        ));
+                    }
+                    // Those members together account for that rarity's share of the slot.
+                    if let Some(sub) = variant
+                        .rarity_rates_by_slot
+                        .get(slot_idx)
+                        .and_then(|s| s.get(rarity))
+                        .and_then(|r| {
+                            if *is_foil {
+                                r.foil.as_ref()
+                            } else {
+                                r.normal.as_ref()
+                            }
+                        })
+                    {
+                        match (sum_rates(members.iter().map(|(_, r)| *r)), rate_value(sub)) {
+                            (Some(t), Some(e)) if (t - e).abs() > RATE_SUM_TOLERANCE => {
+                                v.add(format!(
+                                    "{loc}: {code} slot {slot_idx} {rarity} ({finish}) cards sum to {t}, \
+                                     but the rarity rate is {e}"
+                                ));
+                            }
+                            _ => {}
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    info!(
+        cards = cards.len(),
+        versions = versions_by_set.values().map(HashSet::len).sum::<usize>(),
+        "validation complete"
+    );
+    v.finish()
 }
 
 fn collect_card_names() -> Result<HashSet<String>> {

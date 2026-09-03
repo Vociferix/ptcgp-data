@@ -178,6 +178,62 @@ pub fn load_abstract_id_index() -> Result<AbstractIdIndex> {
     Ok(AbstractIdIndex { by_version, max_id })
 }
 
+/// Every pull rate file on disk, as (set code from the directory name, parsed file).
+/// A file that fails to parse is returned as an Err alongside its path so the
+/// caller can report it rather than aborting the whole scan.
+#[allow(clippy::type_complexity)]
+pub fn load_all_pull_rates() -> Result<Vec<(String, PathBuf, Result<PackPullRates>)>> {
+    let root = data_dir().join("pull_rates");
+    let mut out = Vec::new();
+    if !root.exists() {
+        return Ok(out);
+    }
+    let mut set_dirs: Vec<_> = std::fs::read_dir(&root)?
+        .filter_map(|e| e.ok())
+        .filter(|e| e.path().is_dir())
+        .collect();
+    set_dirs.sort_by_key(|e| e.path());
+    for set_dir in set_dirs {
+        let set_code = set_dir.file_name().to_string_lossy().into_owned();
+        let mut files: Vec<_> = std::fs::read_dir(set_dir.path())?
+            .filter_map(|e| e.ok())
+            .filter(|e| e.path().extension().is_some_and(|x| x == "json"))
+            .collect();
+        files.sort_by_key(|e| e.path());
+        for file in files {
+            let path = file.path();
+            let parsed = std::fs::read_to_string(&path)
+                .map_err(anyhow::Error::from)
+                .and_then(|t| serde_json::from_str::<PackPullRates>(&t).map_err(Into::into));
+            out.push((set_code.clone(), path, parsed));
+        }
+    }
+    Ok(out)
+}
+
+/// Every abstract card on disk, sorted by ID, with parse failures reported per file.
+#[allow(clippy::type_complexity)]
+pub fn load_all_abstract_cards() -> Result<Vec<(PathBuf, Result<AbstractCard>)>> {
+    let dir = abstract_cards_dir();
+    let mut out = Vec::new();
+    if !dir.exists() {
+        return Ok(out);
+    }
+    let mut files: Vec<_> = std::fs::read_dir(&dir)?
+        .filter_map(|e| e.ok())
+        .filter(|e| e.path().extension().is_some_and(|x| x == "json"))
+        .collect();
+    files.sort_by_key(|e| e.path());
+    for file in files {
+        let path = file.path();
+        let parsed = std::fs::read_to_string(&path)
+            .map_err(anyhow::Error::from)
+            .and_then(|t| serde_json::from_str::<AbstractCard>(&t).map_err(Into::into));
+        out.push((path, parsed));
+    }
+    Ok(out)
+}
+
 /// Write data/pull_rates/{SET}/{subtitle_slug}.json
 pub fn write_pull_rates(rates: &PackPullRates) -> Result<()> {
     ensure_pull_rates_dir(&rates.set)?;

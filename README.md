@@ -2,10 +2,8 @@
 
 > **Disclaimer:** The literal and graphical information presented in this repository about Pokémon Trading Card Game Pocket, including card data and text, is copyright The Pokémon Company, DeNA Co., Ltd., and/or Creatures, Inc. This repository is not produced by, endorsed by, supported by, or affiliated with any of those copyright holders.
 
-Community-maintained data for Pokémon TCG Pocket, available in two formats:
-
-- **JSON** — human-readable, diff-friendly, accessible directly via `raw.githubusercontent.com`
-- **SQLite** — pre-built database published as a [GitHub Release](https://github.com/Vociferix/ptcgp-data/releases/latest) asset (`ptcgp.db`)
+Community-maintained data for Pokémon TCG Pocket, published as JSON — human-readable,
+diff-friendly, and accessible directly via `raw.githubusercontent.com`.
 
 Card images are in a companion repository: [Vociferix/ptcgp-images](https://github.com/Vociferix/ptcgp-images)
 
@@ -225,91 +223,23 @@ Promo sets have no pull rate files.
 
 ---
 
-## SQLite Database
-
-The pre-built `ptcgp.db` is published with each [release](https://github.com/Vociferix/ptcgp-data/releases/latest). It contains the same data as the JSON files in a fully relational schema with convenience views.
-
-### Key tables
-
-| Table | Description |
-|---|---|
-| `sets` | All sets with codes and series |
-| `cards` | Abstract cards (one row per unique card identity) |
-| `card_versions` | Physical cards: set, number, rarity, finish |
-| `packs` | One row per pack subtitle per set |
-| `pack_variants` | Pack opening variant (normal/rare/plus1/themed) with rate numerator |
-| `pack_variant_rate_denominators` | LCM denominator shared by all variant rates for a pack |
-| `pack_slots` | Individual card slots within a pack variant, with slot rate denominator |
-| `rarity_pull_rates` | Per-slot rarity probabilities, split by foil vs non-foil finish |
-| `card_pull_rates` | Per-slot per-card probabilities |
-| `rarities` | Rarity codes, names, groups, craft costs |
-| `elements` | Energy types |
-
-### Convenience views
-
-| View | Description |
-|---|---|
-| `versions` | Flat join of card_versions with set, card name, rarity, illustrator, source, finish flags, and `is_tradeable` |
-| `pokemon` | All Pokémon abstract cards with stats, attacks, and ability |
-| `trainers` | All Trainer abstract cards with kind and effect |
-| `rarity_overview` | Rarities with group name, symbol count, craft cost, and dupe dust |
-| `card_version_images` | Card version ID → image path (see [ptcgp-images](https://github.com/Vociferix/ptcgp-images)) |
-| `pack_art` | Pack ID → pack art image path |
-| `pack_logos` | Pack ID → pack logo image path |
-| `set_icons` | Set ID → set icon image path |
-| `set_logos` | Set ID → set logo image path |
-| `rarity_icons` | Rarity ID → rarity icon image path |
-| `element_icons` | Element ID → element icon image path |
-| `card_source_icons` | Card source ID → icon image path |
-
-### Pull rate fractions
-
-Rates are stored as integer fractions using a shared LCM denominator per scope:
-
-- **Pack variant rates**: all variants for a pack share a denominator stored in `pack_variant_rate_denominators`. Dividing `pack_variants.rate_numerator` by that denominator gives the probability.
-- **Slot rates**: each slot in `pack_slots` has its own `rate_denominator`. Dividing any `rarity_pull_rates.rate_numerator` or `card_pull_rates.rate_numerator` for that slot by the slot's denominator gives the probability.
-
-Example query — pack variant probabilities as percentages:
-
-```sql
-SELECT
-    s.code AS set,
-    ps.subtitle AS pack,
-    pvc.code AS variant,
-    ROUND(100.0 * pv.rate_numerator / pvrd.rate_denominator, 4) AS pct
-FROM pack_variants pv
-JOIN pack_variant_kinds pvk ON pvk.id = pv.kind_id
-JOIN pack_variant_codes pvc ON pvc.id = pvk.code_id
-JOIN packs p ON p.id = pv.pack_id
-JOIN pack_subtitles ps ON ps.id = p.subtitle_id
-JOIN sets s ON s.id = p.set_id
-JOIN pack_variant_rate_denominators pvrd ON pvrd.pack_id = p.id
-ORDER BY s.code, ps.subtitle, pvc.code;
-```
-
----
-
 ## Generating the data
 
 ### Prerequisites
 
 - [Rust](https://rustup.rs/) (stable toolchain)
 
-### Build the database
+### Validate the data
 
 ```sh
-cargo run --release --bin db
+cargo run --release --bin scraper -- validate
 ```
 
-This reads all JSON from `data/` and writes `ptcgp.db` to the current directory.
-
-### Verify pull rates
-
-```sh
-cargo run --release --bin check-pull-rates
-```
-
-Confirms that every pull rate in the database round-trips exactly back to the source JSON fractions.
+Checks everything under `data/` for internal consistency without touching the network:
+that every card version points at a card that exists, that every abstract card's
+versions have files, that rarities, card sources and pack variant codes are all known,
+and that pull rates only name cards that were actually written. Exits non-zero on any
+violation; pass `--lenient` to report them as warnings instead.
 
 ### Refresh pull rate JSON
 
