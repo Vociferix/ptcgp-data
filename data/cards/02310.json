@@ -1,30 +1,35 @@
 {
   "id": 2310,
-  "name": "Chinchou",
+  "name": "Team Rocket’s Wobbuffet",
   "card_type": "pokemon",
-  "natdex_number": 170,
-  "element": "Lightning",
+  "natdex_number": 202,
+  "element": "Psychic",
   "stage": "Basic",
-  "hp": 60,
-  "retreat_cost": 1,
-  "weakness": "Fighting",
-  "flavor": "Its antennae, which evolved from a fin, have both positive and negative charges flowing through them.",
+  "hp": 80,
+  "retreat_cost": 2,
+  "weakness": "Darkness",
+  "flavor": "To keep its pitch-black tail hidden, it lives quietly in the darkness. It is never first to attack.",
   "is_ex": false,
   "is_mega": false,
+  "variants": [
+    "Team Rocket’s"
+  ],
   "attacks": [
     {
-      "name": "Luring Glow",
+      "name": "Rocket Frenzy",
       "cost": [
-        "Lightning"
+        "Colorless",
+        "Colorless"
       ],
-      "damage": 0,
-      "effect": "Flip a coin. If heads, switch in 1 of your opponent’s Benched Pokémon to the Active Spot."
+      "damage": 30,
+      "damage_suffix": "x",
+      "effect": "Reveal the top 6 cards of your deck. This attack does 30 damage for each Pokémon you find there that has “Team Rocket” in its name. Shuffle the revealed cards back into your deck."
     }
   ],
   "versions": [
     {
-      "set": "P-A",
-      "number": 95
+      "set": "P-B",
+      "number": 91
     }
   ]
 }

@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -290,16 +290,26 @@ pub struct PackPullRates {
 
 /// Maps variant name (e.g. "normal", "rare", "plus1") to its rates.
 /// Only variants that exist for this pack appear as keys.
-pub type PackVariants = HashMap<String, PackVariantRates>;
+///
+/// These three are BTreeMaps rather than HashMaps so the JSON they serialize into
+/// has a stable key order. HashMap iteration is randomized per process, which made
+/// every pull rate file differ on every run even when nothing had changed.
+pub type PackVariants = BTreeMap<String, PackVariantRates>;
+
+/// Rarity code -> foil/normal sub-rates, for a single slot.
+pub type SlotRarityRates = BTreeMap<String, RaritySlotRates>;
+
+/// Card key -> one Rate per slot (null = cannot appear in that slot).
+pub type CardRates = BTreeMap<String, Vec<Option<Rate>>>;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PackVariantRates {
     pub rate: Rate,
     pub slot_count: u32,
     /// Per-slot rarity breakdown: each element maps rarity code -> foil/normal sub-rates
-    pub rarity_rates_by_slot: Vec<HashMap<String, RaritySlotRates>>,
+    pub rarity_rates_by_slot: Vec<SlotRarityRates>,
     /// Per-card pull rates: card key -> one Rate per slot (null = cannot appear)
-    pub card_rates: HashMap<String, Vec<Option<Rate>>>,
+    pub card_rates: CardRates,
 }
 
 /// Rarity pull rate split by foil vs non-foil finish.

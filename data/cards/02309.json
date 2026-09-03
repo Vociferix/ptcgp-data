@@ -1,30 +1,31 @@
 {
   "id": 2309,
-  "name": "Horsea",
+  "name": "Audino",
   "card_type": "pokemon",
-  "natdex_number": 116,
-  "element": "Water",
+  "natdex_number": 531,
+  "element": "Colorless",
   "stage": "Basic",
-  "hp": 60,
-  "retreat_cost": 1,
-  "weakness": "Lightning",
-  "flavor": "Horsea makes its home in oceans with gentle currents. If this Pokémon is under attack, it spits out pitch-black ink and escapes.",
+  "hp": 100,
+  "retreat_cost": 2,
+  "weakness": "Fighting",
+  "flavor": "This Pokémon has a kind heart. By touching with its feelers, Audino can gauge other creatures’ feelings and physical conditions.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Water Arrow",
+      "name": "Drain Slap",
       "cost": [
-        "Water"
+        "Colorless",
+        "Colorless"
       ],
-      "damage": 0,
-      "effect": "This attack does 10 damage to 1 of your opponent’s Pokémon."
+      "damage": 40,
+      "effect": "Heal 10 damage from this Pokémon."
     }
   ],
   "versions": [
     {
       "set": "P-A",
-      "number": 94
+      "number": 89
     }
   ]
 }

@@ -9,7 +9,8 @@ use tracing::warn;
 
 use crate::client::Client;
 use crate::models::{
-    CardEntry, PackPullRates, PackVariantRates, PackVariants, RaritySlotRates, Rate,
+    CardEntry, CardRates, PackPullRates, PackVariantRates, PackVariants, RaritySlotRates, Rate,
+    SlotRarityRates,
 };
 
 const GLOBAL_MASTER_URL: &str = "https://ptcgp.raenonx.cc/api/data/global-master";
@@ -584,9 +585,9 @@ fn build_variants(
         .as_object()
         .ok_or_else(|| anyhow!("cardPullProbabilityMap is not an object"))?;
 
-    let mut normal_cards: HashMap<String, Vec<Option<Rate>>> = HashMap::new();
-    let mut rare_cards: HashMap<String, Vec<Option<Rate>>> = HashMap::new();
-    let mut plus1_cards: HashMap<String, Vec<Option<Rate>>> = HashMap::new();
+    let mut normal_cards = CardRates::new();
+    let mut rare_cards = CardRates::new();
+    let mut plus1_cards = CardRates::new();
 
     for (card_id, card_val) in card_obj {
         let by_pack = card_val.get("byPack").and_then(Value::as_object);
@@ -619,8 +620,8 @@ fn build_variants(
     //     derives their per-slot rates from the byRarity.rare distribution
     // For plus1: compact single-element card arrays represent the bonus slot; align them.
     let mut themed_rate: Option<Rate> = None;
-    let mut themed_rarity: Vec<HashMap<String, RaritySlotRates>> = Vec::new();
-    let mut themed_cards: HashMap<String, Vec<Option<Rate>>> = HashMap::new();
+    let mut themed_rarity: Vec<SlotRarityRates> = Vec::new();
+    let mut themed_cards = CardRates::new();
     {
         let max_rare_card_len = rare_cards.values().map(Vec::len).max().unwrap_or(0);
         if rare_rarity.len() > max_rare_card_len && max_rare_card_len > 0 {
@@ -748,7 +749,7 @@ fn build_variants(
 /// Shift card probability arrays forward when byRarity has more slots than
 /// the arrays. This aligns compact card arrays (starting at index 0) with
 /// their correct byRarity slots at the end of the slot list.
-fn align_card_slots_to_rarity(cards: &mut HashMap<String, Vec<Option<Rate>>>, rarity_len: usize) {
+fn align_card_slots_to_rarity(cards: &mut CardRates, rarity_len: usize) {
     let max_card_len = cards.values().map(Vec::len).max().unwrap_or(0);
     if rarity_len <= max_card_len {
         return;
@@ -1140,10 +1141,7 @@ pub fn fix_card_rates_from_rarity(
     }
 }
 
-fn slot_rarity_rates(
-    by_rarity: Option<&Value>,
-    variant: &str,
-) -> Vec<HashMap<String, RaritySlotRates>> {
+fn slot_rarity_rates(by_rarity: Option<&Value>, variant: &str) -> Vec<SlotRarityRates> {
     let slots = by_rarity
         .and_then(|br| br.get(variant))
         .and_then(Value::as_array);

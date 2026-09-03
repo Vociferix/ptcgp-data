@@ -1,32 +1,30 @@
 {
   "id": 2312,
-  "name": "Tropius",
+  "name": "Chinchou",
   "card_type": "pokemon",
-  "natdex_number": 357,
-  "element": "Grass",
+  "natdex_number": 170,
+  "element": "Lightning",
   "stage": "Basic",
-  "hp": 100,
-  "retreat_cost": 2,
-  "weakness": "Fire",
-  "flavor": "It lives in tropical jungles. The bunch of fruit around its neck is delicious. The fruit grows twice a year.",
+  "hp": 60,
+  "retreat_cost": 1,
+  "weakness": "Fighting",
+  "flavor": "Its antennae, which evolved from a fin, have both positive and negative charges flowing through them.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Double Smash",
+      "name": "Luring Glow",
       "cost": [
-        "Colorless",
-        "Colorless"
+        "Lightning"
       ],
-      "damage": 40,
-      "damage_suffix": "x",
-      "effect": "Flip 2 coins. This attack does 40 damage for each heads."
+      "damage": 0,
+      "effect": "Flip a coin. If heads, switch in 1 of your opponent’s Benched Pokémon to the Active Spot."
     }
   ],
   "versions": [
     {
       "set": "P-A",
-      "number": 102
+      "number": 95
     }
   ]
 }

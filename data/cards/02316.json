@@ -1,34 +1,32 @@
 {
   "id": 2316,
-  "name": "Machamp",
+  "name": "Pikachu",
   "card_type": "pokemon",
-  "natdex_number": 68,
-  "element": "Fighting",
-  "stage": "Stage 2",
-  "hp": 150,
-  "retreat_cost": 2,
-  "weakness": "Psychic",
-  "flavor": "It quickly swings its four arms to rock its opponents with ceaseless punches and chops from all angles.",
+  "natdex_number": 25,
+  "element": "Lightning",
+  "stage": "Basic",
+  "hp": 60,
+  "retreat_cost": 1,
+  "weakness": "Fighting",
+  "flavor": "When it is angered, it immediately discharges the energy stored in the pouches in its cheeks.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Hurricane Punch",
+      "name": "Quick Attack",
       "cost": [
-        "Fighting",
-        "Fighting",
-        "Fighting"
+        "Lightning",
+        "Colorless"
       ],
-      "damage": 50,
-      "damage_suffix": "x",
-      "effect": "Flip 4 coins. This attack does 50 damage for each heads."
+      "damage": 20,
+      "damage_suffix": "+",
+      "effect": "Flip a coin. If heads, this attack does 30 more damage."
     }
   ],
-  "evolves_from": "Machoke",
   "versions": [
     {
       "set": "P-A",
-      "number": 114
+      "number": 111
     }
   ]
 }

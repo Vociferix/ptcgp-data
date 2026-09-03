@@ -5,7 +5,7 @@ mod output;
 mod pokeapi;
 mod raenonx;
 
-use std::collections::{BTreeSet, HashMap, HashSet};
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::sync::Arc;
 
 use anyhow::Result;
@@ -43,7 +43,9 @@ impl Violations {
         }
     }
 
-    fn finish(self) -> Result<()> {
+    /// Bail if anything has been recorded so far, without consuming the collector.
+    /// Used to stop before a write step rather than after it.
+    fn check(&self) -> Result<()> {
         if !self.items.is_empty() {
             anyhow::bail!(
                 "{} constraint violation(s) — re-run with --lenient to proceed anyway",
@@ -51,6 +53,10 @@ impl Violations {
             );
         }
         Ok(())
+    }
+
+    fn finish(self) -> Result<()> {
+        self.check()
     }
 }
 
@@ -554,8 +560,10 @@ async fn run_cards(
         }
     }
 
-    // Build abstract card groups (regardless of set filter, since abstracts span sets)
-    let groups = build_abstract_groups(&card_entries, &release_dates);
+    // Build abstract card groups (regardless of set filter, since abstracts span sets).
+    // Existing IDs are read first so regeneration keeps them stable.
+    let id_index = output::load_abstract_id_index()?;
+    let groups = build_abstract_groups(&card_entries, &release_dates, &id_index);
 
     // Build lookup: (set, num) → abstract_id and (set, num) → card_entries index
     let mut version_to_abstract: HashMap<(String, u32), u32> = HashMap::new();
@@ -698,7 +706,33 @@ async fn run_cards(
         let mut written = 0usize;
         let mut updated = 0usize;
 
-        for group in &groups {
+        // A card whose canonical version has no Limitless data can only be built as
+        // a name-less placeholder. Refuse before writing anything: a placeholder
+        // written to disk takes an abstract ID, and the next run — which either
+        // replaces or drops it — would then be free to hand that ID to a different
+        // card. Bail up front so a failed run leaves no card behind.
+        let incomplete: Vec<&AbstractGroup> = groups
+            .iter()
+            .filter(|g| {
+                (force || !output::abstract_card_file_exists(g.abstract_id))
+                    && !all_card_data.contains_key(&g.canonical)
+            })
+            .collect();
+        for group in &incomplete {
+            let (set, num) = &group.canonical;
+            violations.add(format!(
+                "{set}/{num:03}: no Limitless data — card skipped (use --skip-incomplete to omit it deliberately)"
+            ));
+        }
+        let incomplete_ids: HashSet<u32> = incomplete.iter().map(|g| g.abstract_id).collect();
+        if !incomplete_ids.is_empty() {
+            violations.check()?;
+        }
+
+        for group in groups
+            .iter()
+            .filter(|g| !incomplete_ids.contains(&g.abstract_id))
+        {
             if !force && output::abstract_card_file_exists(group.abstract_id) {
                 // Just update the versions list in case new versions were added
                 if let Err(e) =
@@ -711,14 +745,7 @@ async fn run_cards(
                 continue;
             }
 
-            let (canonical_set, canonical_num) = &group.canonical;
-            let card_data = all_card_data.get(&(canonical_set.clone(), *canonical_num));
-
-            if card_data.is_none() {
-                violations.add(format!(
-                    "{canonical_set}/{canonical_num:03}: no Limitless data — minimal card built"
-                ));
-            }
+            let card_data = all_card_data.get(&group.canonical);
 
             let abstract_card = build_abstract_card(
                 group.abstract_id,
@@ -735,7 +762,8 @@ async fn run_cards(
             }
         }
 
-        match output::remove_abstract_cards_above(groups.len() as u32) {
+        let live_ids: HashSet<u32> = groups.iter().map(|g| g.abstract_id).collect();
+        match output::remove_abstract_cards_not_in(&live_ids) {
             Ok(0) => {}
             Ok(n) => info!(removed = n, "stale abstract cards deleted"),
             Err(e) => error!("stale abstract card cleanup failed: {e}"),
@@ -1020,9 +1048,12 @@ struct AbstractGroup {
 fn build_abstract_groups(
     card_entries: &[CardEntry],
     release_dates: &HashMap<String, String>,
+    id_index: &output::AbstractIdIndex,
 ) -> Vec<AbstractGroup> {
-    // Group entries by their sorted card_ids_group
-    let mut groups: HashMap<Vec<String>, Vec<usize>> = HashMap::new();
+    // Group entries by their sorted card_ids_group. A BTreeMap keeps iteration
+    // order fixed; a HashMap here would let ties in the sort below fall out in a
+    // different order on every run, since Rust randomizes HashMap iteration.
+    let mut groups: BTreeMap<Vec<String>, Vec<usize>> = BTreeMap::new();
     for (i, entry) in card_entries.iter().enumerate() {
         let mut key = entry.card_ids_group.clone();
         key.sort();
@@ -1030,9 +1061,9 @@ fn build_abstract_groups(
     }
 
     // For each group, collect all versions and sort by release date + number
-    let mut group_list: Vec<(Vec<VersionRef>, Vec<usize>)> = groups
-        .into_values()
-        .map(|indices| {
+    let mut group_list: Vec<(Vec<String>, Vec<VersionRef>, Vec<usize>)> = groups
+        .into_iter()
+        .map(|(key, indices)| {
             let mut versions: Vec<(String, u32)> = indices
                 .iter()
                 .flat_map(|&i| card_entries[i].collection_nums.iter().cloned())
@@ -1056,12 +1087,14 @@ fn build_abstract_groups(
                     number: *n,
                 })
                 .collect();
-            (refs, indices)
+            (key, refs, indices)
         })
         .collect();
 
-    // Sort all groups by their canonical (first) version's (release_date, number)
-    group_list.sort_by(|(a_vers, _), (b_vers, _)| {
+    // Sort all groups by their canonical (first) version's (release_date, number).
+    // Promo sets have no release date and so all tie on the fallback; the group key
+    // breaks the remaining ties to make the order total and reproducible.
+    group_list.sort_by(|(a_key, a_vers, _), (b_key, b_vers, _)| {
         let (a_s, a_n) = (&a_vers[0].set, a_vers[0].number);
         let (b_s, b_n) = (&b_vers[0].set, b_vers[0].number);
         let a_d = release_dates
@@ -1072,16 +1105,73 @@ fn build_abstract_groups(
             .get(b_s)
             .map(String::as_str)
             .unwrap_or("9999-99-99");
-        a_d.cmp(b_d).then(a_n.cmp(&b_n))
+        a_d.cmp(b_d)
+            .then(a_n.cmp(&b_n))
+            .then_with(|| a_s.cmp(b_s))
+            .then_with(|| a_key.cmp(b_key))
     });
+
+    // Reuse the ID each group already owns; mint only for genuinely new cards.
+    // card_versions embed these IDs, so a group that keeps its versions must keep
+    // its ID or every version pointing at it is silently repointed.
+    let mut assigned: Vec<Option<u32>> = Vec::with_capacity(group_list.len());
+    let mut claimed: HashSet<u32> = HashSet::new();
+    for (_, versions, _) in &group_list {
+        let mut candidates: Vec<u32> = versions
+            .iter()
+            .filter_map(|v| id_index.by_version.get(&(v.set.clone(), v.number)).copied())
+            .collect();
+        candidates.sort_unstable();
+        candidates.dedup();
+
+        if candidates.len() > 1 {
+            warn!(
+                ids = ?candidates,
+                versions = ?versions
+                    .iter()
+                    .map(|v| format!("{}/{:03}", v.set, v.number))
+                    .collect::<Vec<_>>(),
+                "card merges versions that had separate IDs — keeping the lowest"
+            );
+        }
+
+        // A group whose ID was already taken by an earlier group (a split upstream)
+        // falls through to a fresh ID rather than colliding.
+        let id = candidates.into_iter().find(|id| !claimed.contains(id));
+        if let Some(id) = id {
+            claimed.insert(id);
+        }
+        assigned.push(id);
+    }
+
+    let mut next_id = id_index.max_id;
+    let mut minted = 0usize;
+    let ids: Vec<u32> = assigned
+        .into_iter()
+        .map(|id| {
+            id.unwrap_or_else(|| {
+                next_id += 1;
+                while claimed.contains(&next_id) {
+                    next_id += 1;
+                }
+                claimed.insert(next_id);
+                minted += 1;
+                next_id
+            })
+        })
+        .collect();
+
+    if minted > 0 {
+        info!(minted, "new abstract card IDs assigned");
+    }
 
     group_list
         .into_iter()
-        .enumerate()
-        .map(|(i, (versions, entry_indices))| {
+        .zip(ids)
+        .map(|((_, versions, entry_indices), abstract_id)| {
             let canonical = (versions[0].set.clone(), versions[0].number);
             AbstractGroup {
-                abstract_id: (i + 1) as u32,
+                abstract_id,
                 entry_indices,
                 versions,
                 canonical,
@@ -1318,7 +1408,7 @@ fn remap_pull_rate_card_ids(
     let set_code = rates.set.clone();
 
     for variant in rates.variants.values_mut() {
-        let remapped: HashMap<String, Vec<Option<models::Rate>>> = variant
+        let remapped: models::CardRates = variant
             .card_rates
             .iter()
             .filter_map(|(raenonx_id, slots)| {

@@ -1,3 +1,4 @@
+use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
 
 use anyhow::Result;
@@ -108,13 +109,14 @@ pub fn write_abstract_card(card: &AbstractCard) -> Result<()> {
     write_json(&abstract_cards_dir().join(filename), card)
 }
 
-/// Delete data/cards files whose ID exceeds `max_id`.
+/// Delete data/cards files whose ID is not in `keep`.
 ///
-/// Abstract IDs are assigned contiguously from 1, so when a run produces fewer
-/// cards than the last one, the surplus files are stale. They have to go: the
-/// validation pass and `collect_card_names` read the whole directory, so a
-/// leftover would keep reporting violations for a card that no longer exists.
-pub fn remove_abstract_cards_above(max_id: u32) -> Result<usize> {
+/// IDs are stable across runs and therefore not contiguous, so "everything above
+/// the count" is not a safe rule — the surviving set has to be named explicitly.
+/// Stale files have to go: the validation pass and `collect_card_names` read the
+/// whole directory, so a leftover keeps reporting violations for a card that no
+/// longer exists.
+pub fn remove_abstract_cards_not_in(keep: &HashSet<u32>) -> Result<usize> {
     let dir = abstract_cards_dir();
     if !dir.exists() {
         return Ok(0);
@@ -127,13 +129,53 @@ pub fn remove_abstract_cards_above(max_id: u32) -> Result<usize> {
                 .file_stem()
                 .and_then(|s| s.to_str())
                 .and_then(|s| s.parse::<u32>().ok());
-            if id.is_some_and(|id| id > max_id) {
+            if id.is_some_and(|id| !keep.contains(&id)) {
                 std::fs::remove_file(&path)?;
                 removed += 1;
             }
         }
     }
     Ok(removed)
+}
+
+/// Which abstract ID currently owns each card version, plus the highest ID in use.
+///
+/// Abstract IDs must survive regeneration: `card_versions` embed them, so an ID
+/// that shifts silently repoints a version at a different card.
+pub struct AbstractIdIndex {
+    /// (set, number) → the abstract ID whose file lists that version
+    pub by_version: HashMap<(String, u32), u32>,
+    /// Highest ID currently on disk. New cards are minted above it, so an ID is
+    /// never handed to a second card while the first still exists.
+    pub max_id: u32,
+}
+
+/// Read data/cards to learn the IDs already assigned. Missing or unreadable files
+/// yield an empty index, which makes the next run mint IDs from scratch.
+pub fn load_abstract_id_index() -> Result<AbstractIdIndex> {
+    let dir = abstract_cards_dir();
+    let mut by_version = HashMap::new();
+    let mut max_id = 0;
+    if !dir.exists() {
+        return Ok(AbstractIdIndex { by_version, max_id });
+    }
+    for entry in std::fs::read_dir(&dir)? {
+        let path = entry?.path();
+        if !path.extension().is_some_and(|e| e == "json") {
+            continue;
+        }
+        let Ok(text) = std::fs::read_to_string(&path) else {
+            continue;
+        };
+        let Ok(card) = serde_json::from_str::<AbstractCard>(&text) else {
+            continue;
+        };
+        max_id = max_id.max(card.id);
+        for v in &card.versions {
+            by_version.insert((v.set.clone(), v.number), card.id);
+        }
+    }
+    Ok(AbstractIdIndex { by_version, max_id })
 }
 
 /// Write data/pull_rates/{SET}/{subtitle_slug}.json

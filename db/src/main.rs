@@ -1,4 +1,4 @@
-use std::collections::{BTreeSet, HashMap};
+use std::collections::{BTreeMap, BTreeSet, HashMap};
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
@@ -199,7 +199,7 @@ struct Attack {
 struct PackPullRates {
     set: String,
     subtitle: String,
-    variants: HashMap<String, Option<PackVariantRates>>,
+    variants: BTreeMap<String, Option<PackVariantRates>>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -212,8 +212,8 @@ struct Rate {
 struct PackVariantRates {
     rate: Rate,
     slot_count: u32,
-    rarity_rates_by_slot: Vec<HashMap<String, RaritySlotRates>>,
-    card_rates: HashMap<String, Vec<Option<Rate>>>,
+    rarity_rates_by_slot: Vec<BTreeMap<String, RaritySlotRates>>,
+    card_rates: BTreeMap<String, Vec<Option<Rate>>>,
 }
 
 #[derive(Deserialize)]

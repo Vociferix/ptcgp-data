@@ -1,36 +1,30 @@
 {
   "id": 2293,
-  "name": "Rayquaza ex",
+  "name": "Charcadet",
   "card_type": "pokemon",
-  "natdex_number": 384,
-  "element": "Colorless",
+  "natdex_number": 935,
+  "element": "Fire",
   "stage": "Basic",
-  "hp": 140,
-  "retreat_cost": 2,
-  "weakness": "Lightning",
-  "is_ex": true,
+  "hp": 60,
+  "retreat_cost": 1,
+  "weakness": "Water",
+  "flavor": "Its firepower increases when it fights, reaching over 1,800 degrees Fahrenheit. It likes berries that are rich in fat.",
+  "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Draco Meteor",
+      "name": "Protect",
       "cost": [
-        "Colorless",
-        "Colorless",
-        "Colorless",
         "Colorless"
       ],
       "damage": 0,
-      "effect": "1 of your opponent’s Pokémon is chosen at random 4 times. For each time a Pokémon was chosen, do 40 damage to it."
+      "effect": "Flip a coin. If heads, during your opponent’s next turn, prevent all damage from—and effects of—attacks done to this Pokémon."
     }
   ],
   "versions": [
     {
-      "set": "P-A",
+      "set": "P-B",
       "number": 64
-    },
-    {
-      "set": "P-A",
-      "number": 65
     }
   ]
 }

@@ -1,31 +1,30 @@
 {
   "id": 2308,
-  "name": "Audino",
+  "name": "Dragonair",
   "card_type": "pokemon",
-  "natdex_number": 531,
-  "element": "Colorless",
-  "stage": "Basic",
+  "natdex_number": 148,
+  "element": "Dragon",
+  "stage": "Stage 1",
   "hp": 100,
   "retreat_cost": 2,
-  "weakness": "Fighting",
-  "flavor": "This Pokémon has a kind heart. By touching with its feelers, Audino can gauge other creatures’ feelings and physical conditions.",
+  "flavor": "They say that if it emits an aura from its whole body, the weather will begin to change instantly.",
   "is_ex": false,
   "is_mega": false,
   "attacks": [
     {
-      "name": "Drain Slap",
+      "name": "Shed Skin",
       "cost": [
-        "Colorless",
         "Colorless"
       ],
-      "damage": 40,
-      "effect": "Heal 10 damage from this Pokémon."
+      "damage": 0,
+      "effect": "Heal 30 damage from this Pokémon."
     }
   ],
+  "evolves_from": "Dratini",
   "versions": [
     {
       "set": "P-A",
-      "number": 89
+      "number": 88
     }
   ]
 }
