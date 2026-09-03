@@ -786,7 +786,7 @@ async fn run_cards(
         );
     }
 
-    compute_and_write_duplicates(&all_sets, &release_dates)?;
+    compute_and_write_duplicates(&card_entries, &all_sets, &release_dates)?;
 
     // ── Data integrity validation pass ────────────────────────────────────────
 
@@ -958,7 +958,23 @@ async fn run_pull_rates(
 
 // ── Helper: duplicate detection ──────────────────────────────────────────────
 
+/// Computed link state for one card version: (is_reprint, duplicates, illustrator).
+type VersionLinkState = (bool, Vec<VersionRef>, Option<String>);
+
+/// Fill in `is_reprint` and `duplicates` on every card version.
+///
+/// Two printings are the same physical card exactly when RaenonX files them under
+/// one card entry — its `collectionNums` list *is* the duplicate set. Nothing is
+/// inferred here.
+///
+/// The obvious-looking alternative, grouping versions that share a card, rarity,
+/// illustrator and finish, is wrong in both directions. It merges cards that only
+/// differ by artwork (B2b 85/86 Mew and A3a 83 / A4b 375 Lusamine are separate
+/// RaenonX entries, `…_00` vs `…_01`), and it splits genuine duplicates when the
+/// two Limitless pages disagree — A1/121 and A4b/153 are one entry, but Limitless
+/// spells the illustrator "Nisata Niso" on one page and "Nisota Niso" on the other.
 fn compute_and_write_duplicates(
+    card_entries: &[CardEntry],
     all_sets: &[SetSummary],
     release_dates: &HashMap<String, String>,
 ) -> Result<()> {
@@ -972,29 +988,31 @@ fn compute_and_write_duplicates(
     if all_versions.is_empty() {
         return Ok(());
     }
+    let versions_map: HashMap<(String, u32), CardVersion> = all_versions
+        .into_iter()
+        .map(|v| ((v.set.clone(), v.number), v))
+        .collect();
 
-    // Group versions by identity: same physical card in PTCGP's eyes
-    type VersionIdentity = (u32, String, Option<String>, bool, bool);
-    let mut identity_groups: HashMap<VersionIdentity, Vec<(String, u32)>> = HashMap::new();
-    for v in &all_versions {
-        let key = (
-            v.card_id,
-            v.rarity.clone(),
-            v.illustrator.clone(),
-            v.is_promo,
-            v.is_foil,
-        );
-        identity_groups
-            .entry(key)
-            .or_default()
-            .push((v.set.clone(), v.number));
+    // How often each illustrator spelling appears, to settle disagreements below.
+    let mut spelling_counts: HashMap<&str, usize> = HashMap::new();
+    for v in versions_map.values() {
+        if let Some(name) = &v.illustrator {
+            *spelling_counts.entry(name.as_str()).or_default() += 1;
+        }
     }
 
-    // Compute final (is_reprint, duplicates) for every version
-    let mut new_state: HashMap<(String, u32), (bool, Vec<VersionRef>)> = HashMap::new();
-    for versions in identity_groups.values() {
-        let mut sorted = versions.clone();
-        sorted.sort_by(|(a_s, a_n), (b_s, b_n)| {
+    // Compute final (is_reprint, duplicates, illustrator) for every version
+    let mut new_state: HashMap<(String, u32), VersionLinkState> = HashMap::new();
+    for entry in card_entries {
+        // A version that was never written (dropped as incomplete, or from a set
+        // that failed to scrape) must not be linked to.
+        let mut printings: Vec<(String, u32)> = entry
+            .collection_nums
+            .iter()
+            .filter(|key| versions_map.contains_key(*key))
+            .cloned()
+            .collect();
+        printings.sort_by(|(a_s, a_n), (b_s, b_n)| {
             let a_d = release_dates
                 .get(a_s.as_str())
                 .map(String::as_str)
@@ -1005,9 +1023,42 @@ fn compute_and_write_duplicates(
                 .unwrap_or("9999-99-99");
             a_d.cmp(b_d).then(a_n.cmp(b_n))
         });
-        for (i, (set, num)) in sorted.iter().enumerate() {
+        printings.dedup();
+
+        // RaenonX files these printings under one entry with one illustrator, so any
+        // disagreement is a Limitless transcription slip, not two different artists
+        // (A1/121 reads "Nisata Niso" where every other card reads "Nisota Niso").
+        // The spelling used most widely across the data wins.
+        let illustrator = printings
+            .iter()
+            .filter_map(|k| versions_map.get(k)?.illustrator.as_ref())
+            .max_by_key(|name| {
+                (
+                    spelling_counts.get(name.as_str()).copied().unwrap_or(0),
+                    // Deterministic tie-break, so equally common spellings don't flap.
+                    std::cmp::Reverse(name.as_str()),
+                )
+            })
+            .cloned();
+        if let Some(chosen) = &illustrator {
+            for key in &printings {
+                let current = versions_map.get(key).and_then(|v| v.illustrator.as_deref());
+                if current.is_some_and(|c| c != chosen) {
+                    warn!(
+                        "{}/{:03}: illustrator '{}' disagrees with the rest of its printings — \
+                         using '{chosen}'",
+                        key.0,
+                        key.1,
+                        current.unwrap_or_default()
+                    );
+                }
+            }
+        }
+
+        for (i, (set, num)) in printings.iter().enumerate() {
+            // The earliest printing is the original; every later one is a reprint.
             let is_reprint = i > 0;
-            let dups: Vec<VersionRef> = sorted
+            let dups: Vec<VersionRef> = printings
                 .iter()
                 .filter(|(s, n)| !(s == set && n == num))
                 .map(|(s, n)| VersionRef {
@@ -1015,28 +1066,24 @@ fn compute_and_write_duplicates(
                     number: *n,
                 })
                 .collect();
-            new_state.insert((set.clone(), *num), (is_reprint, dups));
+            new_state.insert((set.clone(), *num), (is_reprint, dups, illustrator.clone()));
         }
     }
 
     // Write back versions where the computed state differs from what is on disk
-    let versions_map: HashMap<(String, u32), CardVersion> = all_versions
-        .into_iter()
-        .map(|v| ((v.set.clone(), v.number), v))
-        .collect();
-
     let mut updated = 0usize;
-    for ((set, num), (is_reprint, dups)) in &new_state {
+    for ((set, num), (is_reprint, dups, illustrator)) in &new_state {
         let v = match versions_map.get(&(set.clone(), *num)) {
             Some(v) => v,
             None => continue,
         };
-        if v.is_reprint == *is_reprint && v.duplicates == *dups {
+        if v.is_reprint == *is_reprint && v.duplicates == *dups && v.illustrator == *illustrator {
             continue;
         }
         let mut v = v.clone();
         v.is_reprint = *is_reprint;
         v.duplicates = dups.clone();
+        v.illustrator = illustrator.clone();
         output::write_card_version(&v)?;
         updated += 1;
     }
@@ -1854,6 +1901,13 @@ fn cmd_validate(lenient: bool) -> Result<()> {
                 v.add(format!(
                     "{loc}: duplicate {dloc} belongs to card {:05}, not {:05}",
                     other.card_id, version.card_id
+                ));
+            }
+            // A set never prints the same physical card twice — two numbers in one
+            // set differ by artwork, which makes them separate cards, not duplicates.
+            if other.set == version.set {
+                v.add(format!(
+                    "{loc}: duplicate {dloc} is in the same set — these are separate printings"
                 ));
             }
             // Duplicates are the same physical card, so the identifying fields must agree.
