@@ -2,6 +2,7 @@ use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
 
 use anyhow::Result;
+use icu_normalizer::DecomposingNormalizerBorrowed;
 use serde::Serialize;
 
 use crate::models::{
@@ -27,16 +28,22 @@ fn pull_rates_dir(set_code: &str) -> PathBuf {
     data_dir().join("pull_rates").join(set_code)
 }
 
-/// Filesystem-safe slug for a pack subtitle: lowercased, with every run of
-/// non-alphanumeric characters collapsed to a single underscore
-/// ("Deluxe Pack: ex" → `deluxe_pack_ex`). Hyphens are kept as-is, since they
-/// are part of the name rather than a separator ("Ho-Oh" → `ho-oh`).
+/// Filesystem-safe slug for a pack subtitle: lowercased and reduced to ASCII.
+///
+/// The name is decomposed to NFKD first, so a decorated letter keeps its base form
+/// ("Pokémon" → `pokemon`) rather than losing the letter entirely. Whitespace runs
+/// become a single underscore, hyphens survive because they belong to the name
+/// rather than separating words ("Ho-Oh" → `ho-oh`), and everything else — ASCII
+/// punctuation, leftover combining marks, and any character with no ASCII form —
+/// is dropped. Both apostrophes therefore vanish, and "Team Rocket's Ambition"
+/// slugs to `team_rockets_ambition` whichever one the source used.
 fn pack_slug(subtitle: &str) -> String {
+    let nfkd = DecomposingNormalizerBorrowed::new_nfkd();
     let mut slug = String::with_capacity(subtitle.len());
-    for c in subtitle.to_lowercase().chars() {
-        if c.is_alphanumeric() || c == '-' {
+    for c in nfkd.normalize(&subtitle.to_lowercase()).chars() {
+        if c.is_ascii_alphanumeric() || c == '-' {
             slug.push(c);
-        } else if !slug.ends_with('_') {
+        } else if c.is_whitespace() && !slug.ends_with('_') {
             slug.push('_');
         }
     }
@@ -305,4 +312,31 @@ pub fn update_abstract_card_versions(
     let mut card: AbstractCard = serde_json::from_str(&json)?;
     card.versions = versions.to_vec();
     write_json(&path, &card)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::pack_slug;
+
+    #[test]
+    fn slugs_are_ascii_word_characters() {
+        // Whitespace separates, other punctuation just disappears.
+        assert_eq!(pack_slug("Deluxe Pack: ex"), "deluxe_pack_ex");
+        assert_eq!(pack_slug("Mythical Island"), "mythical_island");
+        assert_eq!(pack_slug("Vol 1"), "vol_1");
+        // Hyphens belong to the name.
+        assert_eq!(pack_slug("Ho-Oh"), "ho-oh");
+        // Either apostrophe drops out, leaving no separator behind.
+        assert_eq!(
+            pack_slug("Team Rocket\u{2019}s Ambition"),
+            "team_rockets_ambition"
+        );
+        assert_eq!(pack_slug("Team Rocket's Ambition"), "team_rockets_ambition");
+        // NFKD keeps the base letter instead of dropping the whole character.
+        assert_eq!(pack_slug("Pok\u{e9}mon"), "pokemon");
+        assert_eq!(pack_slug("\u{ff30}ok\u{e9}mon"), "pokemon");
+        // Runs collapse, and edges are trimmed.
+        assert_eq!(pack_slug("  A   B  "), "a_b");
+        assert_eq!(pack_slug("!!Wow!!"), "wow");
+    }
 }

@@ -20,3 +20,4 @@ rust_decimal = { version = "1", features = ["serde-arbitrary-precision"] }
 tokio = { version = "1", features = ["full"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+icu_normalizer = { version = "2", features = ["compiled_data"] }
