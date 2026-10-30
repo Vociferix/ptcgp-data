@@ -71,7 +71,7 @@ pub fn parse_card_entries(raw: &Value) -> Result<Vec<CardEntry>> {
             .unwrap_or("")
             .to_string();
 
-        let collection_nums: Vec<(String, u32)> = val
+        let collection_nums: Vec<(String, i32)> = val
             .get("collectionNums")
             .and_then(Value::as_array)
             .map(|arr| {
@@ -81,7 +81,8 @@ pub fn parse_card_entries(raw: &Value) -> Result<Vec<CardEntry>> {
                             .get("expansion")
                             .and_then(|e| e.get("id"))
                             .and_then(Value::as_str)?;
-                        let num = cn.get("num").and_then(Value::as_u64)? as u32;
+                        let num = cn.get("num").and_then(Value::as_i64)?;
+                        let num = i32::try_from(num).ok()?;
                         Some((normalize_expansion_id(exp_id), num))
                     })
                     .collect()

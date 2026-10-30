@@ -7,7 +7,7 @@ use serde::Serialize;
 
 use crate::models::{
     AbstractCard, BasePokemon, CardSource, CardVersion, ElementInfo, PackPullRates,
-    PackVariantName, RarityInfo, SetSummary,
+    PackVariantName, RarityInfo, SetSummary, number_key,
 };
 
 // ── Path helpers ─────────────────────────────────────────────────────────────
@@ -105,7 +105,7 @@ pub fn write_pack_variant_names(variants: &[PackVariantName]) -> Result<()> {
 /// Write data/card_versions/{SET}/{NUM:03}.json — card version file.
 pub fn write_card_version(version: &CardVersion) -> Result<()> {
     ensure_set_dirs(&version.set)?;
-    let filename = format!("{:03}.json", version.number);
+    let filename = format!("{}.json", number_key(version.number));
     write_json(&cards_dir(&version.set).join(filename), version)
 }
 
@@ -151,7 +151,7 @@ pub fn remove_abstract_cards_not_in(keep: &HashSet<u32>) -> Result<usize> {
 /// that shifts silently repoints a version at a different card.
 pub struct AbstractIdIndex {
     /// (set, number) → the abstract ID whose file lists that version
-    pub by_version: HashMap<(String, u32), u32>,
+    pub by_version: HashMap<(String, i32), u32>,
     /// Highest ID currently on disk. New cards are minted above it, so an ID is
     /// never handed to a second card while the first still exists.
     pub max_id: u32,
@@ -266,9 +266,9 @@ pub fn load_card_versions(set_code: &str) -> Result<Vec<CardVersion>> {
 
 // ── Skip-if-exists helpers ───────────────────────────────────────────────────
 
-pub fn card_version_file_exists(set_code: &str, number: u32) -> bool {
+pub fn card_version_file_exists(set_code: &str, number: i32) -> bool {
     cards_dir(set_code)
-        .join(format!("{number:03}.json"))
+        .join(format!("{}.json", number_key(number)))
         .exists()
 }
 

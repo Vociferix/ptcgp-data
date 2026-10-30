@@ -1,0 +1,35 @@
+{
+  "id": 2321,
+  "name": "Ivysaur",
+  "card_type": "pokemon",
+  "natdex_number": 2,
+  "element": [
+    "Grass"
+  ],
+  "stage": "Stage 1",
+  "hp": 100,
+  "retreat_cost": 3,
+  "weakness": "Fire",
+  "flavor": "The more sunlight Ivysaur bathes in, the more strength wells up within it, allowing the bud on its back to grow larger.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Leaf Drain",
+      "cost": [
+        "Grass",
+        "Colorless",
+        "Colorless"
+      ],
+      "damage": 50,
+      "effect": "Heal 20 damage from this Pokémon."
+    }
+  ],
+  "evolves_from": "Bulbasaur",
+  "versions": [
+    {
+      "set": "C1",
+      "number": 2
+    }
+  ]
+}

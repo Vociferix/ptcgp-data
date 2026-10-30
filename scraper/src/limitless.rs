@@ -25,7 +25,7 @@ pub async fn scrape_sets(client: &Client) -> Result<Vec<SetSummary>> {
     parse_sets_index(&html)
 }
 
-pub async fn scrape_card_numbers(client: &Client, set_code: &str) -> Result<Vec<u32>> {
+pub async fn scrape_card_numbers(client: &Client, set_code: &str) -> Result<Vec<i32>> {
     let html = client.get_text(&format!("{BASE}/cards/{set_code}")).await?;
     parse_card_numbers(&html)
 }
@@ -43,7 +43,7 @@ pub async fn scrape_set_packs(client: &Client, set_code: &str) -> Result<Vec<Str
 pub async fn scrape_card(
     client: &Client,
     set_code: &str,
-    number: u32,
+    number: i32,
 ) -> Result<LimitlessCardData> {
     let html = client
         .get_text(&format!("{BASE}/cards/{set_code}/{number}"))
@@ -122,7 +122,7 @@ fn parse_sets_index(html: &str) -> Result<Vec<SetSummary>> {
 
 // ── Card number list parser ──────────────────────────────────────────────────
 
-fn parse_card_numbers(html: &str) -> Result<Vec<u32>> {
+fn parse_card_numbers(html: &str) -> Result<Vec<i32>> {
     let doc = Html::parse_document(html);
     let link_sel = sel!("div.card-search-grid a[href]");
 
@@ -130,7 +130,7 @@ fn parse_card_numbers(html: &str) -> Result<Vec<u32>> {
     for el in doc.select(&link_sel) {
         let href = el.value().attr("href").unwrap_or("");
         if let Some(num_str) = href.split('/').next_back() {
-            if let Ok(n) = num_str.parse::<u32>() {
+            if let Ok(n) = num_str.parse::<i32>() {
                 numbers.push(n);
             }
         }
@@ -218,7 +218,7 @@ fn parse_card(html: &str, set_code: &str) -> Result<LimitlessCardData> {
     let (element, hp) = if card_type == "pokemon" {
         parse_element_hp(&title_text, &name)
     } else {
-        (None, None)
+        (Vec::new(), None)
     };
 
     let wrr_sel = sel!("p.card-text-wrr");
@@ -358,7 +358,8 @@ fn parse_evolves_from(type_text: &str) -> Option<String> {
     None
 }
 
-fn parse_element_hp(title_text: &str, name: &str) -> (Option<String>, Option<u32>) {
+/// Title tail "Water/Darkness - 170 HP" → (["Water", "Darkness"], Some(170))
+fn parse_element_hp(title_text: &str, name: &str) -> (Vec<String>, Option<u32>) {
     let after = title_text
         .find(name)
         .map(|i| &title_text[i + name.len()..])
@@ -372,8 +373,13 @@ fn parse_element_hp(title_text: &str, name: &str) -> (Option<String>, Option<u32
 
     let element = parts
         .first()
-        .map(|s| s.split_whitespace().collect::<Vec<_>>().join(" "))
-        .filter(|s| !s.is_empty());
+        .map(|s| {
+            s.split('/')
+                .map(|el| el.split_whitespace().collect::<Vec<_>>().join(" "))
+                .filter(|el| !el.is_empty())
+                .collect()
+        })
+        .unwrap_or_default();
 
     let hp = parts.get(1).and_then(|s| {
         s.split_whitespace()
@@ -632,7 +638,20 @@ fn parse_series(code: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::clean_text;
+    use super::{clean_text, parse_element_hp};
+
+    #[test]
+    fn splits_dual_elements() {
+        let name = "Mega Greninja ex";
+        assert_eq!(
+            parse_element_hp("Mega Greninja ex - Water/Darkness - 170 HP", name),
+            (vec!["Water".to_string(), "Darkness".to_string()], Some(170))
+        );
+        assert_eq!(
+            parse_element_hp("Ho-Oh - Fire - 90 HP", "Ho-Oh"),
+            (vec!["Fire".to_string()], Some(90))
+        );
+    }
 
     #[test]
     fn splits_only_at_lowercase_uppercase_boundaries() {

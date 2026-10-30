@@ -14,6 +14,7 @@ use futures::stream::{self, StreamExt};
 use models::{
     canonicalize_apostrophes, Ability, AbstractCard, CardEntry, CardSource, CardVersion,
     ElementInfo, LimitlessCardData, PackVariantName, RarityInfo, SetSummary, VersionRef,
+    number_key, number_order,
 };
 use rust_decimal::Decimal;
 use serde_json::Value;
@@ -466,6 +467,7 @@ async fn run_cards(
 ) -> Result<()> {
     let mut violations = Violations::new(lenient);
     let mut card_entries = raenonx::parse_card_entries(raw)?;
+    let version_indices = build_version_indices(&card_entries);
     let promo_subtitles = raenonx::parse_promo_pack_subtitles(raw);
 
     let pokemon_map: HashMap<String, u32> = if output::base_pokemon_exists() {
@@ -520,7 +522,7 @@ async fn run_cards(
     //
     // Fetched before grouping because --skip-incomplete drops versions from the
     // entries, and abstract IDs are assigned from whatever groups survive.
-    let mut set_numbers: HashMap<String, Vec<u32>> = HashMap::new();
+    let mut set_numbers: HashMap<String, Vec<i32>> = HashMap::new();
     for set in &sets_to_scrape {
         match limitless::scrape_card_numbers(client, &set.code).await {
             Ok(numbers) => {
@@ -542,7 +544,7 @@ async fn run_cards(
         if filter_set.is_some() {
             warn!("--skip-incomplete: skipping cards RaenonX has no entry for, but dropping versions Limitless lacks needs a full run, not --set");
         } else {
-            let available: HashSet<(String, u32)> = set_numbers
+            let available: HashSet<(String, i32)> = set_numbers
                 .iter()
                 .flat_map(|(set, nums)| nums.iter().map(|n| (set.clone(), *n)))
                 .collect();
@@ -569,14 +571,46 @@ async fn run_cards(
         }
     }
 
+    // RaenonX can list expansions that aren't in sets.json (e.g. SP1, which has no
+    // Limitless page). Their versions can never get a card_version file, and the
+    // --skip-incomplete filter above can't drop them: with no number list it
+    // treats the set like one whose fetch failed. Drop them here on every run.
+    let known_sets: HashSet<&str> = all_sets.iter().map(|s| s.code.as_str()).collect();
+    let mut untracked: BTreeMap<String, usize> = BTreeMap::new();
+    let mut unparsed: Vec<String> = Vec::new();
+    for entry in &mut card_entries {
+        if entry.collection_nums.is_empty() {
+            unparsed.push(entry.card_id.clone());
+        }
+        entry.collection_nums.retain(|(set, _)| {
+            let keep = known_sets.contains(set.as_str());
+            if !keep {
+                *untracked.entry(set.clone()).or_default() += 1;
+            }
+            keep
+        });
+    }
+    for (set, versions) in &untracked {
+        warn!(set, versions, "set not in sets.json — versions dropped");
+    }
+
+    // An entry can also arrive with no versions at all, e.g. when RaenonX gives a
+    // negative collection number that the parser can't read as a u32. An abstract
+    // card needs at least one version, so drop these along with any entry the
+    // untracked-set filter just emptied (already reported per set above).
+    for card_id in &unparsed {
+        warn!(card_id, "card entry has no parsable collection number — dropped");
+    }
+    card_entries.retain(|e| !e.collection_nums.is_empty());
+
     // Build abstract card groups (regardless of set filter, since abstracts span sets).
     // Existing IDs are read first so regeneration keeps them stable.
     let id_index = output::load_abstract_id_index()?;
     let groups = build_abstract_groups(&card_entries, &release_dates, &id_index);
 
     // Build lookup: (set, num) → abstract_id and (set, num) → card_entries index
-    let mut version_to_abstract: HashMap<(String, u32), u32> = HashMap::new();
-    let mut version_to_entry_idx: HashMap<(String, u32), usize> = HashMap::new();
+    let mut version_to_abstract: HashMap<(String, i32), u32> = HashMap::new();
+    let mut version_to_entry_idx: HashMap<(String, i32), usize> = HashMap::new();
     for group in &groups {
         for &entry_idx in &group.entry_indices {
             let entry = &card_entries[entry_idx];
@@ -588,7 +622,7 @@ async fn run_cards(
     }
 
     // Determine which canonical versions we need Limitless data for
-    let canonicals_needing_data: HashSet<(String, u32)> = if filter_set.is_none() {
+    let canonicals_needing_data: HashSet<(String, i32)> = if filter_set.is_none() {
         groups
             .iter()
             .filter(|g| force || !output::abstract_card_file_exists(g.abstract_id))
@@ -600,14 +634,14 @@ async fn run_cards(
 
     // ── Fetch cards from Limitless ────────────────────────────────────────────
 
-    let mut all_card_data: HashMap<(String, u32), LimitlessCardData> = HashMap::new();
+    let mut all_card_data: HashMap<(String, i32), LimitlessCardData> = HashMap::new();
 
     for set in &sets_to_scrape {
         let Some(numbers) = set_numbers.get(&set.code) else {
             continue;
         };
 
-        let to_fetch: Vec<u32> = numbers
+        let to_fetch: Vec<i32> = numbers
             .iter()
             .copied()
             .filter(|&n| {
@@ -635,7 +669,7 @@ async fn run_cards(
         let set_code = set.code.clone();
         let client_arc = Arc::clone(client);
 
-        let fetched: Vec<(u32, LimitlessCardData)> = stream::iter(to_fetch)
+        let fetched: Vec<(i32, LimitlessCardData)> = stream::iter(to_fetch)
             .map(|n| {
                 let client = Arc::clone(&client_arc);
                 let set_code = set_code.clone();
@@ -683,11 +717,16 @@ async fn run_cards(
                 continue;
             }
         };
+        let Some(&index) = version_indices.get(&(set.clone(), *num)) else {
+            violations.add(format!("{set}/{num:03}: no index in set — version skipped"));
+            continue;
+        };
         let entry = &card_entries[entry_idx];
         let is_promo = *set_is_promo.get(set).unwrap_or(&false);
         let version = match build_card_version(
             set,
             *num,
+            index,
             abstract_id,
             entry,
             &pack_subtitle_map,
@@ -884,13 +923,13 @@ async fn run_pull_rates(
 
     // Build card entry lookup for remapping pull rate card IDs
     let card_entries = raenonx::parse_card_entries(raw)?;
-    let mut card_id_to_versions: HashMap<String, Vec<(String, u32)>> = HashMap::new();
+    let mut card_id_to_versions: HashMap<String, Vec<(String, i32)>> = HashMap::new();
     let mut card_id_to_rarity: HashMap<String, String> = HashMap::new();
     let mut card_id_to_is_foil: HashMap<String, bool> = HashMap::new();
     for entry in &card_entries {
         // `cards --skip-incomplete` drops versions with no card_version file; a
         // pull rate naming one would point at a card that was never written.
-        let versions: Vec<(String, u32)> = entry
+        let versions: Vec<(String, i32)> = entry
             .collection_nums
             .iter()
             .filter(|(set, num)| !skip_incomplete || output::card_version_file_exists(set, *num))
@@ -988,7 +1027,7 @@ fn compute_and_write_duplicates(
     if all_versions.is_empty() {
         return Ok(());
     }
-    let versions_map: HashMap<(String, u32), CardVersion> = all_versions
+    let versions_map: HashMap<(String, i32), CardVersion> = all_versions
         .into_iter()
         .map(|v| ((v.set.clone(), v.number), v))
         .collect();
@@ -1002,11 +1041,11 @@ fn compute_and_write_duplicates(
     }
 
     // Compute final (is_reprint, duplicates, illustrator) for every version
-    let mut new_state: HashMap<(String, u32), VersionLinkState> = HashMap::new();
+    let mut new_state: HashMap<(String, i32), VersionLinkState> = HashMap::new();
     for entry in card_entries {
         // A version that was never written (dropped as incomplete, or from a set
         // that failed to scrape) must not be linked to.
-        let mut printings: Vec<(String, u32)> = entry
+        let mut printings: Vec<(String, i32)> = entry
             .collection_nums
             .iter()
             .filter(|key| versions_map.contains_key(*key))
@@ -1021,7 +1060,8 @@ fn compute_and_write_duplicates(
                 .get(b_s.as_str())
                 .map(String::as_str)
                 .unwrap_or("9999-99-99");
-            a_d.cmp(b_d).then(a_n.cmp(b_n))
+            a_d.cmp(b_d)
+                .then(number_order(*a_n).cmp(&number_order(*b_n)))
         });
         printings.dedup();
 
@@ -1098,7 +1138,7 @@ struct AbstractGroup {
     abstract_id: u32,
     entry_indices: Vec<usize>,
     versions: Vec<VersionRef>,
-    canonical: (String, u32),
+    canonical: (String, i32),
 }
 
 fn build_abstract_groups(
@@ -1120,7 +1160,7 @@ fn build_abstract_groups(
     let mut group_list: Vec<(Vec<String>, Vec<VersionRef>, Vec<usize>)> = groups
         .into_iter()
         .map(|(key, indices)| {
-            let mut versions: Vec<(String, u32)> = indices
+            let mut versions: Vec<(String, i32)> = indices
                 .iter()
                 .flat_map(|&i| card_entries[i].collection_nums.iter().cloned())
                 .collect();
@@ -1133,7 +1173,8 @@ fn build_abstract_groups(
                     .get(b_s)
                     .map(String::as_str)
                     .unwrap_or("9999-99-99");
-                a_d.cmp(b_d).then(a_n.cmp(b_n))
+                a_d.cmp(b_d)
+                .then(number_order(*a_n).cmp(&number_order(*b_n)))
             });
             versions.dedup();
             let refs = versions
@@ -1162,7 +1203,7 @@ fn build_abstract_groups(
             .map(String::as_str)
             .unwrap_or("9999-99-99");
         a_d.cmp(b_d)
-            .then(a_n.cmp(&b_n))
+            .then(number_order(a_n).cmp(&number_order(b_n)))
             .then_with(|| a_s.cmp(b_s))
             .then_with(|| a_key.cmp(b_key))
     });
@@ -1238,10 +1279,33 @@ fn build_abstract_groups(
 
 // ── Helper: card version construction ────────────────────────────────────────
 
+/// Each version's 0-based position within its set, in [`number_order`].
+///
+/// Ranked over every number RaenonX lists for the set, so a version Limitless
+/// hasn't published yet still reserves its slot and later ones keep their index.
+fn build_version_indices(card_entries: &[CardEntry]) -> HashMap<(String, i32), u32> {
+    let mut by_set: HashMap<&str, Vec<i32>> = HashMap::new();
+    for entry in card_entries {
+        for (set, num) in &entry.collection_nums {
+            by_set.entry(set.as_str()).or_default().push(*num);
+        }
+    }
+    let mut indices = HashMap::new();
+    for (set, mut nums) in by_set {
+        nums.sort_unstable_by_key(|&n| number_order(n));
+        nums.dedup();
+        for (i, num) in (0u32..).zip(nums) {
+            indices.insert((set.to_string(), num), i);
+        }
+    }
+    indices
+}
+
 #[allow(clippy::too_many_arguments)]
 fn build_card_version(
     set: &str,
-    number: u32,
+    number: i32,
+    index: u32,
     abstract_id: u32,
     entry: &CardEntry,
     pack_subtitle_map: &HashMap<String, String>,
@@ -1277,6 +1341,7 @@ fn build_card_version(
     Some(CardVersion {
         set: set.to_string(),
         number,
+        index,
         card_id: abstract_id,
         rarity,
         illustrator,
@@ -1347,7 +1412,7 @@ fn build_abstract_card(
             name: format!("{set}-{num:03}"),
             card_type,
             natdex_number: None,
-            element: None,
+            element: Vec::new(),
             stage: None,
             hp: None,
             retreat_cost: None,
@@ -1459,7 +1524,7 @@ fn promo_vol_label(pack_id: &str) -> String {
 
 fn remap_pull_rate_card_ids(
     rates: &mut models::PackPullRates,
-    card_id_to_versions: &HashMap<String, Vec<(String, u32)>>,
+    card_id_to_versions: &HashMap<String, Vec<(String, i32)>>,
 ) {
     let set_code = rates.set.clone();
 
@@ -1480,7 +1545,7 @@ fn remap_pull_rate_card_ids(
                     );
                     None
                 })?;
-                Some((format!("{ver_num:03}"), slots.clone()))
+                Some((number_key(*ver_num), slots.clone()))
             })
             .collect();
         variant.card_rates = remapped;
@@ -1743,7 +1808,7 @@ fn cmd_validate(lenient: bool) -> Result<()> {
                 ));
             }
         }
-        let mut seen_refs: HashSet<(&str, u32)> = HashSet::new();
+        let mut seen_refs: HashSet<(&str, i32)> = HashSet::new();
         for ver in &card.versions {
             if !output::card_version_file_exists(&ver.set, ver.number) {
                 v.add(format!(
@@ -1759,7 +1824,7 @@ fn cmd_validate(lenient: bool) -> Result<()> {
             }
         }
         // Versions run oldest first, so the canonical printing is versions[0].
-        let ordering: Vec<(&str, u32)> = card
+        let ordering: Vec<(&str, (bool, u32))> = card
             .versions
             .iter()
             .map(|r| {
@@ -1768,20 +1833,20 @@ fn cmd_validate(lenient: bool) -> Result<()> {
                         .get(&r.set)
                         .map(String::as_str)
                         .unwrap_or("9999-99-99"),
-                    r.number,
+                    number_order(r.number),
                 )
             })
             .collect();
         if ordering.windows(2).any(|w| w[0] > w[1]) {
             v.add(format!(
-                "card {:05} ({}): versions are not ordered by release date then number",
+                "card {:05} ({}): versions are not ordered by release date then index",
                 card.id, card.name
             ));
         }
     }
 
     // ── Card versions ─────────────────────────────────────────────────────────
-    let mut all_versions: HashMap<(String, u32), CardVersion> = HashMap::new();
+    let mut all_versions: HashMap<(String, i32), CardVersion> = HashMap::new();
     for set in &sets {
         match output::load_card_versions(&set.code) {
             Ok(versions) => {
@@ -1794,7 +1859,7 @@ fn cmd_validate(lenient: bool) -> Result<()> {
     }
 
     // Which versions each card claims, for the reverse direction of the link check.
-    let card_version_refs: HashMap<u32, HashSet<(String, u32)>> = cards
+    let card_version_refs: HashMap<u32, HashSet<(String, i32)>> = cards
         .iter()
         .map(|c| {
             (
@@ -1807,7 +1872,7 @@ fn cmd_validate(lenient: bool) -> Result<()> {
         })
         .collect();
 
-    let mut versions_by_set: HashMap<String, HashSet<u32>> = HashMap::new();
+    let mut versions_by_set: HashMap<String, HashSet<i32>> = HashMap::new();
     for (key, version) in &all_versions {
         validate_card_version(
             &mut v,
@@ -1939,12 +2004,12 @@ fn cmd_validate(lenient: bool) -> Result<()> {
     }
 
     // Exactly one member of each duplicate group is the original; the rest are reprints.
-    let mut seen_group: HashSet<(String, u32)> = HashSet::new();
+    let mut seen_group: HashSet<(String, i32)> = HashSet::new();
     for (key, version) in &all_versions {
         if version.duplicates.is_empty() || seen_group.contains(key) {
             continue;
         }
-        let mut group: Vec<(String, u32)> = vec![key.clone()];
+        let mut group: Vec<(String, i32)> = vec![key.clone()];
         group.extend(version.duplicates.iter().map(|d| (d.set.clone(), d.number)));
         seen_group.extend(group.iter().cloned());
         let originals = group
@@ -1964,7 +2029,7 @@ fn cmd_validate(lenient: bool) -> Result<()> {
         // The original is the earliest printing. Promo sets carry no release date,
         // so a group involving one cannot be ordered — skip rather than guess.
         // (No duplicate group involves a promo set today.)
-        let dated: Vec<(&str, &(String, u32))> = group
+        let dated: Vec<(&str, &(String, i32))> = group
             .iter()
             .filter_map(|k| Some((release_dates.get(&k.0)?.as_str(), k)))
             .collect();
@@ -1974,7 +2039,7 @@ fn cmd_validate(lenient: bool) -> Result<()> {
         let original = group
             .iter()
             .find(|k| all_versions.get(*k).is_some_and(|x| !x.is_reprint));
-        let earliest = dated.iter().min_by_key(|(d, k)| (*d, k.1));
+        let earliest = dated.iter().min_by_key(|(d, k)| (*d, number_order(k.1)));
         if let (Some(orig), Some((_, first))) = (original, earliest) {
             if orig != *first {
                 v.add(format!(
@@ -2018,6 +2083,26 @@ fn cmd_validate(lenient: bool) -> Result<()> {
                 v.add(format!(
                     "{}: sets.json says {expected} cards but {actual} card_version files exist",
                     set.code
+                ));
+            }
+        }
+    }
+
+    // ── Version indices ───────────────────────────────────────────────────────
+    // The app will look versions up by index, so within a set the indices must
+    // run 0, 1, 2, … with no gaps, in number_order.
+    for (set, numbers) in &versions_by_set {
+        let mut numbers: Vec<i32> = numbers.iter().copied().collect();
+        numbers.sort_unstable_by_key(|&n| number_order(n));
+        for (expected, num) in (0u32..).zip(numbers) {
+            let Some(version) = all_versions.get(&(set.clone(), num)) else {
+                continue;
+            };
+            if version.index != expected {
+                v.add(format!(
+                    "{set}/{}: index is {} but its position in the set is {expected}",
+                    number_key(num),
+                    version.index
                 ));
             }
         }
@@ -2087,7 +2172,7 @@ fn cmd_validate(lenient: bool) -> Result<()> {
                         variant.slot_count
                     ));
                 }
-                let Ok(number) = card_key.parse::<u32>() else {
+                let Ok(number) = card_key.parse::<i32>() else {
                     v.add(format!(
                         "{loc}: invalid card key '{card_key}' in {code} rates"
                     ));
@@ -2124,7 +2209,7 @@ fn cmd_validate(lenient: bool) -> Result<()> {
                 let mut by_rarity: BTreeMap<(String, bool), Vec<(&String, &models::Rate)>> =
                     BTreeMap::new();
                 for (key, rate) in &in_slot {
-                    let Ok(number) = key.parse::<u32>() else {
+                    let Ok(number) = key.parse::<i32>() else {
                         continue;
                     };
                     let Some(ver) = all_versions.get(&(dir_set.clone(), number)) else {
@@ -2242,12 +2327,19 @@ fn validate_pokemon_card(
     base_pokemon_loaded: bool,
 ) {
     let name = &card.name;
-    if card.element.is_none() {
+    if card.element.is_empty() {
         v.add(format!("pokemon {name}: missing element"));
-    } else if let Some(el) = &card.element {
+    }
+    for el in &card.element {
         if !known_elements.is_empty() && !known_elements.contains(el) {
             v.add(format!("pokemon {name}: unknown element '{el}'"));
         }
+    }
+    if card.element.len() > 2 {
+        v.add(format!("pokemon {name}: more than two elements"));
+    }
+    if card.element.len() == 2 && card.element[0] == card.element[1] {
+        v.add(format!("pokemon {name}: element listed twice"));
     }
     if card.stage.is_none() {
         v.add(format!("pokemon {name}: missing stage"));
@@ -2314,7 +2406,7 @@ fn validate_trainer_card(v: &mut Violations, card: &AbstractCard) {
     if card.trainer_effect.is_none() {
         v.add(format!("trainer {name}: missing trainer_effect"));
     }
-    if card.element.is_some() {
+    if !card.element.is_empty() {
         v.add(format!("trainer {name}: unexpected element"));
     }
     if card.stage.is_some() {

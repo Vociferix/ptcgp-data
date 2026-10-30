@@ -1,0 +1,52 @@
+{
+  "id": 2362,
+  "name": "Pikachu ex",
+  "card_type": "pokemon",
+  "natdex_number": 25,
+  "element": [
+    "Lightning"
+  ],
+  "stage": "Basic",
+  "hp": 120,
+  "retreat_cost": 1,
+  "weakness": "Fighting",
+  "is_ex": true,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Pika Punch",
+      "cost": [
+        "Lightning"
+      ],
+      "damage": 30
+    },
+    {
+      "name": "Thundertail",
+      "cost": [
+        "Lightning",
+        "Lightning",
+        "Colorless"
+      ],
+      "damage": 130,
+      "effect": "Discard 2 [L] Energy from this Pokémon."
+    }
+  ],
+  "versions": [
+    {
+      "set": "C1",
+      "number": 43
+    },
+    {
+      "set": "C1",
+      "number": 156
+    },
+    {
+      "set": "C1",
+      "number": 174
+    },
+    {
+      "set": "C1",
+      "number": 183
+    }
+  ]
+}

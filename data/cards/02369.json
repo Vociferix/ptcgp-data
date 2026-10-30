@@ -1,0 +1,44 @@
+{
+  "id": 2369,
+  "name": "Pawmot",
+  "card_type": "pokemon",
+  "natdex_number": 923,
+  "element": [
+    "Lightning"
+  ],
+  "stage": "Stage 2",
+  "hp": 120,
+  "retreat_cost": 1,
+  "weakness": "Fighting",
+  "flavor": "This Pokémon normally is slow to react, but once it enters battle, it will strike down its enemies with lightning-fast movements.",
+  "is_ex": false,
+  "is_mega": false,
+  "ability": {
+    "name": "Electrocreation",
+    "effect": "Once during your turn, you may take a [L] Energy from your Energy Zone and attach it to the [L] Pokémon in the Active Spot."
+  },
+  "attacks": [
+    {
+      "name": "Mach Bolt",
+      "cost": [
+        "Lightning"
+      ],
+      "damage": 50
+    }
+  ],
+  "evolves_from": "Pawmo",
+  "versions": [
+    {
+      "set": "C1",
+      "number": 50
+    },
+    {
+      "set": "C1",
+      "number": 142
+    },
+    {
+      "set": "C1",
+      "number": 216
+    }
+  ]
+}

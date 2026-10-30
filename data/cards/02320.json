@@ -1,0 +1,33 @@
+{
+  "id": 2320,
+  "name": "Bulbasaur",
+  "card_type": "pokemon",
+  "natdex_number": 1,
+  "element": [
+    "Grass"
+  ],
+  "stage": "Basic",
+  "hp": 70,
+  "retreat_cost": 2,
+  "weakness": "Fire",
+  "flavor": "For some time after its birth, it uses the nutrients that are packed into the seed on its back in order to grow.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Leech Seed",
+      "cost": [
+        "Grass",
+        "Colorless"
+      ],
+      "damage": 30,
+      "effect": "Heal 10 damage from this Pokémon."
+    }
+  ],
+  "versions": [
+    {
+      "set": "C1",
+      "number": 1
+    }
+  ]
+}

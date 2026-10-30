@@ -75,8 +75,10 @@ pub struct AbstractCard {
     pub natdex_number: Option<u32>,
 
     // Pokemon fields (null for trainers)
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub element: Option<String>,
+    /// One entry for most Pokémon; dual-type Pokémon (e.g. "Water/Darkness" on
+    /// Limitless) list both. Empty for trainers.
+    #[serde(skip_serializing_if = "Vec::is_empty", default)]
+    pub element: Vec<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub stage: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -114,14 +116,18 @@ pub struct AbstractCard {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct VersionRef {
     pub set: String,
-    pub number: u32,
+    pub number: i32,
 }
 
-/// Card version file — data/card_versions/{SET}/{NUM:03}.json
+/// Card version file — data/card_versions/{SET}/{NUM}.json, named by [`number_key`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CardVersion {
     pub set: String,
-    pub number: u32,
+    /// Collector number as RaenonX lists it. Unnumbered special cards (e.g. in SP1)
+    /// carry negative numbers.
+    pub number: i32,
+    /// 0-based position of this version within its set, in [`number_order`].
+    pub index: u32,
     /// References the abstract card by its sequential ID
     pub card_id: u32,
     pub rarity: String,
@@ -152,6 +158,24 @@ fn default_tradable() -> bool {
     true
 }
 
+/// Sort key that puts a set's card numbers in index order: negative numbers
+/// first in reverse (-1, -2, -3, …), then the positive numbers ascending.
+pub fn number_order(number: i32) -> (bool, u32) {
+    (number >= 0, number.unsigned_abs())
+}
+
+/// Zero-padded card number for file names and pull-rate keys: "007", "-001".
+///
+/// Padding the magnitude rather than the signed value keeps negatives the same
+/// width as positives, and makes the keys sort lexically in [`number_order`].
+pub fn number_key(number: i32) -> String {
+    if number < 0 {
+        format!("-{:03}", number.unsigned_abs())
+    } else {
+        format!("{number:03}")
+    }
+}
+
 // ── Card content from Limitless scraping ─────────────────────────────────────
 
 /// Game content scraped from a Limitless card page.
@@ -161,7 +185,7 @@ pub struct LimitlessCardData {
     pub name: String,
     pub card_type: String,
 
-    pub element: Option<String>,
+    pub element: Vec<String>,
     pub stage: Option<String>,
     pub hp: Option<u32>,
     pub retreat_cost: Option<u32>,
@@ -260,7 +284,7 @@ pub struct CardEntry {
     /// True when this card can be offered in a trade (isTradable from RaenonX)
     pub is_tradable: bool,
     /// All (expansion_id, card_number) pairs for this entry (may span multiple sets)
-    pub collection_nums: Vec<(String, u32)>,
+    pub collection_nums: Vec<(String, i32)>,
     /// All variant card IDs that share the same abstract card (play.cardIds)
     pub card_ids_group: Vec<String>,
     /// Pack IDs this card can be obtained from (source.pack)
@@ -323,4 +347,27 @@ pub struct RaritySlotRates {
     pub normal: Option<Rate>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub foil: Option<Rate>,
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::{number_key, number_order};
+
+    #[test]
+    fn negative_numbers_come_first_in_reverse() {
+        let mut nums = vec![2, -3, 1, -1, 27, -2];
+        nums.sort_by_key(|&n| number_order(n));
+        assert_eq!(nums, vec![-1, -2, -3, 1, 2, 27]);
+    }
+
+    #[test]
+    fn keys_sort_lexically_in_number_order() {
+        let nums = [-1, -2, -3, 1, 2, 27];
+        let keys: Vec<String> = nums.iter().map(|&n| number_key(n)).collect();
+        assert_eq!(keys, ["-001", "-002", "-003", "001", "002", "027"]);
+        let mut sorted = keys.clone();
+        sorted.sort();
+        assert_eq!(sorted, keys);
+    }
 }

@@ -1,0 +1,36 @@
+{
+  "id": 2338,
+  "name": "Volcanion",
+  "card_type": "pokemon",
+  "natdex_number": 721,
+  "element": [
+    "Fire"
+  ],
+  "stage": "Basic",
+  "hp": 120,
+  "retreat_cost": 2,
+  "weakness": "Water",
+  "flavor": "It lets out billows of steam and disappears into the dense fog. It’s said to live in mountains where humans do not tread.",
+  "is_ex": false,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Dynamite Steam",
+      "cost": [
+        "Fire",
+        "Fire",
+        "Fire",
+        "Colorless"
+      ],
+      "damage": 110,
+      "damage_suffix": "x",
+      "effect": "Flip 2 coins. This attack does 110 damage for each heads."
+    }
+  ],
+  "versions": [
+    {
+      "set": "C1",
+      "number": 19
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "id": 2344,
+  "name": "Fuecoco ex",
+  "card_type": "pokemon",
+  "natdex_number": 909,
+  "element": [
+    "Fire"
+  ],
+  "stage": "Basic",
+  "hp": 130,
+  "retreat_cost": 2,
+  "weakness": "Water",
+  "is_ex": true,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Bite",
+      "cost": [
+        "Fire"
+      ],
+      "damage": 30
+    },
+    {
+      "name": "Feisty Flames",
+      "cost": [
+        "Fire",
+        "Colorless"
+      ],
+      "damage": 50,
+      "damage_suffix": "+",
+      "effect": "If this Pokémon has damage on it, this attack does 70 more damage."
+    }
+  ],
+  "versions": [
+    {
+      "set": "C1",
+      "number": 25
+    },
+    {
+      "set": "C1",
+      "number": 154
+    },
+    {
+      "set": "C1",
+      "number": 172
+    },
+    {
+      "set": "C1",
+      "number": 215
+    }
+  ]
+}

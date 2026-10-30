@@ -1,0 +1,42 @@
+{
+  "id": 2410,
+  "name": "Mega Skarmory ex",
+  "card_type": "pokemon",
+  "natdex_number": 227,
+  "element": [
+    "Metal"
+  ],
+  "stage": "Basic",
+  "hp": 170,
+  "retreat_cost": 1,
+  "weakness": "Fire",
+  "is_ex": true,
+  "is_mega": true,
+  "attacks": [
+    {
+      "name": "Shredding Claw",
+      "cost": [
+        "Metal",
+        "Metal",
+        "Colorless"
+      ],
+      "damage": 90,
+      "damage_suffix": "+",
+      "effect": "Flip a coin until you get tails. This attack does 50 more damage for each heads."
+    }
+  ],
+  "versions": [
+    {
+      "set": "C1",
+      "number": 91
+    },
+    {
+      "set": "C1",
+      "number": 161
+    },
+    {
+      "set": "C1",
+      "number": 179
+    }
+  ]
+}

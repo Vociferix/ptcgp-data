@@ -1,0 +1,47 @@
+{
+  "id": 2376,
+  "name": "Mew ex",
+  "card_type": "pokemon",
+  "natdex_number": 151,
+  "element": [
+    "Psychic"
+  ],
+  "stage": "Basic",
+  "hp": 130,
+  "retreat_cost": 1,
+  "weakness": "Darkness",
+  "is_ex": true,
+  "is_mega": false,
+  "attacks": [
+    {
+      "name": "Secret Guidance",
+      "cost": [
+        "Psychic"
+      ],
+      "damage": 0,
+      "effect": "Flip 3 coins. Take an amount of [P] Energy from your Energy Zone equal to the number of heads and attach it to your Benched [P] Pokémon in any way you like."
+    },
+    {
+      "name": "Psyburn",
+      "cost": [
+        "Psychic",
+        "Colorless"
+      ],
+      "damage": 60
+    }
+  ],
+  "versions": [
+    {
+      "set": "C1",
+      "number": 57
+    },
+    {
+      "set": "C1",
+      "number": 158
+    },
+    {
+      "set": "C1",
+      "number": 176
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "id": 2451,
+  "name": "Mega Mewtwo Y ex",
+  "card_type": "pokemon",
+  "natdex_number": 150,
+  "element": [
+    "Psychic"
+  ],
+  "stage": "Basic",
+  "hp": 170,
+  "retreat_cost": 1,
+  "weakness": "Darkness",
+  "is_ex": true,
+  "is_mega": true,
+  "variants": [
+    "Y"
+  ],
+  "attacks": [
+    {
+      "name": "Psychic Blaster",
+      "cost": [
+        "Psychic",
+        "Psychic"
+      ],
+      "damage": 60,
+      "damage_suffix": "x",
+      "effect": "Flip a coin for each [P] Energy attached to this Pokémon. This attack does 60 damage for each heads."
+    }
+  ],
+  "versions": [
+    {
+      "set": "P-C",
+      "number": 2
+    }
+  ]
+}
